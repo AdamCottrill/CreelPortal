@@ -1,0 +1,10 @@
+*~
+*#*
+*.pyc
+*.pyr
+db/*
+TAGS
+.pylintrc
+*fly_make*
+.dir-locals.el
+pytest.ini

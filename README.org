@@ -1,0 +1,67 @@
+* Creel Portal
+
+Creel portal is a django application that makes Creel survey data
+available in your browser.
+
+
+* urls
+
+| url                             | view name                  |
+|---------------------------------+----------------------------|
+| creels                          | creel list                 |
+| creel/<prj_cd>                  | creel detail               |
+| creel/<prj_cd>/interviews       | creel interviews           |
+| creel/<prj_cd>/effort_estimates | creel effort estimates     |
+| creel/<prj_cd>/catch_estimates  | creel catch estiamtes      |
+| api/creels                      | creel list api             |
+| api/creel/<prj_cd>/interviews   | creel interviews api       |
+| api/creel/<prj_cd>              | creel detail api           |
+| api/creel/<prj_cd>/effort       | creel effort estimates api |
+| api/creel/<prj_cd>/catch        | creel catch estimates api  |
+
+* views
+
+** creel list
+- self explanitory, return alist of creels in a table by project code, name, lake, and project leader
+- table should be sortable
+- project code should be link to project detail page
+
+** creel detail
+- fn011 information - project location, project name, duration and project lead
+- creel wide summary statistics?  Total effort, total harvest and
+  catch by species. (what else)
+- map showing location of sample location(s) on lake.
+- should also include tables or listings of strata - season, spatial,
+  day type, fishing modes, and exception dates
+- links to estimates of effort and catch/harvest
+
+** effort estimates
+- include ajax api call to get actual data
+- crossfilter/dc graphs
+- interactive map with illustating spatial aspect of currently selected data
+- graphs/filters of effort by each stratum:
+  + season
+  + location (space)
+  + day type
+  + mode
+
+** catch/harvest estimates
+- include ajax api call to get actual data
+- crossfilter/dc graphs
+- interactive map with illustating spatial aspect of currently selected data
+- toggle catch/harvest/released(?)
+- toggle targetted efforts/all effort
+- pie chart of catch composition
+- graphs/filters of catch by each stratum:
+  + season
+  + location (space)
+  + day type
+  + mode
+
+** creel biosamples
+- given a creel and spc, display graphis of basic biolgical attributes of catch
+- include graphs/filters for each stratum:
+  + season
+  + location (space)
+  + day type
+  + mode
