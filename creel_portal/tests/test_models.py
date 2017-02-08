@@ -83,3 +83,25 @@ def test_period_repr():
     shouldbe = shouldbe.format(prd, start, end, dtp_nm, ssn_des, prj_cd)
 
     assert str(period) == shouldbe
+
+
+
+def test_exception_dates_repr():
+    """Verify that a exception dates are represented by object type,
+    the date, the day type name, the season name,and the project code
+    and for the associated creel."""
+
+    dtp1 = "2"
+    datestring = '2011-07-04'
+    date = datetime.strptime(datestring, '%Y-%m-%d')
+    prj_cd = "LHA_SC11_123"
+    ssn_des = 'Summer'
+
+    creel = FN011Factory.build(prj_cd=prj_cd)
+    season = FN022Factory.build(creel=creel, ssn_des=ssn_des)
+    exceptiondate = FN025Factory.build(season=season, dtp1=dtp1, date=date)
+
+    shouldbe = "<ExceptionDate: {} ({}-{})>".format(datestring,
+                                                      ssn_des, prj_cd)
+
+    assert str(exceptiondate) == shouldbe

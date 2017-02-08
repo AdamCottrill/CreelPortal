@@ -2,6 +2,8 @@ from django.db import models
 
 from django.template.defaultfilters import slugify
 
+from datetime import datetime
+
 # Create your models here.
 
 
@@ -158,3 +160,41 @@ class FN024(models.Model):
         return repr.format(self.prd, start, end,
                            self.daytype.dtp_nm, self.daytype.season.ssn_des,
                            self.daytype.season.creel.prj_cd)
+
+
+class FN025(models.Model):
+    '''Class to represent the day type exceptions so that holidays can be
+    treated as weekends.
+    '''
+
+    season = models.ForeignKey(FN022)
+    date = models.DateField("Exception Date", blank=False)
+    dtp1 = models.CharField("Day Type Code", max_length=2,
+                               blank=False)
+
+    class Meta:
+        verbose_name = "Exception Dates"
+        ordering = ['date']
+
+#    def get_dtp_nm(self):
+#        """the day types are stored in the FN023 table.  We want to return
+#        dpt_nm from FN023 where the season and dpt match."""
+#
+#        dtp_nm = FN023.objects.filter(season=self.season,
+#                                      dtp=self.dpt1).values('dpt_name')[0]
+#        return dpt_nm
+
+    def __str__(self):
+        '''return the object type, the date, the season name, and
+       code project code of the creel this record is assoicated with.
+
+        '''
+        fdate = datetime.strftime(self.date,'%Y-%m-%d')
+        repr =  "<ExceptionDate: {} ({}-{})>"
+        return repr.format(fdate, self.season.ssn_des,
+                           self.season.creel.prj_cd)
+
+
+#class FN026(models.Model):
+#    '''Class to represent the spatial strat used in a creel.
+#    '''

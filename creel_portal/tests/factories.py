@@ -84,3 +84,14 @@ class FN024Factory(factory.DjangoModelFactory):
     prd = "am"
     prdtm0 = datetime.strptime("06:00", "%H:%M").time()
     prdtm1 = datetime.strptime("13:00", "%H:%M").time()
+
+
+class FN025Factory(factory.DjangoModelFactory):
+    '''a factory for daytype exeptions (holidays)'''
+
+    class Meta:
+        model = 'creel_portal.FN025'
+
+    date = datetime.strptime("2015-07-01", "%Y-%m-%d")
+    dtp1 = "1"
+    season = factory.SubFactory(FN022Factory)

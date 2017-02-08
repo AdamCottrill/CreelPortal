@@ -1,0 +1,11 @@
+Django==1.10.5
+django-filter==1.0.1
+djangorestframework==3.5.3
+factory-boy==2.8.1
+Faker==0.7.7
+Markdown==2.6.8
+py==1.4.32
+pytest==3.0.6
+pytest-django==3.1.2
+python-dateutil==2.6.0
+six==1.10.0
