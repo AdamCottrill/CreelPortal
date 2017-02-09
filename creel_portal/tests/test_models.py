@@ -105,3 +105,37 @@ def test_exception_dates_repr():
                                                       ssn_des, prj_cd)
 
     assert str(exceptiondate) == shouldbe
+
+
+def test_space_repr():
+    """Verify that a spatial strata are represented by object type,
+    the space description, the space code and the project code
+    and for the associated creel."""
+
+    prj_cd = "LHA_SC11_123"
+    space = 'AB'
+    space_des = 'the river'
+    creel = FN011Factory.build(prj_cd=prj_cd)
+
+    spatial_strata = FN026Factory.build(creel=creel, space=space,
+                                        space_des=space_des)
+    shouldbe = "<Space: {} ({}) [{}]>".format(space_des, space, prj_cd)
+
+    assert str(spatial_strata) == shouldbe
+
+
+def test_mode_repr():
+    """Verify that a fishing mode is represented by object type,
+    the mode description, the mode code and the project code
+    and for the associated creel."""
+
+    prj_cd = "LHA_SC11_123"
+    mode = 'AB'
+    mode_des = 'trolling'
+    creel = FN011Factory.build(prj_cd=prj_cd)
+
+    fishing_mode = FN028Factory.build(creel=creel, mode=mode,
+                                        mode_des=mode_des)
+    shouldbe = "<FishingMode: {} ({}) [{}]>".format(mode_des, mode, prj_cd)
+
+    assert str(fishing_mode) == shouldbe

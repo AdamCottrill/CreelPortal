@@ -195,6 +195,65 @@ class FN025(models.Model):
                            self.season.creel.prj_cd)
 
 
-#class FN026(models.Model):
-#    '''Class to represent the spatial strat used in a creel.
-#    '''
+class FN026(models.Model):
+    '''Class to represent the spatial strat used in a creel.
+    '''
+
+
+    creel = models.ForeignKey(FN011)
+    space = models.CharField("Space Code", max_length=2, blank=False)
+    space_des = models.CharField("Space Description", max_length=100,
+                                 blank=False)
+    space_siz = models.IntegerField(blank=True, null=True)
+    area_cnt = models.IntegerField(blank=True, null=True)
+    area_lst = models.CharField("Area List", max_length=2,
+                                blank=True, null=True)
+    area_wt = models.FloatField(blank=True, null=True)
+
+    ddlat = models.FloatField(blank=True, null=True)
+    ddlat = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Spatial Strata"
+        ordering = ['space']
+
+    def __str__(self):
+        '''return the object type, the space name, the space code, and
+       project code of the creel this record is assoicated with.
+
+        '''
+
+        repr =  "<Space: {} ({}) [{}]>"
+        return repr.format(self.space_des, self.space,
+                           self.creel.prj_cd)
+
+
+
+
+
+class FN028(models.Model):
+    '''Class to represent the fishing modes used in a creel.
+    '''
+
+
+    creel = models.ForeignKey(FN011)
+    mode = models.CharField("Space Code", max_length=2, blank=False)
+    mode_des = models.CharField("Space Description", max_length=100,
+                                 blank=False)
+    atyunit = models.IntegerField("Activity Unit")
+    itvunit = models.IntegerField("Interview Unit")
+    chkflag = models.IntegerField("Check Flag")
+
+    class Meta:
+        verbose_name = "Fishing Mode"
+        ordering = ['mode']
+
+    def __str__(self):
+        '''return the object type, the mode name, the mode code, and
+       project code of the creel this record is assoicated with.
+
+        '''
+
+        repr =  "<FishingMode: {} ({}) [{}]>"
+        return repr.format(self.mode_des, self.mode,
+                           self.creel.prj_cd)

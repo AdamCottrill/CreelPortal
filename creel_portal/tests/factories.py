@@ -95,3 +95,25 @@ class FN025Factory(factory.DjangoModelFactory):
     date = datetime.strptime("2015-07-01", "%Y-%m-%d")
     dtp1 = "1"
     season = factory.SubFactory(FN022Factory)
+
+
+class FN026Factory(factory.DjangoModelFactory):
+    '''a factory for spatial strata'''
+
+    class Meta:
+        model = 'creel_portal.FN026'
+
+    space = "01"
+    space_des = "The Lake"
+    creel = factory.SubFactory(FN011Factory)
+
+
+class FN028Factory(factory.DjangoModelFactory):
+    '''a factory for fishing modes'''
+
+    class Meta:
+        model = 'creel_portal.FN028'
+
+    mode = "01"
+    mode_des = "Ice Fishing"
+    creel = factory.SubFactory(FN011Factory)
