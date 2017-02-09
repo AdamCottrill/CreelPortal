@@ -27,15 +27,18 @@ class FN011(models.Model):
 
     lake = models.ForeignKey(Lake, default=1)
 
-    prj_date0 = models.DateField("Start Date", blank=False)
-    prj_date1 = models.DateField("End Date", blank=False)
-    prj_cd = models.CharField("Project Code", max_length=12, unique=True,
+    prj_date0 = models.DateField(help_text="Start Date", blank=False)
+    prj_date1 = models.DateField(help_text="End Date", blank=False)
+    prj_cd = models.CharField(help_text="Project Code", max_length=12,
+                              unique=True, blank=False)
+    year = models.CharField(help_text="Year", max_length=4, blank=True,
+                            editable=False)
+    prj_nm = models.CharField(help_text="Project Name", max_length=60,
                               blank=False)
-    year = models.CharField("Year", max_length=4, blank=True, editable=False)
-    prj_nm = models.CharField("Project Name", max_length=60, blank=False)
-    prj_ldr = models.CharField("Project Lead", max_length=40, blank=False)
+    prj_ldr = models.CharField(help_text="Project Lead", max_length=40,
+                               blank=False)
     comment0 = models.TextField(blank=False,
-                               help_text="General project description.")
+                               help_text="General Project Description.")
     slug = models.SlugField(blank=True, unique=True, editable=False)
 
     aru = models.TextField(blank=True, null=True)
@@ -88,16 +91,17 @@ class FN022(models.Model):
     '''
 
     creel = models.ForeignKey(FN011)
-    ssn = models.CharField("Season Code", max_length=2, blank=False)
-    ssn_des = models.CharField("Season Description", max_length=60,
+    ssn = models.CharField(help_text="Season Code", max_length=2, blank=False)
+    ssn_des = models.CharField(help_text="Season Description", max_length=60,
                                blank=False)
-    ssn_date0 = models.DateField("Season Start Date", blank=False)
-    ssn_date1 = models.DateField("Season End Date", blank=False)
+    ssn_date0 = models.DateField(help_text="Season Start Date", blank=False)
+    ssn_date1 = models.DateField(help_text="Season End Date", blank=False)
     v0 = models.CharField(max_length=4, blank=False)
 
     class Meta:
         verbose_name = "Seasons"
         ordering = ['ssn']
+        unique_together = ['creel', 'ssn']
 
     def __str__(self):
         '''return the season name, code and project code associated with this
@@ -112,15 +116,17 @@ class FN023(models.Model):
     '''
 
     season = models.ForeignKey(FN022)
-    dow_lst = models.CharField("DayOfWeek List", max_length=7, blank=False)
-    dtp = models.CharField("Day Type Code", max_length=2,
+    dtp = models.CharField(help_text="Day Type Code", max_length=2,
+                              blank=False)
+    dtp_nm = models.CharField(help_text="Day Type Name", max_length=10,
                                blank=False)
-    dtp_nm = models.CharField("Day Type Name", max_length=10,
-                               blank=False)
+    dow_lst = models.CharField(help_text="Day Of Week List",
+                               max_length=7, blank=False)
 
     class Meta:
         verbose_name = "Day Types"
         ordering = ['dtp']
+        unique_together = ['season', 'dtp']
 
     def __str__(self):
         '''return the object type, the daytype name, day type code, and the
@@ -139,13 +145,14 @@ class FN024(models.Model):
     '''
 
     daytype = models.ForeignKey(FN023)
-    prd = models.CharField("Day Type Code", max_length=2, blank=False)
-    prdtm0 = models.TimeField("Period Start Time", blank=False)
-    prdtm1 = models.TimeField("Period End Time", blank=False)
+    prd = models.CharField(help_text="Day Type Code", max_length=2, blank=False)
+    prdtm0 = models.TimeField(help_text="Period Start Time", blank=False)
+    prdtm1 = models.TimeField(help_text="Period End Time", blank=False)
 
     class Meta:
         verbose_name = "Periods"
         ordering = ['prd']
+        unique_together = ['daytype', 'prd']
 
     def __str__(self):
         '''return the object type, period code, the daytype name, the season,
@@ -168,13 +175,14 @@ class FN025(models.Model):
     '''
 
     season = models.ForeignKey(FN022)
-    date = models.DateField("Exception Date", blank=False)
-    dtp1 = models.CharField("Day Type Code", max_length=2,
+    date = models.DateField(help_text="Exception Date", blank=False)
+    dtp1 = models.CharField(help_text="Day Type Code", max_length=2,
                                blank=False)
 
     class Meta:
         verbose_name = "Exception Dates"
         ordering = ['date']
+
 
 #    def get_dtp_nm(self):
 #        """the day types are stored in the FN023 table.  We want to return
@@ -201,12 +209,13 @@ class FN026(models.Model):
 
 
     creel = models.ForeignKey(FN011)
-    space = models.CharField("Space Code", max_length=2, blank=False)
-    space_des = models.CharField("Space Description", max_length=100,
-                                 blank=False)
+    space = models.CharField(max_length=2, blank=False,
+                             help_text="Space Code")
+    space_des = models.CharField(max_length=100, blank=False,
+                                 help_text= "Space Description",)
     space_siz = models.IntegerField(blank=True, null=True)
     area_cnt = models.IntegerField(blank=True, null=True)
-    area_lst = models.CharField("Area List", max_length=2,
+    area_lst = models.CharField(max_length=2, help_text="Area List",
                                 blank=True, null=True)
     area_wt = models.FloatField(blank=True, null=True)
 
@@ -216,6 +225,7 @@ class FN026(models.Model):
     class Meta:
         verbose_name = "Spatial Strata"
         ordering = ['space']
+        unique_together = ['creel', 'space']
 
     def __str__(self):
         '''return the object type, the space name, the space code, and
@@ -235,18 +245,18 @@ class FN028(models.Model):
     '''Class to represent the fishing modes used in a creel.
     '''
 
-
     creel = models.ForeignKey(FN011)
-    mode = models.CharField("Space Code", max_length=2, blank=False)
-    mode_des = models.CharField("Space Description", max_length=100,
-                                 blank=False)
-    atyunit = models.IntegerField("Activity Unit")
-    itvunit = models.IntegerField("Interview Unit")
-    chkflag = models.IntegerField("Check Flag")
+    mode = models.CharField(help_text="Mode Code", max_length=2, blank=False)
+    mode_des = models.CharField(help_text="Fishing Mode Description",
+                                max_length=100, blank=False)
+    atyunit = models.IntegerField(help_text="Activity Unit")
+    itvunit = models.IntegerField(help_text="Interview Unit")
+    chkflag = models.IntegerField(help_text="Check Flag")
 
     class Meta:
         verbose_name = "Fishing Mode"
         ordering = ['mode']
+        unique_together = ['creel', 'mode']
 
     def __str__(self):
         '''return the object type, the mode name, the mode code, and
@@ -257,3 +267,74 @@ class FN028(models.Model):
         repr =  "<FishingMode: {} ({}) [{}]>"
         return repr.format(self.mode_des, self.mode,
                            self.creel.prj_cd)
+
+
+class FN111(models.Model):
+    '''Class to represent the creel logs.
+    '''
+
+    #prj_cd, sama, area, mode, dow, [date], samtm0, stratum, weather, comment1
+
+    creel = models.ForeignKey(FN011)
+    area = models.ForeignKey(FN026)
+    mode = models.ForeignKey(FN028)
+
+    sama = models.CharField(max_length=6, blank=False)
+    date = models.DateField(blank=False)
+    samtm0 = models.TimeField(blank=False,
+                              help_text="Interview Period Start")
+    weather = models.CharField(max_length=200, blank=False)
+    help_str = 'Comments about current interview period.'
+    comment1 = models.CharField(max_length=200, blank=False,
+                                help_text=help_str)
+
+    class Meta:
+        verbose_name = "Inveriew Log"
+        ordering = ['creel', 'sama']
+        unique_together = ['creel', 'sama']
+
+    def __str__(self):
+        '''return the object type, the interview log number (sama), the stratum,
+        and project code of the creel this record is assoicated
+       with.
+
+        '''
+
+        repr =  "<InterviewLog: {} ({})>"
+        return repr.format(self.sama, self.creel.prj_cd)
+
+    def get_daytype(self):
+        """get the day type associated with this interview log.  The day type
+        is determined by the creel, season, and date.  If a record
+        exsits for this date in the exception dates table (FN025) use it,
+        otherwise get the day type from the FN024 table.
+
+        Arguments:
+        - `self`:
+
+        """
+        pass
+
+    def get_period(self):
+        """get the period associated with this interview log.  The period is
+        determined by the creel, season, date, and start time.
+
+        Arguments:
+        - `self`:
+
+        """
+        pass
+
+#    @static_property
+#    def stratum(self):
+
+    @property
+    def dow(self):
+        """Return the numeric day of the week of the interview log.
+        Sunday=1, Saturday=7.
+
+        Arguments:
+        - `self`:
+        """
+        dow = int(datetime.strftime(self.date, '%w')) + 1
+        return dow

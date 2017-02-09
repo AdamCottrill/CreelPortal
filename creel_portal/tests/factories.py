@@ -117,3 +117,17 @@ class FN028Factory(factory.DjangoModelFactory):
     mode = "01"
     mode_des = "Ice Fishing"
     creel = factory.SubFactory(FN011Factory)
+
+
+class FN111Factory(factory.DjangoModelFactory):
+    '''a factory for fishing modes'''
+
+    class Meta:
+        model = 'creel_portal.FN111'
+
+    creel = factory.SubFactory(FN011Factory)
+    area = factory.SubFactory(FN026Factory)
+    mode = factory.SubFactory(FN028Factory)
+
+    date = datetime.strptime("2015-07-01", "%Y-%m-%d")
+    samtm0 = datetime.strptime("06:15", "%H:%M").time()

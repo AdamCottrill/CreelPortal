@@ -139,3 +139,80 @@ def test_mode_repr():
     shouldbe = "<FishingMode: {} ({}) [{}]>".format(mode_des, mode, prj_cd)
 
     assert str(fishing_mode) == shouldbe
+
+
+def test_sama_repr():
+    """Verify that an interview log is represented by object type,
+    the sama number, the straum code and the project code
+    and for the associated creel."""
+
+    prj_cd = "LHA_SC11_123"
+    creel = FN011Factory.build(prj_cd=prj_cd)
+
+    sama = '1230'
+    interviewlog = FN111Factory.build(creel=creel, sama=sama)
+
+    shouldbe = "<InterviewLog: {} ({})>".format(sama, prj_cd)
+
+    assert str(interviewlog) == shouldbe
+
+def test_sama_dow():
+    """Verify that an interview log is represented by object type,
+    the sama number, the straum code and the project code
+    and for the associated creel."""
+
+    prj_cd = "LHA_SC11_123"
+    creel = FN011Factory.build(prj_cd=prj_cd)
+
+    sama = '1230'
+
+    datestr = '2017-02-05' #Sunday
+    interview_date = datetime.strptime(datestr, '%Y-%m-%d')
+    interviewlog = FN111Factory.build(creel=creel, sama=sama,
+                                      date=interview_date)
+    assert interviewlog.dow == 1
+
+
+    datestr = '2017-02-08' #Wednesday
+    interview_date = datetime.strptime(datestr, '%Y-%m-%d')
+    interviewlog = FN111Factory.build(creel=creel, sama=sama,
+                                      date=interview_date)
+    assert interviewlog.dow == 4
+
+
+    datestr = '2017-02-11' #Saturday
+    interview_date = datetime.strptime(datestr, '%Y-%m-%d')
+    interviewlog = FN111Factory.build(creel=creel, sama=sama,
+                                      date=interview_date)
+    assert interviewlog.dow == 7
+
+
+def test_sama_daytype():
+    '''Given an interviewlog verify that it is able to return the correct
+    daytype using the creel and date.  The date used in this example will
+    not be in the exceptions table.'''
+    assert 0 == 1
+
+
+def test_sama_daytype_exception():
+    '''If the date of an interviewlog falls on a date in the exceptions
+    table for that creel, the day type in the exceptions table should be
+    returned regardless of which day of the week the interview
+    occurred.'''
+    assert 0 == 1
+
+
+def test_sama_period():
+    '''Given the date and time of an interview log, period should
+    return the value of the associated period defined in the FN024
+    table.'''
+
+    assert 0 == 1
+
+
+def test_sama_stratum():
+    '''given the space, mode, day type, period and season of an
+    interview log, the stratum method should retuurn the FishNet-2
+    stratum string of the form: "XX_XX_XX_XX."'''
+
+    assert 0 == 1
