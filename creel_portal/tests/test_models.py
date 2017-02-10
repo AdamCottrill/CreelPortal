@@ -2,6 +2,7 @@ from django.test import TestCase
 from creel_portal.models import *
 from creel_portal.tests.factories import *
 
+import pytest
 
 def test_lake_repr():
     """Verify that a lake is represented by object type, lake name and
@@ -187,27 +188,148 @@ def test_sama_dow():
     assert interviewlog.dow == 7
 
 
+@pytest.mark.django_db
+def test_sama_season():
+    """Verify that the season method of a sama object returns the correct
+    season."""
+
+    prj_cd = "LHA_SC11_123"
+    creel = FN011Factory(prj_cd=prj_cd)
+
+    ssnA_date0 = datetime.strptime('2014-04-01', '%Y-%m-%d')
+    ssnA_date1 = datetime.strptime('2014-04-30', '%Y-%m-%d')
+    ssnA = "AA"
+    ssnA_des = 'SeasonA'
+    seasonA = FN022Factory(creel=creel, ssn=ssnA, ssn_des=ssnA_des,
+                                 ssn_date0=ssnA_date0, ssn_date1=ssnA_date1)
+
+    ssnB_date0 = datetime.strptime('2014-05-01', '%Y-%m-%d')
+    ssnB_date1 = datetime.strptime('2014-05-30', '%Y-%m-%d')
+    ssnB = "BB"
+    ssnB_des = 'SeasonB'
+    seasonB = FN022Factory(creel=creel, ssn=ssnB, ssn_des=ssnB_des,
+                                 ssn_date0=ssnB_date0, ssn_date1=ssnB_date1)
+    mydate = datetime.strptime('2014-05-15', '%Y-%m-%d')
+    sama = FN111Factory.build(creel=creel, date=mydate)
+
+    assert sama.season.ssn == ssnB
+    assert sama.season.ssn_des == ssnB_des
+    assert sama.season != seasonA
+
+
+@pytest.mark.django_db
 def test_sama_daytype():
     '''Given an interviewlog verify that it is able to return the correct
     daytype using the creel and date.  The date used in this example will
     not be in the exceptions table.'''
-    assert 0 == 1
+
+    prj_cd = "LHA_SC11_123"
+    ssn = '22'
+    creel = FN011Factory(prj_cd=prj_cd)
+    ssn_date0 = datetime.strptime('2017-02-01', '%Y-%m-%d')
+    ssn_date1 = datetime.strptime('2017-02-28', '%Y-%m-%d')
+    season = FN022Factory(creel=creel, ssn=ssn, ssn_date0=ssn_date0,
+                          ssn_date1=ssn_date1)
+
+    dtp1 = "1"
+    dtp1_nm = "Weekend"
+    dow_lst = '17'
+    daytype1 = FN023Factory(season=season, dtp=dtp1, dtp_nm=dtp1_nm,
+                            dow_lst=dow_lst)
+
+    dtp2 = "2"
+    dtp2_nm = "Weekday"
+    dow_lst = '23456'
+    daytype2 = FN023Factory(season=season, dtp=dtp2, dtp_nm=dtp2_nm,
+                            dow_lst=dow_lst)
+
+     #A thursday between season start and end dates
+    mydate = datetime.strptime('2017-02-09', '%Y-%m-%d')
+    sama = FN111Factory.build(creel=creel, date=mydate)
+
+    assert sama.daytype.dtp == dtp2
+    assert sama.daytype.dtp_nm == dtp2_nm
 
 
+@pytest.mark.django_db
 def test_sama_daytype_exception():
     '''If the date of an interviewlog falls on a date in the exceptions
     table for that creel, the day type in the exceptions table should be
     returned regardless of which day of the week the interview
     occurred.'''
-    assert 0 == 1
 
 
+    prj_cd = "LHA_SC11_123"
+    ssn = '22'
+    creel = FN011Factory(prj_cd=prj_cd)
+    ssn_date0 = datetime.strptime('2017-02-01', '%Y-%m-%d')
+    ssn_date1 = datetime.strptime('2017-02-28', '%Y-%m-%d')
+    season = FN022Factory(creel=creel, ssn=ssn, ssn_date0=ssn_date0,
+                          ssn_date1=ssn_date1)
+
+    dtp1 = "1"
+    dtp1_nm = "Weekend"
+    dow_lst = '17'
+    daytype1 = FN023Factory(season=season, dtp=dtp1, dtp_nm=dtp1_nm,
+                            dow_lst=dow_lst)
+
+    dtp2 = "2"
+    dtp2_nm = "Weekday"
+    dow_lst = '23456'
+    daytype2 = FN023Factory(season=season, dtp=dtp2, dtp_nm=dtp2_nm,
+                            dow_lst=dow_lst)
+
+    #A thursday between season start and end dates
+    mydate = datetime.strptime('2017-02-09', '%Y-%m-%d')
+    #make my date an exception
+    exceptiondate = FN025Factory(season=season, dtp1=dtp1, date=mydate)
+
+    sama = FN111Factory.build(creel=creel, date=mydate)
+
+    assert sama.daytype.dtp == dtp1
+    assert sama.daytype.dtp_nm == dtp1_nm
+
+
+@pytest.mark.django_db
 def test_sama_period():
     '''Given the date and time of an interview log, period should
     return the value of the associated period defined in the FN024
     table.'''
 
-    assert 0 == 1
+
+    creel = FN011Factory()
+    ssn_date0 = datetime.strptime('2017-04-01', '%Y-%m-%d')
+    ssn_date1 = datetime.strptime('2017-04-30', '%Y-%m-%d')
+    season = FN022Factory(creel=creel, ssn_date0=ssn_date0,
+                          ssn_date1=ssn_date1)
+    daytype = FN023Factory(season=season)
+
+    prd = 'am'
+    prdtm0 = datetime.strptime("08:00", "%H:%M").time()
+    prdtm1 = datetime.strptime("12:00", "%H:%M").time()
+    period1 = FN024Factory(daytype=daytype, prd=prd,
+                           prdtm0=prdtm0, prdtm1=prdtm1)
+
+    prd = 'noon'
+    prdtm0 = datetime.strptime("12:00", "%H:%M").time()
+    prdtm1 = datetime.strptime("16:00", "%H:%M").time()
+    period2 = FN024Factory(daytype=daytype, prd=prd,
+                           prdtm0=prdtm0, prdtm1=prdtm1)
+
+    prd = 'pm'
+    prdtm0 = datetime.strptime("16:00", "%H:%M").time()
+    prdtm1 = datetime.strptime("20:00", "%H:%M").time()
+    period3 = FN024Factory(daytype=daytype, prd=prd,
+                           prdtm0=prdtm0, prdtm1=prdtm1)
+
+    #a day in the middle of our seasons
+    mydate = datetime.strptime('2017-04-15', '%Y-%m-%d')
+    mytime = datetime.strptime("14:00", "%H:%M").time()
+
+    sama = FN111Factory.build(creel=creel, date=mydate, samtm0=mytime)
+
+    assert sama.period == period2
+
 
 
 def test_sama_stratum():

@@ -83,7 +83,7 @@ class FN011(models.Model):
             self.slug = slugify(self.prj_cd)
             self.year = self.prj_date0.year
             new = True
-        super(Project, self).save( *args, **kwargs)
+        super(FN011, self).save( *args, **kwargs)
 
 
 class FN022(models.Model):
@@ -114,7 +114,7 @@ class FN022(models.Model):
 class FN023(models.Model):
     '''Class  to represent the daytypes used in each season of creel
     '''
-
+    #creel = models.ForeignKey(FN011)
     season = models.ForeignKey(FN022)
     dtp = models.CharField(help_text="Day Type Code", max_length=2,
                               blank=False)
@@ -137,6 +137,9 @@ class FN023(models.Model):
         repr =  "<DayType: {}({}) {}-{}>"
         return repr.format(self.dtp_nm, self.dtp, self.season.ssn,
                            self.season.creel.prj_cd)
+        #repr =  "<DayType: {}({}) [{}]>"
+        #return repr.format(self.dtp_nm, self.dtp,
+        #                   self.creel.prj_cd)
 
 
 class FN024(models.Model):
@@ -238,9 +241,6 @@ class FN026(models.Model):
                            self.creel.prj_cd)
 
 
-
-
-
 class FN028(models.Model):
     '''Class to represent the fishing modes used in a creel.
     '''
@@ -303,7 +303,8 @@ class FN111(models.Model):
         repr =  "<InterviewLog: {} ({})>"
         return repr.format(self.sama, self.creel.prj_cd)
 
-    def get_daytype(self):
+    @property
+    def daytype(self):
         """get the day type associated with this interview log.  The day type
         is determined by the creel, season, and date.  If a record
         exsits for this date in the exception dates table (FN025) use it,
@@ -313,9 +314,19 @@ class FN111(models.Model):
         - `self`:
 
         """
-        pass
 
-    def get_period(self):
+        exception = FN025.objects.filter(season=self.season).\
+                  filter(date=self.date).first()
+        if exception:
+            daytype = FN023.objects.filter(season=self.season).\
+                      filter(dtp=exception.dtp1).get()
+        else:
+            daytype = FN023.objects.filter(season=self.season).\
+                      filter(dow_lst__contains=self.dow).get()
+        return daytype
+
+    @property
+    def period(self):
         """get the period associated with this interview log.  The period is
         determined by the creel, season, date, and start time.
 
@@ -323,7 +334,10 @@ class FN111(models.Model):
         - `self`:
 
         """
-        pass
+        period = FN024.objects.filter(daytype=self.daytype).\
+              filter(prdtm0__lte=self.samtm0).\
+              order_by('-prdtm0').first()
+        return period
 
 #    @static_property
 #    def stratum(self):
@@ -338,3 +352,40 @@ class FN111(models.Model):
         """
         dow = int(datetime.strftime(self.date, '%w')) + 1
         return dow
+
+
+    @property
+    def season(self):
+        """Given the project_code and date, return the corresponding season
+        for this creel log by finding the season that has start and
+        end dates span the date of the creel log.
+
+        Arguments:
+        - `self`:
+
+        """
+
+        mydate = self.date.date()
+        ssn = FN022.objects.filter(creel=self.creel).\
+              filter(ssn_date0__lte=mydate).\
+              filter(ssn_date1__gte=mydate).get()
+
+        return ssn
+
+
+    @property
+    def stratum(self):
+        """the stratum method should return the space, mode, day type,
+        period and season of an interview log, as a FishNet-2 stratum
+        string of the form: "XX_XX_XX_XX."
+
+        """
+        myseason=self.season
+        myspace = self.area.space
+        myperiod = self.period.prd
+        mydaytype = self.daytype
+        mymode = self.mode.mode
+
+        repr = '{}_{}_{}{}_{}'.format(myseason, myspace, myperiod,
+                                      mydaytype, mymode)
+        return repr
