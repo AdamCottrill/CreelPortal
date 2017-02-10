@@ -117,7 +117,9 @@ class FN028Factory(factory.DjangoModelFactory):
     mode = "01"
     mode_des = "Ice Fishing"
     creel = factory.SubFactory(FN011Factory)
-
+    atyunit = 1
+    itvunit = 1
+    chkflag = 0
 
 class FN111Factory(factory.DjangoModelFactory):
     '''a factory for fishing modes'''

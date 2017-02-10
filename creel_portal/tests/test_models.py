@@ -331,10 +331,44 @@ def test_sama_period():
     assert sama.period == period2
 
 
-
+@pytest.mark.django_db
 def test_sama_stratum():
     '''given the space, mode, day type, period and season of an
     interview log, the stratum method should retuurn the FishNet-2
     stratum string of the form: "XX_XX_XX_XX."'''
 
-    assert 0 == 1
+
+
+    creel = FN011Factory()
+
+    ssn="SN"
+    ssn_date0 = datetime.strptime('2017-04-01', '%Y-%m-%d')
+    ssn_date1 = datetime.strptime('2017-04-30', '%Y-%m-%d')
+    season = FN022Factory(creel=creel, ssn=ssn, ssn_date0=ssn_date0,
+                          ssn_date1=ssn_date1)
+    dtp = '2'
+    daytype = FN023Factory(season=season, dtp='2')
+
+    prd = '2'
+    prdtm0 = datetime.strptime("12:00", "%H:%M").time()
+    prdtm1 = datetime.strptime("16:00", "%H:%M").time()
+    period = FN024Factory(daytype=daytype, prd=prd,
+                           prdtm0=prdtm0, prdtm1=prdtm1)
+
+    space = 'SP'
+    spatial_strata = FN026Factory(creel=creel, space=space)
+
+    mode = 'AB'
+    fishing_mode = FN028Factory(creel=creel, mode=mode)
+
+    # a day in the middle of our seasons
+    mydate = datetime.strptime('2017-04-15', '%Y-%m-%d')
+    # a time in the middle of our period
+    mytime = datetime.strptime("14:00", "%H:%M").time()
+
+    sama = FN111Factory.build(creel=creel, date=mydate, samtm0=mytime,
+                              area=spatial_strata, mode=fishing_mode)
+
+    shouldbe = '{}_{}{}_{}_{}'.format(ssn, dtp, prd, space, mode)
+
+    assert sama.stratum == shouldbe

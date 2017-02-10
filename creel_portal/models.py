@@ -377,15 +377,15 @@ class FN111(models.Model):
     def stratum(self):
         """the stratum method should return the space, mode, day type,
         period and season of an interview log, as a FishNet-2 stratum
-        string of the form: "XX_XX_XX_XX."
+        string of the form: "XX_XX_XX_XX (SSN_[DayType][Period]_Area_Mode)."
 
         """
-        myseason=self.season
+        myseason=self.season.ssn
         myspace = self.area.space
         myperiod = self.period.prd
-        mydaytype = self.daytype
+        mydaytype = self.daytype.dtp
         mymode = self.mode.mode
 
-        repr = '{}_{}_{}{}_{}'.format(myseason, myspace, myperiod,
-                                      mydaytype, mymode)
+        repr = '{}_{}{}_{}_{}'.format(myseason, mydaytype, myperiod,
+                                      myspace, mymode)
         return repr
