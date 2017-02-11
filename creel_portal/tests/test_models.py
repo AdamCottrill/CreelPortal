@@ -433,3 +433,65 @@ def test_fish_repr():
     shouldbe = '<Fish: {}-{}-{}-{}-{}>'.format(prj_cd, sam_num, spc,
                                                grp, fish_num)
     assert str(fish) == shouldbe
+
+
+
+def test_age_estimate_repr():
+    """The string method an age estimate should return the object
+    type (age estimate), project code, the sample, species code, group code,
+    fish number, and ageid."""
+
+    spc = '091'
+    sam_num = '12345'
+    prj_cd = "LHA_SC11_123"
+    grp = '55'
+    fish_num = 321
+    age_id = 99
+
+    species = SpeciesFactory.build(species_code=spc)
+    creel = FN011Factory.build(prj_cd=prj_cd)
+    interview = FN121Factory.build(creel=creel, sam=sam_num)
+    catch = FN123Factory.build(interview=interview, species=species)
+    fish = FN125Factory.build(catch=catch, grp=grp,
+                              fish=fish_num)
+    age_est = FN127Factory.build(fish=fish, ageid=age_id)
+    shouldbe = '<AgeEstimate: {}-{}-{}-{}-{}-{}>'.format(prj_cd, sam_num, spc,
+                                                         grp, fish_num, age_id)
+    assert str(age_est) == shouldbe
+
+
+def test_effort_estimate_repr():
+    """The effort estimate string method should return the object type,
+    the project code and the stratum to which the estimate applies."""
+
+    prj_cd = "LHA_SC11_123"
+    strat = '++_++_++_++'
+
+    creel = FN011Factory.build(prj_cd=prj_cd)
+    effort_estimate = FR713Factory.build(creel=creel,strat=strat)
+
+    shouldbe = '<EffortEstimate: {} ({})>'.format(prj_cd, strat)
+    assert str(effort_estimate) == shouldbe
+
+
+def test_harvest_estimate_repr():
+    """The harvest estimate string method should return the object type,
+    the project code, stratum, the species and whether or not the
+    catch was targeted.
+
+    """
+
+    prj_cd = "LHA_SC11_123"
+    strat = '++_++_++_++'
+    sek = 'Targetted'
+    spc = '091'
+
+    creel = FN011Factory.build(prj_cd=prj_cd)
+    species = SpeciesFactory.build(species_code=spc)
+
+    harvest_estimate = FR714Factory.build(creel=creel, strat=strat,
+                                          species=species)
+
+    shouldbe = '<HarvestEstimate: {} ({}-{}-{})>'.format(spc, prj_cd,
+                                                         strat, sek)
+    assert str(harvest_estimate) == shouldbe

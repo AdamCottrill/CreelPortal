@@ -410,8 +410,9 @@ class FN121(models.Model):
 
     creel = models.ForeignKey(FN011)
     sama = models.ForeignKey(FN111)
-    mode = models.ForeignKey(FN028)
+
     area = models.ForeignKey(FN026)
+    mode = models.ForeignKey(FN028)
 
     sam = models.CharField(max_length=6)
     itvseq = models.IntegerField()
@@ -526,8 +527,8 @@ class FN125(models.Model):
 
     class Meta:
         verbose_name = "Fish"
-        ordering = ['catch', 'species', 'fish']
-        unique_together = ['catch', 'species', 'grp', 'fish']
+        ordering = ['catch', 'fish']
+        unique_together = ['catch', 'grp', 'fish']
 
     def __str__(self):
         '''return the object type (fish), and the fishnet key fields prj_cd,
@@ -539,3 +540,133 @@ class FN125(models.Model):
                            self.catch.interview.sam,
                            self.catch.species.species_code,
                            self.grp, self.fish)
+
+
+
+class FN127(models.Model):
+    '''Class to represent the attributes of and age estimate for a
+    particular fish.
+
+    '''
+
+    fish = models.ForeignKey(FN125)
+
+    ageid = models.IntegerField()
+    agea = models.IntegerField(blank=True, null=True)
+    agemt = models.CharField(max_length=6)
+    conf = models.IntegerField(blank=True, null=True)
+    edge = models.CharField(max_length=2, blank=True, null=True)
+    nca = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = "AgeEstimate"
+        ordering = ['fish', 'ageid',]
+        unique_together = ['fish', 'ageid']
+
+    def __str__(self):
+        '''return the object type (fish), and the fishnet key fields prj_cd,
+        sam, grp, spc and fish.
+
+        '''
+        repr = "<AgeEstimate: {}-{}-{}-{}-{}-{}>"
+        return repr.format(self.fish.catch.interview.creel.prj_cd,
+                           self.fish.catch.interview.sam,
+                           self.fish.catch.species.species_code,
+                           self.fish.grp,
+                           self.fish.fish,
+                           self.ageid)
+
+
+class FR713(models.Model):
+    '''Class to hold creel estimate of effort by strata.
+
+    TODO - figure out if we need strat, if it should be build
+    dynamically or ahead of time or if a '++' placeholder should be
+    created add to each stratum of each creel to represent the
+    collapsed 'all' estimate.
+
+    '''
+
+    creel = models.ForeignKey(FN011)
+
+    space = models.ForeignKey(FN022, blank=True, null=True)
+    dtp = models.ForeignKey(FN023, blank=True, null=True)
+    period = models.ForeignKey(FN024, blank=True, null=True)
+    area = models.ForeignKey(FN026, blank=True, null=True)
+    mode = models.ForeignKey(FN028, blank=True, null=True)
+
+    strat = models.CharField(max_length=11)
+    angler_s = models.IntegerField()
+    angler_ss = models.IntegerField(blank=True, null=True)
+    atycnt_s = models.IntegerField(blank=True, null=True)
+    aty_days = models.IntegerField(blank=True, null=True)
+    aty_nn = models.IntegerField()
+    chkcnt_s = models.IntegerField(blank=True, null=True)
+    cif_nn = models.IntegerField()
+    itvcnt_s = models.IntegerField(blank=True, null=True)
+    person_s = models.IntegerField()
+    rod_s = models.IntegerField()
+    rod_ss = models.IntegerField(blank=True, null=True)
+    tripno = models.IntegerField(blank=True, null=True)
+    rec_tp = models.IntegerField()
+    run = models.CharField(max_length=2, blank=True, null=True)
+
+    class Meta:
+        verbose_name = "EffortEstimate"
+        ordering = ['creel', 'strat', 'rec_tp']
+        unique_together = ['creel', 'strat', 'rec_tp']
+
+    def __str__(self):
+        '''return the object type (EffortEstimate), and the prj_cd.
+        '''
+        repr = "<EffortEstimate: {} ({})>"
+        return repr.format(self.creel.prj_cd, self.strat)
+
+
+class FR714(models.Model):
+    '''Class to hold creel estimate of harvest by strata and species.
+
+    TODO - figure out if we need strat, if it should be build
+    dynamically or ahead of time or if a '++' placeholder should be
+    created add to each stratum of each creel to represent the
+    collapsed 'all' estimate.
+
+    '''
+
+    creel = models.ForeignKey(FN011)
+    species = models.ForeignKey(Species)
+
+    space = models.ForeignKey(FN022, blank=True, null=True)
+    dtp = models.ForeignKey(FN023, blank=True, null=True)
+    period = models.ForeignKey(FN024, blank=True, null=True)
+    area = models.ForeignKey(FN026, blank=True, null=True)
+    mode = models.ForeignKey(FN028, blank=True, null=True)
+
+    strat = models.CharField(max_length=11)
+    sek = models.BooleanField()
+    rod1_s = models.IntegerField()
+    angler1_s = models.IntegerField()
+    catno1_s = models.IntegerField()
+    catno1_ss = models.IntegerField(blank=True, null=True)
+    catno_s = models.IntegerField()
+    catno_ss = models.IntegerField(blank=True, null=True)
+    cif1_nn = models.IntegerField()
+    hvsno1_s = models.IntegerField()
+    hvsno1_ss = models.IntegerField(blank=True, null=True)
+    hvsno_s = models.IntegerField()
+    hvsno_ss = models.IntegerField(blank=True, null=True)
+    mescnt_s = models.IntegerField()
+    rec_tp = models.IntegerField()
+    run = models.CharField(max_length=2, blank=True, null=True)
+
+    class Meta:
+        verbose_name = "HarvestEstimate"
+        ordering = ['creel', 'strat', 'species', 'rec_tp', 'sek']
+        unique_together = ['creel', 'strat', 'species', 'rec_tp', 'sek']
+
+    def __str__(self):
+        '''return the object type (EffortEstimate), and the prj_cd.'''
+        repr = "<HarvestEstimate: {} ({}-{}-{})>"
+        targetted = 'Targetted' if self.sek else 'NonTargetted'
+        return repr.format(self.species.species_code,
+                           self.creel.prj_cd, self.strat, targetted)

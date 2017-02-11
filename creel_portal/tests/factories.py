@@ -187,6 +187,73 @@ class FN125Factory(factory.DjangoModelFactory):
     #species = factory.SubFactory(Species)
 
     grp = '10'
-    fish = 123
+    fish = factory.Sequence(lambda n: '12{0}'.format(n))
     flen = 250
     tlen = 270
+
+
+
+class FN127Factory(factory.DjangoModelFactory):
+    '''A factory for age estimates for a particular fish.
+
+    '''
+
+    class Meta:
+        model = 'creel_portal.FN127'
+
+    fish = factory.SubFactory(FN125)
+    ageid = factory.Sequence(lambda n: n)
+    agea = 5
+    agemt = ""
+    conf = 7
+    edge = '*'
+    nca = 5
+
+
+class FR713Factory(factory.DjangoModelFactory):
+    '''A factory for creel effort estimates.
+
+    '''
+
+    class Meta:
+        model = 'creel_portal.FR713'
+
+    creel = factory.SubFactory(FN011)
+    strat = '++_++_++_++'
+    angler_s = 5
+    aty_nn = 3
+    chkcnt_s = 35
+    cif_nn = 10
+    itvcnt_s = 10
+    person_s = 20
+    rod_s = 10
+    rod_ss = 25
+    tripno = 0
+    rec_tp = 2
+    run = '01'
+
+
+class FR714Factory(factory.DjangoModelFactory):
+    '''A factory for creel harvest estimates.
+
+    '''
+
+    class Meta:
+        model = 'creel_portal.FR714'
+
+    creel = factory.SubFactory(FN011)
+    species = factory.SubFactory(Species)
+
+    strat = '++_++_++_++'
+
+    sek = True
+    rod1_s = 20
+    angler1_s = 20
+    catno1_s = 1
+    catno_s = 1
+    cif1_nn = 11
+    hvsno1_s = 1
+    hvsno_s = 1
+    mescnt_s = 0
+    rec_tp = 3
+    run = '01'
