@@ -5,12 +5,21 @@ from django.template.defaultfilters import slugify
 from creel_portal.models import *
 
 
+class SpeciesFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Species
+    #species_code = '81'
+    species_code = factory.Sequence(lambda n: n)
+    common_name = 'Lake Trout'
+    scientific_name = 'Salvelinus nameychush'
+
 class LakeFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'creel_portal.Lake'
 
     lake_name = "Lake Huron"
-    abbrev = "HU"
+    #abbrev = "HU"
+    abbrev = factory.Sequence(lambda n: 'H{0}'.format(n))
 
 class FN011Factory(factory.DjangoModelFactory):
     '''year and slug are built by the creel save method'''
@@ -133,3 +142,35 @@ class FN111Factory(factory.DjangoModelFactory):
 
     date = datetime.strptime("2015-07-01", "%Y-%m-%d")
     samtm0 = datetime.strptime("06:15", "%H:%M").time()
+
+
+
+class FN121Factory(factory.DjangoModelFactory):
+    '''a factory for creel interviews'''
+
+    class Meta:
+        model = 'creel_portal.FN121'
+
+    creel = factory.SubFactory(FN011Factory)
+    area = factory.SubFactory(FN026Factory)
+    mode = factory.SubFactory(FN028Factory)
+    sama = factory.SubFactory(FN111Factory)
+
+    itvseq = factory.Sequence(lambda n: '{0}'.format(n))
+    sam = factory.Sequence(lambda n: '235{0}'.format(n))
+    date = datetime.strptime("2015-07-01", "%Y-%m-%d")
+    itvtm0 = datetime.strptime("08:15", "%H:%M").time()
+    efftm0 = datetime.strptime("06:15", "%H:%M").time()
+    effcmp = False
+
+
+class FN123Factory(factory.DjangoModelFactory):
+    '''a factory for catch counts by species for an interview'''
+
+    class Meta:
+        model = 'creel_portal.FN123'
+
+    interview = factory.SubFactory(FN121Factory)
+    sek = True
+    hvscnt = 3
+    rlscnt = 1

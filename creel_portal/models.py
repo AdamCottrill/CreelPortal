@@ -6,7 +6,24 @@ from datetime import datetime
 
 # Create your models here.
 
+#note = move this to main.models
+class Species(models.Model):
+    species_code = models.IntegerField(unique=True)
+    common_name = models.CharField(max_length=30)
+    scientific_name = models.CharField(max_length=50, null=True, blank=True)
 
+    class Meta:
+        ordering = ['species_code']
+
+    def __str__(self):
+        if self.scientific_name:
+            spc_str = "<Species: %s (%s)>" % (self.common_name,
+                                              self.scientific_name)
+        else:
+            spc_str = "<Species: %s>" % self.common_name
+        return spc_str
+
+#note = move this to main.models
 class Lake(models.Model):
     '''A lookup table to hold the names of the different lakes'''
 
@@ -20,7 +37,7 @@ class Lake(models.Model):
         '''return the lake name as its string representation'''
         return "<Lake: {} ({})>".format(self.lake_name, self.abbrev)
 
-
+#note = move this to main.models too
 class FN011(models.Model):
     '''Class to hold a record for each project
     '''
@@ -273,8 +290,6 @@ class FN111(models.Model):
     '''Class to represent the creel logs.
     '''
 
-    #prj_cd, sama, area, mode, dow, [date], samtm0, stratum, weather, comment1
-
     creel = models.ForeignKey(FN011)
     area = models.ForeignKey(FN026)
     mode = models.ForeignKey(FN028)
@@ -339,9 +354,6 @@ class FN111(models.Model):
               order_by('-prdtm0').first()
         return period
 
-#    @static_property
-#    def stratum(self):
-
     @property
     def dow(self):
         """Return the numeric day of the week of the interview log.
@@ -389,3 +401,82 @@ class FN111(models.Model):
         repr = '{}_{}{}_{}_{}'.format(myseason, mydaytype, myperiod,
                                       myspace, mymode)
         return repr
+
+
+
+class FN121(models.Model):
+    '''Class to represent the creel intervews.
+    '''
+
+    creel = models.ForeignKey(FN011)
+    sama = models.ForeignKey(FN111)
+    mode = models.ForeignKey(FN028)
+    area = models.ForeignKey(FN026)
+
+    sam = models.CharField(max_length=6)
+    itvseq = models.IntegerField()
+    itvtm0 = models.TimeField(help_text="Interview Time")
+    date = models.DateField()
+    efftm0 = models.TimeField(help_text="Fishing Start Time")
+    efftm1 = models.TimeField(blank=True, null=True,
+                              help_text="Fishing End Time")
+    effcmp = models.BooleanField(default=False)
+    effdur = models.FloatField(blank=True, null=True)
+    persons = models.IntegerField(blank=True, null=True)
+    anglers = models.IntegerField(blank=True, null=True)
+    rods = models.IntegerField(blank=True, null=True)
+    angmeth = models.IntegerField(blank=True, null=True)
+    angvis = models.IntegerField(blank=True, null=True)
+    angorig = models.IntegerField(blank=True, null=True)
+    angop1 = models.IntegerField(blank=True, null=True)
+    angop2 = models.IntegerField(blank=True, null=True)
+    angop3 = models.IntegerField(blank=True, null=True)
+    comment1 = models.TextField(blank=False, null=True)
+
+    class Meta:
+        verbose_name = "Inveriew"
+        ordering = ['creel', 'sam']
+        unique_together = ['creel', 'sam']
+
+    def __str__(self):
+        '''return the object type, the interview log number (sama), the stratum,
+        and project code of the creel this record is assoicated
+       with.
+
+        '''
+
+        repr =  "<Interview: {} ({})>"
+        return repr.format(self.sam, self.creel.prj_cd)
+
+
+
+
+
+
+class FN123(models.Model):
+    '''Class to represent the creel catch counts.
+    '''
+
+    interview = models.ForeignKey(FN121)
+    species = models.ForeignKey(Species)
+    sek = models.BooleanField(default=True)
+    hvscnt = models.IntegerField(default=0)
+    rlscnt = models.IntegerField(default=0)
+    mescnt = models.IntegerField(default=0)
+    meswt = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Catch"
+        ordering = ['interview', 'species']
+        unique_together = ['interview', 'species']
+
+    def __str__(self):
+        '''return the object type, the interview log number (sama), the stratum,
+        and project code of the creel this record is assoicated
+       with.
+
+        '''
+        repr = "<Catch: {}-{}-{}>"
+        return repr.format(self.interview.creel.prj_cd,
+                           self.interview.sam,
+                           self.species.species_code)
