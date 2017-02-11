@@ -171,6 +171,22 @@ class FN123Factory(factory.DjangoModelFactory):
         model = 'creel_portal.FN123'
 
     interview = factory.SubFactory(FN121Factory)
+    species = factory.SubFactory(Species)
     sek = True
     hvscnt = 3
     rlscnt = 1
+
+
+class FN125Factory(factory.DjangoModelFactory):
+    '''a factory for a sampled fish'''
+
+    class Meta:
+        model = 'creel_portal.FN125'
+
+    catch = factory.SubFactory(FN123Factory)
+    #species = factory.SubFactory(Species)
+
+    grp = '10'
+    fish = 123
+    flen = 250
+    tlen = 270

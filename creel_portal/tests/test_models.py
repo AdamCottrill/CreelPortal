@@ -410,3 +410,26 @@ def test_catch_count_repr():
     catch = FN123Factory.build(interview=interview, species=species)
 
     assert str(catch) == '<Catch: {}-{}-{}>'.format(prj_cd, sam_num, spc)
+
+
+def test_fish_repr():
+    """The string method of fish should return the object
+    type (fish), project code, the sample, species code, group code
+    and fish number."""
+
+    spc = '091'
+    sam_num = '12345'
+    prj_cd = "LHA_SC11_123"
+    grp = '55'
+    fish_num = 321
+
+    species = SpeciesFactory.build(species_code=spc)
+    creel = FN011Factory.build(prj_cd=prj_cd)
+    interview = FN121Factory.build(creel=creel, sam=sam_num)
+    catch = FN123Factory.build(interview=interview, species=species)
+    fish = FN125Factory.build(catch=catch, grp=grp,
+                              fish=fish_num)
+
+    shouldbe = '<Fish: {}-{}-{}-{}-{}>'.format(prj_cd, sam_num, spc,
+                                               grp, fish_num)
+    assert str(fish) == shouldbe

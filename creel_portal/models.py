@@ -480,3 +480,62 @@ class FN123(models.Model):
         return repr.format(self.interview.creel.prj_cd,
                            self.interview.sam,
                            self.species.species_code)
+
+
+class FN125(models.Model):
+    '''Class to represent the attributes of sampled fish..
+    '''
+
+    SEX_CHOICES = (
+        (1,'Male'),
+        (2,'Female'),
+        (9,'Unknown'),
+    )
+
+    MAT_CHOICES = (
+        (1,'Immature'),
+        (2,'Mature'),
+        (9,'Unknown'),
+    )
+
+    #get from FN_Dict.
+    #GON_CHOICES = (
+    #)
+
+
+    catch = models.ForeignKey(FN123)
+    #species = models.ForeignKey(Species)
+
+    grp = models.CharField(max_length=2)
+    fish = models.IntegerField()
+    flen = models.IntegerField(blank=True, null=True)
+    tlen = models.IntegerField(blank=True, null=True)
+    rwt = models.IntegerField(blank=True, null=True)
+    sex = models.IntegerField(
+        choices=SEX_CHOICES, default=None,
+        blank=True, null=True)
+    #gon should be a choice field too
+    gon = models.CharField(max_length=2, blank=True, null=True)
+    mat= models.IntegerField(
+        choices=MAT_CHOICES, default=None,
+        blank=True, null=True)
+    age = models.IntegerField(blank=True, null=True)
+    agest = models.CharField(max_length=8, blank=True, null=True)
+    clipc = models.CharField(max_length=6, blank=True, null=True)
+    fate = models.CharField(max_length=2, blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Fish"
+        ordering = ['catch', 'species', 'fish']
+        unique_together = ['catch', 'species', 'grp', 'fish']
+
+    def __str__(self):
+        '''return the object type (fish), and the fishnet key fields prj_cd,
+        sam, grp, spc and fish.
+
+        '''
+        repr = "<Fish: {}-{}-{}-{}-{}>"
+        return repr.format(self.catch.interview.creel.prj_cd,
+                           self.catch.interview.sam,
+                           self.catch.species.species_code,
+                           self.grp, self.fish)
