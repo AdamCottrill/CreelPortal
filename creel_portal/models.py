@@ -42,7 +42,7 @@ class FN011(models.Model):
     '''Class to hold a record for each project
     '''
 
-    lake = models.ForeignKey(Lake, default=1)
+    lake = models.ForeignKey(Lake, default=1, related_name='creels')
 
     prj_date0 = models.DateField(help_text="Start Date", blank=False)
     prj_date1 = models.DateField(help_text="End Date", blank=False)
@@ -95,11 +95,9 @@ class FN011(models.Model):
         Slugify name if it doesn't exist. IMPORTANT: doesn't check to see
         if slug is a dupicate!
         """
-        new = False
-        if not self.slug or not self.year:
-            self.slug = slugify(self.prj_cd)
-            self.year = self.prj_date0.year
-            new = True
+
+        self.slug = slugify(self.prj_cd)
+        self.year = self.prj_date0.year
         super(FN011, self).save( *args, **kwargs)
 
 
@@ -107,7 +105,7 @@ class FN022(models.Model):
     '''Class to represent the seasons (temporal strata) used in each creel.
     '''
 
-    creel = models.ForeignKey(FN011)
+    creel = models.ForeignKey(FN011, related_name='seasons')
     ssn = models.CharField(help_text="Season Code", max_length=2, blank=False)
     ssn_des = models.CharField(help_text="Season Description", max_length=60,
                                blank=False)
@@ -132,7 +130,7 @@ class FN023(models.Model):
     '''Class  to represent the daytypes used in each season of creel
     '''
     #creel = models.ForeignKey(FN011)
-    season = models.ForeignKey(FN022)
+    season = models.ForeignKey(FN022, related_name='daytypes')
     dtp = models.CharField(help_text="Day Type Code", max_length=2,
                               blank=False)
     dtp_nm = models.CharField(help_text="Day Type Name", max_length=10,
@@ -164,7 +162,7 @@ class FN024(models.Model):
     of creel.
     '''
 
-    daytype = models.ForeignKey(FN023)
+    daytype = models.ForeignKey(FN023, related_name='periods')
     prd = models.CharField(help_text="Day Type Code", max_length=2, blank=False)
     prdtm0 = models.TimeField(help_text="Period Start Time", blank=False)
     prdtm1 = models.TimeField(help_text="Period End Time", blank=False)
@@ -194,7 +192,7 @@ class FN025(models.Model):
     treated as weekends.
     '''
 
-    season = models.ForeignKey(FN022)
+    season = models.ForeignKey(FN022, related_name='execption_dates')
     date = models.DateField(help_text="Exception Date", blank=False)
     dtp1 = models.CharField(help_text="Day Type Code", max_length=2,
                                blank=False)
@@ -228,7 +226,7 @@ class FN026(models.Model):
     '''
 
 
-    creel = models.ForeignKey(FN011)
+    creel = models.ForeignKey(FN011, related_name='spatial_strata')
     space = models.CharField(max_length=2, blank=False,
                              help_text="Space Code")
     space_des = models.CharField(max_length=100, blank=False,
@@ -262,7 +260,7 @@ class FN028(models.Model):
     '''Class to represent the fishing modes used in a creel.
     '''
 
-    creel = models.ForeignKey(FN011)
+    creel = models.ForeignKey(FN011, related_name='modes')
     mode = models.CharField(help_text="Mode Code", max_length=2, blank=False)
     mode_des = models.CharField(help_text="Fishing Mode Description",
                                 max_length=100, blank=False)
@@ -290,9 +288,9 @@ class FN111(models.Model):
     '''Class to represent the creel logs.
     '''
 
-    creel = models.ForeignKey(FN011)
-    area = models.ForeignKey(FN026)
-    mode = models.ForeignKey(FN028)
+    creel = models.ForeignKey(FN011, related_name='interview_logs')
+    area = models.ForeignKey(FN026, related_name='interview_logs')
+    mode = models.ForeignKey(FN028, related_name='interview_logs')
 
     sama = models.CharField(max_length=6, blank=False)
     date = models.DateField(blank=False)
@@ -408,11 +406,11 @@ class FN121(models.Model):
     '''Class to represent the creel intervews.
     '''
 
-    creel = models.ForeignKey(FN011)
-    sama = models.ForeignKey(FN111)
+    creel = models.ForeignKey(FN011, related_name='interviews')
+    sama = models.ForeignKey(FN111, related_name='interviews')
 
-    area = models.ForeignKey(FN026)
-    mode = models.ForeignKey(FN028)
+    area = models.ForeignKey(FN026, related_name='interviews')
+    mode = models.ForeignKey(FN028, related_name='interviews')
 
     sam = models.CharField(max_length=6)
     itvseq = models.IntegerField()
@@ -458,8 +456,8 @@ class FN123(models.Model):
     '''Class to represent the creel catch counts.
     '''
 
-    interview = models.ForeignKey(FN121)
-    species = models.ForeignKey(Species)
+    interview = models.ForeignKey(FN121, related_name='catch_counts')
+    species = models.ForeignKey(Species, related_name='catch_counts')
     sek = models.BooleanField(default=True)
     hvscnt = models.IntegerField(default=0)
     rlscnt = models.IntegerField(default=0)
@@ -504,7 +502,7 @@ class FN125(models.Model):
     #)
 
 
-    catch = models.ForeignKey(FN123)
+    catch = models.ForeignKey(FN123, related_name='bio_samples')
     #species = models.ForeignKey(Species)
 
     grp = models.CharField(max_length=2)
@@ -549,7 +547,7 @@ class FN127(models.Model):
 
     '''
 
-    fish = models.ForeignKey(FN125)
+    fish = models.ForeignKey(FN125, related_name='age_estimates')
 
     ageid = models.IntegerField()
     agea = models.IntegerField(blank=True, null=True)
@@ -587,15 +585,21 @@ class FR713(models.Model):
 
     '''
 
-    creel = models.ForeignKey(FN011)
+    creel = models.ForeignKey(FN011, related_name='effort_estimates')
 
-    space = models.ForeignKey(FN022, blank=True, null=True)
-    dtp = models.ForeignKey(FN023, blank=True, null=True)
-    period = models.ForeignKey(FN024, blank=True, null=True)
-    area = models.ForeignKey(FN026, blank=True, null=True)
-    mode = models.ForeignKey(FN028, blank=True, null=True)
+    season = models.ForeignKey(FN022, related_name='effort_estimates',
+                              blank=True, null=True)
+    dtp = models.ForeignKey(FN023, related_name='effort_estimates',
+                            blank=True, null=True)
+    period = models.ForeignKey(FN024, related_name='effort_estimates',
+                               blank=True, null=True)
+    area = models.ForeignKey(FN026, related_name='effort_estimates',
+                             blank=True, null=True)
+    mode = models.ForeignKey(FN028, related_name='effort_estimates',
+                             blank=True, null=True)
 
     strat = models.CharField(max_length=11)
+    date = models.DateField(blank=False, null=True)
     angler_s = models.IntegerField()
     angler_ss = models.IntegerField(blank=True, null=True)
     atycnt_s = models.IntegerField(blank=True, null=True)
@@ -613,8 +617,8 @@ class FR713(models.Model):
 
     class Meta:
         verbose_name = "EffortEstimate"
-        ordering = ['creel', 'strat', 'rec_tp']
-        unique_together = ['creel', 'strat', 'rec_tp']
+        ordering = ['creel', 'strat', 'date', 'rec_tp']
+        unique_together = ['creel', 'strat', 'date', 'rec_tp']
 
     def __str__(self):
         '''return the object type (EffortEstimate), and the prj_cd.
@@ -633,16 +637,22 @@ class FR714(models.Model):
 
     '''
 
-    creel = models.ForeignKey(FN011)
-    species = models.ForeignKey(Species)
+    creel = models.ForeignKey(FN011, related_name='catch_estimates')
+    species = models.ForeignKey(Species, related_name='catch_estimates')
 
-    space = models.ForeignKey(FN022, blank=True, null=True)
-    dtp = models.ForeignKey(FN023, blank=True, null=True)
-    period = models.ForeignKey(FN024, blank=True, null=True)
-    area = models.ForeignKey(FN026, blank=True, null=True)
-    mode = models.ForeignKey(FN028, blank=True, null=True)
+    season = models.ForeignKey(FN022, related_name='catch_estimates',
+                              blank=True, null=True)
+    dtp = models.ForeignKey(FN023, related_name='catch_estimates',
+                            blank=True, null=True)
+    period = models.ForeignKey(FN024, related_name='catch_estimates',
+                               blank=True, null=True)
+    area = models.ForeignKey(FN026, related_name='catch_estimates',
+                             blank=True, null=True)
+    mode = models.ForeignKey(FN028, related_name='catch_estimates',
+                             blank=True, null=True)
 
     strat = models.CharField(max_length=11)
+    date = models.DateField(blank=False, null=True)
     sek = models.BooleanField()
     rod1_s = models.IntegerField()
     angler1_s = models.IntegerField()
@@ -661,8 +671,8 @@ class FR714(models.Model):
 
     class Meta:
         verbose_name = "HarvestEstimate"
-        ordering = ['creel', 'strat', 'species', 'rec_tp', 'sek']
-        unique_together = ['creel', 'strat', 'species', 'rec_tp', 'sek']
+        ordering = ['creel', 'strat', 'species', 'date', 'rec_tp', 'sek']
+        unique_together = ['creel', 'strat', 'species', 'date', 'rec_tp', 'sek']
 
     def __str__(self):
         '''return the object type (EffortEstimate), and the prj_cd.'''
