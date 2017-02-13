@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+
+
+{% block content %}
+
+<table class="table">
+    <tbody>
+
+        <thead>
+            <tr>
+                <th>Year</th>
+                <th>Project Code</th>
+                <th>Project Name</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+            </tr>
+        </thead>
+
+        {% for object in object_list %}
+        <tr>
+            <td>{{ object.year }}</td>
+            <td> <a href="{{ object.get_absolute_url }}">{{ object.prj_cd }}</a> </td>
+            <td>{{ object.prj_nm }}</td>
+            <td>{{ object.prj_date0 }}</td>
+            <td>{{ object.prj_date1 }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock content %}

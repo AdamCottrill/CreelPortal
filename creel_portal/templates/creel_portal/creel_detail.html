@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<ul>
+<li>{{ object.year }}</li>
+<li>{{ object.prj_cd }}</li>
+<li>{{ object.prj_nm }}</li>
+<li>{{ object.prj_ldr }}</li>
+<li>{{ object.prj_date0 }}</li>
+<li>{{ object.prj_date1 }}</li>
+</ul>
+
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Project Summary</h3>
+  </div>
+  <div class="panel-body">
+    {{ object.comment0 }}
+  </div>
+</div>
+
+
+{% for ssn in object.seasons.all %}
+
+    <p>Season: {{ ssn.ssn_des }}({{ssn.ssn}}) </p>
+    <p>Season Start: {{ ssn.ssn_date0 }}</p>
+    <p>Season End: {{ ssn.ssn_date1 }}</p>
+
+    <p>DayTypes</p>
+    {% for dt in ssn.daytypes.all %}
+        <p>{{ dt.dtp }} - {{ dt.dtp_nm }}</p>
+
+        <p>Periods:</p>
+        {% for period in dt.periods.all %}
+            <p>{{ period.prd }} {{period.prdtm0}} - {{ period.prdtm1}}</p>
+        {% endfor %}
+
+    {% endfor %}
+
+    <p>Execption Dates:</p>
+    {% for x in ssn.exception_dates.all %}
+        {{ x.date }}
+    {% endfor %}
+
+{% endfor %}
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Seasons</h3>
+  </div>
+  <div class="panel-body">
+      <table class="table">
+          <thead>
+              <tr>
+                  <th>Season</th>
+                  <th>Descrption</th>
+                  <th>Start Date</th>
+                  <th>End Date</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for item in object.seasons.all %}
+              <tr>
+                  <td>{{ item.ssn }}</td>
+                  <td>{{ item.ssn_des }}</td>
+                  <td>{{ item.ssn_date0 }}</td>
+                  <td>{{ item.ssn_date1 }}</td>
+              </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+  </div>
+</div>
+
+
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Spatial Strata</h3>
+  </div>
+  <div class="panel-body">
+
+      <table class="table">
+          <thead>
+              <tr>
+                  <th>Space</th>
+                  <th>Descrption</th>
+                  <th>Area Size</th>
+                  <th>Area Count</th>
+                  <th>Area List</th>
+                  <th>Area Weight</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for item in object.spatial_strata.all %}
+              <tr>
+                  <td>{{ item.space }}</td>
+                  <td>{{ item.space_des }}</td>
+                  <td>{{ item.space_siz }}</td>
+                  <td>{{ item.area_count }}</td>
+                  <td>{{ item.area_lst }}</td>
+                  <td>{{ item.area_wt }}</td>
+              </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+  </div>
+</div>
+
+
+
+
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Fishing Modes</h3>
+    </div>
+    <div class="panel-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Mode</th>
+                    <th>Descrption</th>
+                    <th>ATY Unit</th>
+                    <th>Interview Unit</th>
+                    <th>Check Flag</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in object.modes.all %}
+                <tr>
+                    <td>{{ item.mode }}</td>
+                    <td>{{ item.mode_des }}</td>
+                    <td>{{ item.atyunit }}</td>
+                    <td>{{ item.itvunit }}</td>
+                    <td>{{ item.chkflag }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+
+
+{% endblock content %}

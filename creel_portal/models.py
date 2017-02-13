@@ -1,6 +1,7 @@
 from django.db import models
 
 from django.template.defaultfilters import slugify
+from django.urls import reverse
 
 from datetime import datetime
 
@@ -36,6 +37,7 @@ class Lake(models.Model):
     def __str__(self):
         '''return the lake name as its string representation'''
         return "<Lake: {} ({})>".format(self.lake_name, self.abbrev)
+
 
 #note = move this to main.models too
 class FN011(models.Model):
@@ -73,14 +75,12 @@ class FN011(models.Model):
         verbose_name = "Creel List"
         ordering = ['-prj_date1']
 
-        #@models.permalink
-    #    def get_absolute_url(self):
-    #        '''return the url for the project'''
-    #        url = reverse('creel_portal.views.creel_detail',
-    #                      kwargs={'slug':self.slug})
-    #        return url
-    #
-
+    @models.permalink
+    def get_absolute_url(self):
+        '''return the url for the project'''
+        #url = reverse('creel_detail', kwargs={'slug':self.slug})
+        #return url
+        return ('creel_detail', (), { "slug": self.slug })
 
     def __str__(self):
         '''return the creel name and project code as its string
@@ -192,7 +192,7 @@ class FN025(models.Model):
     treated as weekends.
     '''
 
-    season = models.ForeignKey(FN022, related_name='execption_dates')
+    season = models.ForeignKey(FN022, related_name='exception_dates')
     date = models.DateField(help_text="Exception Date", blank=False)
     dtp1 = models.CharField(help_text="Day Type Code", max_length=2,
                                blank=False)
