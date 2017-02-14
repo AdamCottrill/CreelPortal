@@ -385,6 +385,29 @@ def test_sama_stratum():
     assert sama.stratum == shouldbe
 
 
+def test_creel_count_repr():
+    """Verify that at interview counts are represented by object type,
+    project code, the sama number, start time, and end time"""
+
+    prj_cd = "LHA_SC11_123"
+    creel = FN011Factory.build(prj_cd=prj_cd)
+
+    sama = '1230'
+    interviewlog = FN111Factory.build(creel=creel, sama=sama)
+
+    time0_str = "14:00"
+    time1_str = "16:00"
+    time0 = datetime.strptime(time0_str, "%H:%M").time()
+    time1 = datetime.strptime(time1_str, "%H:%M").time()
+
+    interview_counts = FN112Factory.build(sama=interviewlog, atytm0=time0,
+                                          atytm1=time1)
+
+    shouldbe = 'ActivityCount: {}-{} {}-{}'.format(prj_cd, sama, time0, time1)
+    assert str(interview_counts) == shouldbe
+
+
+
 def test_sam_repr():
     """The string method of a creel interview should return the object
     type (an interveiw), the sample number and the project code."""

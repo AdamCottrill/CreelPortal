@@ -144,6 +144,21 @@ class FN111Factory(factory.DjangoModelFactory):
     samtm0 = datetime.strptime("06:15", "%H:%M").time()
 
 
+class FN112Factory(factory.DjangoModelFactory):
+    '''a factory for activity counts on creel logs'''
+
+    class Meta:
+        model = 'creel_portal.FN112'
+
+    sama = factory.SubFactory(FN111Factory)
+
+    atytm0 = datetime.strptime("06:15", "%H:%M").time()
+    atytm1 = datetime.strptime("08:15", "%H:%M").time()
+    atycnt = 10
+    chkcnt = 8
+    itvcnt = 3
+
+
 
 class FN121Factory(factory.DjangoModelFactory):
     '''a factory for creel interviews'''

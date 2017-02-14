@@ -401,6 +401,34 @@ class FN111(models.Model):
         return repr
 
 
+class FN112(models.Model):
+    '''Class to represent the activity counts associated with a creel log.
+    '''
+
+    sama = models.ForeignKey(FN111, related_name='activity_counts')
+
+    atytm0 = models.TimeField(blank=False, help_text="Period Start")
+    atytm1 = models.TimeField(blank=False, help_text="Period End")
+    atycnt = models.IntegerField(default=0, help_text="Activity Count")
+    chkcnt = models.IntegerField(default=0, help_text="Activity Count")
+    itvcnt = models.IntegerField(default=0, help_text="Activity Count")
+
+
+    class Meta:
+        verbose_name = "Activity Count"
+        ordering = ['sama', 'atytm0', 'atytm1']
+        unique_together = ['sama', 'atytm0', 'atytm1']
+
+    def __str__(self):
+        '''return the object type, project code, the interview log
+        number (sama), the start time, and the end time.
+        '''
+
+        repr =  "ActivityCount: {}-{} {}-{}"
+        return repr.format(self.sama.creel.prj_cd, self.sama.sama,
+                           self.atytm0, self.atytm1)
+
+
 
 class FN121(models.Model):
     '''Class to represent the creel intervews.
