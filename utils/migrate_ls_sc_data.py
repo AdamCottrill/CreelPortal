@@ -13,24 +13,37 @@
 '''
 
 import django
+import os
+
+os.chdir('/home/adam/Documents/djcode/creel_portal/utils')
 django.setup()
+
 
 import django_settings
 import sqlite3
 
 from creel_portal.models import *
 
+from utils.helper_fcts import *
+
+
 SRC_DB = '/home/adam/Documents/work/Superior/SC_master.db'
 conn = sqlite3.connect(SRC_DB)
 cursor = conn.cursor()
+
+#lake = Lake(lake_name='Superior', abbrev='SU')
+#lake.save()
+
+lake = Lake.objects.get(abbrev='SU')
 
 #==================================
 #    FN011  - Project Details
 
 sql = """select PRJ_CD, ARU, COMMENT0, FOF_LOC, FOF_NM, PRJ_DATE0,
          PRJ_DATE1, PRJ_HIS, PRJ_LDR, PRJ_NM, PRJ_SIZE, PRJ_VER,
-         V0, WBY WBY_NM from fn011;""" cursor.execute(sql)
+         V0, WBY WBY_NM from fn011;"""
 
+cursor.execute(sql)
 rs = cursor.fetchall()
 
 col_names = [x[0].lower() for x in cursor.description]
@@ -255,6 +268,38 @@ print("Done adding FN111 records.")
 
 
 #==================================
+#    FN112  - ActivityCounts
+
+sql = """select prj_cd, sama, atytm0, atytm1, atycnt, chkcnt,
+         itvcnt from fn112 order by prj_cd, sama"""
+
+cursor.execute(sql)
+rs = cursor.fetchall()
+col_names = [x[0].lower() for x in cursor.description]
+objects = []
+for record in rs:
+    x = {k:v for k,v in zip(col_names, record)}
+    prj_cd = prj_cd_shouldbe(x.pop('prj_cd'))
+    sama = x.pop('sama')
+    sama = FN111.objects.filter(creel__prj_cd=prj_cd,
+                                sama=sama).first()
+    if sama is None:
+        print("oops! can't find FN111 for: " + str(record))
+    else:
+        x['sama'] = sama
+        x['atytm0'] = time_or_none(x['atytm0'])
+        x['atytm1'] = time_or_none(x['atytm1'])
+        x['atycnt'] = int_or_none(x['atycnt'], 0)
+        x['chkcnt'] = int_or_none(x['chkcnt'], 0)
+        x['itvcnt'] = int_or_none(x['itvcnt'], 0)
+        item = FN112(**x)
+        objects.append(item)
+FN112.objects.bulk_create(objects)
+print("Done adding FN112 records.")
+
+
+
+#==================================
 #    FN121  - Interviews
 
 sql = """SELECT prj_cd, sam, sama, itvseq, itvtm0, area, [date],
@@ -356,7 +401,7 @@ print("Done adding FN123 records.")
 
 
 sql = """select prj_cd, sam, spc, grp, fish, flen, tlen, rwt, sex,
-         gon, mat, age, agest, clipc, fate from fn125 order by
+         gon, null as mat, age, agest, clipc, fate from fn125 order by
          prj_cd, sam, spc, grp, fish"""
 
 cursor.execute(sql)
@@ -440,11 +485,57 @@ print("Done adding FN127 records.")
 #    FR713  - Effort Estimates
 
 
-sql = """ select prj_cd, strat, [date], angler_s, angler_ss, atycnt_s,
-          aty_days, aty_nn, chkcnt_s, cif_nn, itvcnt_s, person_s,
-          rod_s, rod_ss, tripno, [run], rec_tp from fr713
-          order by prj_cd, strat;
-"""
+sql = """ SELECT PRJ_CD,
+       RUN,
+       STRAT,
+       REC_TP,
+       DATE,
+       ANGLER_MN,
+       ANGLER_S,
+       ANGLER_SS,
+       ATY0,
+       ATY1,
+       ATY1_SE,
+       ATY1_VR,
+       ATY2,
+       ATY2_SE,
+       ATY2_VR,
+       ATYCNT_S,
+       ATY_DAYS,
+       ATY_HRS,
+       ATY_NN,
+       CHKCNT_S,
+       CIF_NN,
+       EFFAE,
+       EFFAE_SE,
+       EFFAE_VR,
+       EFFAO_S,
+       EFFAO_SS,
+       EFFPE,
+       EFFPE_SE,
+       EFFPE_VR,
+       EFFPO_S,
+       EFFPO_SS,
+       EFFRE,
+       EFFRE_SE,
+       EFFRE_VR,
+       EFFRO_S,
+       EFFRO_SS,
+       ITVCNT_S,
+       PERSON_S,
+       ROD_MNA,
+       ROD_S,
+       ROD_SS,
+       TRIPNE,
+       TRIPNE_SE,
+       TRIPNE_VR,
+       TRIPNO
+  FROM FR713
+ ORDER BY PRJ_CD,
+          RUN,
+          STRAT,
+          REC_TP,
+          DATE;"""
 
 cursor.execute(sql)
 rs = cursor.fetchall()
@@ -474,6 +565,7 @@ for record in rs:
 
     space = creel.spatial_strata.filter(space=stratum[6:8]).first()
 
+
     x['creel'] = creel
     x['mode'] = mode
     x['season'] = season
@@ -489,21 +581,48 @@ for record in rs:
             my_date = my_date.replace(year=yr)
             x['date'] = my_date
 
+    x['run'] = int_or_none(x['run'])
+    x['rec_tp'] = int_or_none(x['rec_tp'])
+    x['angler_mn'] = float_or_none(x['angler_mn'])
     x['angler_s'] = int_or_none(x['angler_s'])
     x['angler_ss']= int_or_none(x['angler_ss'])
+    x['aty0'] = float_or_none(x['aty0'])
+    x['aty1'] = float_or_none(x['aty1'])
+    x['aty1_se'] = float_or_none(x['aty1_se'])
+    x['aty1_vr'] = float_or_none(x['aty1_vr'])
+    x['aty2'] = float_or_none(x['aty2'])
+    x['aty2_se'] = float_or_none(x['aty2_se'])
+    x['aty2_vr'] = float_or_none(x['aty2_vr'])
     x['atycnt_s']= int_or_none(x['atycnt_s'])
     x['aty_days']= int_or_none(x['aty_days'])
+    x['aty_hrs'] = float_or_none(x['aty_hrs'])
     x['aty_nn']= int_or_none(x['aty_nn'])
     x['chkcnt_s']= int_or_none(x['chkcnt_s'])
     x['cif_nn']= int_or_none(x['cif_nn'])
+    x['effae'] = float_or_none(x['effae'])
+    x['effae_se'] = float_or_none(x['effae_se'])
+    x['effae_vr'] = float_or_none(x['effae_vr'])
+    x['effao_s'] = float_or_none(x['effao_s'])
+    x['effao_ss'] = float_or_none(x['effao_ss'])
+    x['effpe'] = float_or_none(x['effpe'])
+    x['effpe_se'] = float_or_none(x['effpe_se'])
+    x['effpe_vr'] = float_or_none(x['effpe_vr'])
+    x['effpo_s'] = float_or_none(x['effpo_s'])
+    x['effpo_ss'] = float_or_none(x['effpo_ss'])
+    x['effre'] = float_or_none(x['effre'])
+    x['effre_se'] = float_or_none(x['effre_se'])
+    x['effre_vr'] = float_or_none(x['effre_vr'])
+    x['effro_s'] = float_or_none(x['effro_s'])
+    x['effro_ss'] = float_or_none(x['effro_ss'])
     x['itvcnt_s']= int_or_none(x['itvcnt_s'])
     x['person_s']= int_or_none(x['person_s'])
+    x['rod_mna'] = float_or_none(x['rod_mna'])
     x['rod_s']= int_or_none(x['rod_s'])
-    x['rod_ss']= int_or_none(x['rod_ss'])
-    x['tripno']= int_or_none(x['tripno'])
-    x['run']= int_or_none(x['run'])
-    x['rec_tp']= int_or_none(x['rec_tp'])
-
+    x['rod_ss'] = int_or_none(x['rod_ss'])
+    x['tripne'] = float_or_none(x['tripne'])
+    x['tripne_se'] = float_or_none(x['tripne_se'])
+    x['tripne_vr'] = float_or_none(x['tripne_vr'])
+    x['tripno'] = int_or_none(x['tripno'])
 
     item = FR713(**x)
     objects.append(item)
@@ -517,10 +636,88 @@ print("Done adding FR713 records.")
 #    FR714  - Catch Estimates
 
 
-sql = """select prj_cd, strat, spc, sek, [date], rod1_s, angler1_s,
-         catno1_s, catno1_ss, catno_s, catno_ss, cif1_nn, hvsno1_s,
-         hvsno1_ss, hvsno_s, hvsno_ss, mescnt_s, rec_tp, [run] from fr714
-         order by prj_cd, strat, spc, sek;"""
+#sql = """select prj_cd, strat, spc, sek, [date], rod1_s, angler1_s,
+#         catno1_s, catno1_ss, catno_s, catno_ss, cif1_nn, hvsno1_s,
+#         hvsno1_ss, hvsno_s, hvsno_ss, mescnt_s, rec_tp, [run] from fr714
+#         order by prj_cd, strat, spc, sek;"""
+
+sql = """SELECT PRJ_CD,
+       RUN,
+       DATE,
+       STRAT,
+       REC_TP,
+       SPC,
+       SEK,
+       ANGLER1_S,
+       CATEA1_XY,
+       CATEA_XY,
+       CATEP1_XY,
+       CATEP_XY,
+       CATER1_XY,
+       CATER_XY,
+       CATNE,
+       CATNE1,
+       CATNE1_PC,
+       CATNE1_SE,
+       CATNE1_VR,
+       CATNE_SE,
+       CATNE_VR,
+       CATNO1_S,
+       CATNO1_SS,
+       CATNO_S,
+       CATNO_SS,
+       CIF1_NN,
+       CUENAE,
+       CUENAE1,
+       CUENAO,
+       CUENAO1,
+       EFFAE1,
+       EFFAE1_PC,
+       EFFAE1_SE,
+       EFFAE1_VR,
+       EFFAO1_S,
+       EFFAO1_SS,
+       EFFPE1,
+       EFFPE1_SE,
+       EFFPE1_VR,
+       EFFPO1_S,
+       EFFPO1_SS,
+       EFFRE1,
+       EFFRE1_SE,
+       EFFRE1_VR,
+       EFFRO1_S,
+       EFFRO1_SS,
+       HVSCAT_PC,
+       HVSEA1_XY,
+       HVSEA_XY,
+       HVSEP1_XY,
+       HVSEP_XY,
+       HVSER1_XY,
+       HVSER_XY,
+       HVSNE,
+       HVSNE1,
+       HVSNE1_SE,
+       HVSNE1_VR,
+       HVSNE_SE,
+       HVSNE_VR,
+       HVSNO1_S,
+       HVSNO1_SS,
+       HVSNO_S,
+       HVSNO_SS,
+       MESCNT_S,
+       MESWT_S,
+       ROD1_S
+  FROM fr714
+ ORDER BY PRJ_CD,
+          RUN,
+          DATE,
+          STRAT,
+          REC_TP,
+          SPC,
+          SEK
+"""
+
+
 
 cursor.execute(sql)
 rs = cursor.fetchall()
@@ -570,27 +767,77 @@ for record in rs:
             my_date = my_date.replace(year=yr)
             x['date'] = my_date
 
+
+    x['run'] = int_or_none(x['run'])
+    x['rec_tp'] = int_or_none(x['rec_tp'])
     x['sek'] = bool_or_none(x['sek'])
-    x['rod1_s'] = int_or_none(x['rod1_s'])
     x['angler1_s'] = int_or_none(x['angler1_s'])
+    x['catea1_xy'] = float_or_none(x['catea1_xy'])
+    x['catea_xy'] = float_or_none(x['catea_xy'])
+    x['catep1_xy'] = float_or_none(x['catep1_xy'])
+    x['catep_xy'] = float_or_none(x['catep_xy'])
+    x['cater1_xy'] = float_or_none(x['cater1_xy'])
+    x['cater_xy'] = float_or_none(x['cater_xy'])
+    x['catne'] = float_or_none(x['catne'])
+    x['catne1'] = float_or_none(x['catne1'])
+    x['catne1_pc'] = float_or_none(x['catne1_pc'])
+    x['catne1_se'] = float_or_none(x['catne1_se'])
+    x['catne1_vr'] = float_or_none(x['catne1_vr'])
+    x['catne_se'] = float_or_none(x['catne_se'])
+    x['catne_vr'] = float_or_none(x['catne_vr'])
     x['catno1_s'] = int_or_none(x['catno1_s'])
     x['catno1_ss'] = int_or_none(x['catno1_ss'])
     x['catno_s'] = int_or_none(x['catno_s'])
     x['catno_ss'] = int_or_none(x['catno_ss'])
     x['cif1_nn'] = int_or_none(x['cif1_nn'])
+    x['cuenae'] = float_or_none(x['cuenae'])
+    x['cuenae1'] = float_or_none(x['cuenae1'])
+    x['cuenao'] = float_or_none(x['cuenao'])
+    x['cuenao1'] = float_or_none(x['cuenao1'])
+    x['effae1'] = float_or_none(x['effae1'])
+    x['effae1_pc'] = float_or_none(x['effae1_pc'])
+    x['effae1_se'] = float_or_none(x['effae1_se'])
+    x['effae1_vr'] = float_or_none(x['effae1_vr'])
+    x['effao1_s'] = float_or_none(x['effao1_s'])
+    x['effao1_ss'] = float_or_none(x['effao1_ss'])
+    x['effpe1'] = float_or_none(x['effpe1'])
+    x['effpe1_se'] = float_or_none(x['effpe1_se'])
+    x['effpe1_vr'] = float_or_none(x['effpe1_vr'])
+    x['effpo1_s'] = float_or_none(x['effpo1_s'])
+    x['effpo1_ss'] = float_or_none(x['effpo1_ss'])
+    x['effre1'] = float_or_none(x['effre1'])
+    x['effre1_se'] = float_or_none(x['effre1_se'])
+    x['effre1_vr'] = float_or_none(x['effre1_vr'])
+    x['effro1_s'] = float_or_none(x['effro1_s'])
+    x['effro1_ss'] = float_or_none(x['effro1_ss'])
+    x['hvscat_pc'] = float_or_none(x['hvscat_pc'])
+    x['hvsea1_xy'] = float_or_none(x['hvsea1_xy'])
+    x['hvsea_xy'] = float_or_none(x['hvsea_xy'])
+    x['hvsep1_xy'] = float_or_none(x['hvsep1_xy'])
+    x['hvsep_xy'] = float_or_none(x['hvsep_xy'])
+    x['hvser1_xy'] = float_or_none(x['hvser1_xy'])
+    x['hvser_xy'] = float_or_none(x['hvser_xy'])
+    x['hvsne'] = float_or_none(x['hvsne'])
+    x['hvsne1'] = float_or_none(x['hvsne1'])
+    x['hvsne1_se'] = float_or_none(x['hvsne1_se'])
+    x['hvsne1_vr'] = float_or_none(x['hvsne1_vr'])
+    x['hvsne_se'] = float_or_none(x['hvsne_se'])
+    x['hvsne_vr'] = float_or_none(x['hvsne_vr'])
     x['hvsno1_s'] = int_or_none(x['hvsno1_s'])
     x['hvsno1_ss'] = int_or_none(x['hvsno1_ss'])
     x['hvsno_s'] = int_or_none(x['hvsno_s'])
     x['hvsno_ss'] = int_or_none(x['hvsno_ss'])
     x['mescnt_s'] = int_or_none(x['mescnt_s'])
-    x['rec_tp'] = int_or_none(x['rec_tp'])
-    x['run'] = int_or_none(x['run'])
+    x['meswt_s'] = float_or_none(x['meswt_s'])
+    x['rod1_s'] = int_or_none(x['rod1_s'])
 
     item = FR714(**x)
     objects.append(item)
 
 FR714.objects.bulk_create(objects)
 print("Done adding FR714 records.")
+
+conn.commit()
 
 #clean up
 cur.close()

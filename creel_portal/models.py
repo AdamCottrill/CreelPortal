@@ -56,7 +56,7 @@ class FN011(models.Model):
                               blank=False)
     prj_ldr = models.CharField(help_text="Project Lead", max_length=40,
                                blank=False)
-    comment0 = models.TextField(blank=False,
+    comment0 = models.TextField(blank=True, null=True,
                                help_text="General Project Description.")
     slug = models.SlugField(blank=True, unique=True, editable=False)
 
@@ -99,6 +99,15 @@ class FN011(models.Model):
         self.slug = slugify(self.prj_cd)
         self.year = self.prj_date0.year
         super(FN011, self).save( *args, **kwargs)
+
+
+    def get_global_effort(self):
+
+        return self.effort_estimates.filter(strat='++_++_++_++').first()
+
+    def get_global_catch(self):
+
+        return self.effort_estimates.filter(strat='++_++_++_++').all()
 
 
 class FN022(models.Model):
@@ -298,7 +307,7 @@ class FN111(models.Model):
                               help_text="Interview Period Start")
     weather = models.CharField(max_length=200, blank=False)
     help_str = 'Comments about current interview period.'
-    comment1 = models.CharField(max_length=200, blank=False,
+    comment1 = models.CharField(max_length=200, blank=True, null=True,
                                 help_text=help_str)
 
     class Meta:
@@ -410,8 +419,9 @@ class FN112(models.Model):
     atytm0 = models.TimeField(blank=False, help_text="Period Start")
     atytm1 = models.TimeField(blank=False, help_text="Period End")
     atycnt = models.IntegerField(default=0, help_text="Activity Count")
-    chkcnt = models.IntegerField(default=0, help_text="Activity Count")
-    itvcnt = models.IntegerField(default=0, help_text="Activity Count")
+    chkcnt = models.IntegerField(blank=True, null=True, default=0,
+                                 help_text="Check Count")
+    itvcnt = models.IntegerField(default=0, help_text="Interview Count")
 
 
     class Meta:
@@ -626,22 +636,65 @@ class FR713(models.Model):
     mode = models.ForeignKey(FN028, related_name='effort_estimates',
                              blank=True, null=True)
 
+    run = models.CharField(max_length=2)
+    rec_tp = models.IntegerField(default=1)
     strat = models.CharField(max_length=11)
-    date = models.DateField(blank=False, null=True)
-    angler_s = models.IntegerField()
-    angler_ss = models.IntegerField(blank=True, null=True)
-    atycnt_s = models.IntegerField(blank=True, null=True)
-    aty_days = models.IntegerField(blank=True, null=True)
-    aty_nn = models.IntegerField()
+    date = models.DateField(blank=True, null=True)
+
     chkcnt_s = models.IntegerField(blank=True, null=True)
-    cif_nn = models.IntegerField()
     itvcnt_s = models.IntegerField(blank=True, null=True)
     person_s = models.IntegerField()
+
+    cif_nn = models.IntegerField()
+
+    effre = models.FloatField(blank=True, null=True)
+    effre_se = models.FloatField()
+    effre_vr = models.FloatField(blank=True, null=True)
+
+    effae = models.FloatField(blank=True, null=True)
+    effae_se = models.FloatField()
+    effae_vr = models.FloatField(blank=True, null=True)
+
+    effpe = models.FloatField()
+    effpe_se = models.FloatField()
+    effpe_vr = models.FloatField(blank=True, null=True)
+
+    effro_s = models.FloatField()
+    effro_ss = models.FloatField(blank=True, null=True)
+
+    effpo_s = models.FloatField(blank=True, null=True)
+    effpo_ss = models.FloatField(blank=True, null=True)
+
+    effao_s = models.FloatField()
+    effao_ss = models.IntegerField(blank=True, null=True)
+
+    tripno = models.IntegerField(blank=True, null=True)
+    tripne = models.FloatField()
+    tripne_se = models.FloatField(blank=True, null=True)
+    tripne_vr = models.FloatField(blank=True, null=True)
+
+    aty_nn = models.IntegerField()
+    aty_hrs = models.FloatField(blank=True, null=True)
+    atycnt_s = models.IntegerField(blank=True, null=True)
+    aty_days = models.IntegerField(blank=True, null=True)
+
+    aty0 = models.FloatField(blank=True, null=True)
+
+    aty1 = models.FloatField()
+    aty1_se = models.FloatField()
+    aty1_vr = models.FloatField(blank=True, null=True)
+
+    aty2 = models.FloatField()
+    aty2_se = models.FloatField()
+    aty2_vr = models.FloatField(blank=True, null=True)
+
+    angler_mn = models.FloatField(blank=True, null=True)
+    angler_s = models.IntegerField()
+    angler_ss = models.IntegerField(blank=True, null=True)
+
+    rod_mna = models.FloatField(blank=True, null=True)
     rod_s = models.IntegerField()
     rod_ss = models.IntegerField(blank=True, null=True)
-    tripno = models.IntegerField(blank=True, null=True)
-    rec_tp = models.IntegerField()
-    run = models.CharField(max_length=2, blank=True, null=True)
 
     class Meta:
         verbose_name = "EffortEstimate"
@@ -679,23 +732,91 @@ class FR714(models.Model):
     mode = models.ForeignKey(FN028, related_name='catch_estimates',
                              blank=True, null=True)
 
+    #new
+    run = models.CharField(max_length=2, blank=True, null=True)
+    rec_tp = models.IntegerField()
     strat = models.CharField(max_length=11)
     date = models.DateField(blank=False, null=True)
     sek = models.BooleanField()
-    rod1_s = models.IntegerField()
+    cif1_nn = models.IntegerField()
+
     angler1_s = models.IntegerField()
+    rod1_s = models.IntegerField()
+    mescnt_s = models.IntegerField()
+    meswt_s = models.FloatField()
+
+    catne1 = models.FloatField()
+    catne1_pc = models.FloatField(blank=True, null=True)
+    catne1_se = models.FloatField()
+    catne1_vr = models.FloatField(blank=True, null=True)
+
+    catne = models.FloatField()
+    catne_se = models.FloatField()
+    catne_vr = models.FloatField(blank=True, null=True)
+
     catno1_s = models.IntegerField()
     catno1_ss = models.IntegerField(blank=True, null=True)
     catno_s = models.IntegerField()
     catno_ss = models.IntegerField(blank=True, null=True)
-    cif1_nn = models.IntegerField()
-    hvsno1_s = models.IntegerField()
-    hvsno1_ss = models.IntegerField(blank=True, null=True)
+
+    effae1 = models.FloatField()
+    effae1_pc = models.FloatField(blank=True, null=True)
+    effae1_se = models.FloatField()
+    effae1_vr = models.FloatField(blank=True, null=True)
+
+    effao1_s = models.FloatField()
+    effao1_ss = models.FloatField(blank=True, null=True)
+
+    effpe1 = models.FloatField()
+    effpe1_se = models.FloatField()
+    effpe1_vr = models.FloatField(blank=True, null=True)
+
+    effpo1_s = models.FloatField()
+    effpo1_ss = models.FloatField(blank=True, null=True)
+
+    effre1 = models.FloatField()
+    effre1_se = models.FloatField()
+    effre1_vr = models.FloatField(blank=True, null=True)
+
+    effro1_s = models.FloatField()
+    effro1_ss = models.FloatField(blank=True, null=True)
+
+    hvscat_pc = models.FloatField()
+
+    hvsne = models.FloatField()
+    hvsne_se = models.FloatField()
+    hvsne_vr = models.FloatField(blank=True,null=True)
+
+    hvsne1 = models.FloatField()
+    hvsne1_se = models.FloatField()
+    hvsne1_vr = models.FloatField(blank=True, null=True)
+
+    cuenao = models.FloatField()
+    cuenao1 = models.FloatField(blank=True, null=True)
+    cuenae = models.FloatField()
+    cuenae1 = models.FloatField(blank=True, null=True)
+
     hvsno_s = models.IntegerField()
     hvsno_ss = models.IntegerField(blank=True, null=True)
-    mescnt_s = models.IntegerField()
-    rec_tp = models.IntegerField()
-    run = models.CharField(max_length=2, blank=True, null=True)
+
+    hvsno1_s = models.IntegerField()
+    hvsno1_ss = models.IntegerField(blank=True, null=True)
+
+    catea_xy = models.FloatField(blank=True, null=True)
+    catea1_xy = models.FloatField(blank=True, null=True)
+    hvsea_xy = models.FloatField(blank=True, null=True)
+    hvsea1_xy = models.FloatField(blank=True, null=True)
+    cater_xy = models.FloatField(blank=True, null=True)
+    cater1_xy = models.FloatField(blank=True, null=True)
+    hvser_xy = models.FloatField(blank=True, null=True)
+    hvser1_xy = models.FloatField(blank=True, null=True)
+    catep_xy = models.FloatField(blank=True, null=True)
+    catep1_xy = models.FloatField(blank=True, null=True)
+    hvsep_xy = models.FloatField(blank=True, null=True)
+    hvsep1_xy = models.FloatField(blank=True, null=True)
+
+
+
 
     class Meta:
         verbose_name = "HarvestEstimate"
