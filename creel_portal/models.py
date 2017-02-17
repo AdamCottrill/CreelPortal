@@ -107,7 +107,7 @@ class FN011(models.Model):
 
     def get_global_catch(self):
 
-        return self.effort_estimates.filter(strat='++_++_++_++').all()
+        return self.catch_estimates.filter(strat='++_++_++_++').all()
 
 
 class FN022(models.Model):
