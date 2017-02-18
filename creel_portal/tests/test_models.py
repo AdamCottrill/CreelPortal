@@ -483,6 +483,25 @@ def test_age_estimate_repr():
     assert str(age_est) == shouldbe
 
 
+def test_strat_setting_repr():
+    """The stratum setting string method should return the, the project
+    code and the stratum combination string used to generate
+    estimates.
+
+    """
+
+    prj_cd = "LHA_SC11_123"
+    strat_comb = '??_++_++_++'
+
+    creel = FN011Factory.build(prj_cd=prj_cd)
+    strat_setting = FR711Factory.build(creel=creel, strat_comb=strat_comb)
+
+    shouldbe = '{} ({})'.format(prj_cd, strat_comb)
+
+    assert str(strat_setting) == shouldbe
+
+
+
 def test_effort_estimate_repr():
     """The effort estimate string method should return the object type,
     the project code and the stratum to which the estimate applies."""

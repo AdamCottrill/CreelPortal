@@ -225,6 +225,30 @@ class FN127Factory(factory.DjangoModelFactory):
     nca = 5
 
 
+
+class FR711Factory(factory.DjangoModelFactory):
+    '''a factory for creel strata settings'''
+
+    class Meta:
+        model = 'creel_portal.FR711'
+
+    creel = factory.SubFactory(FN011Factory)
+
+    strat_comb = '++_++_++_++'
+
+    atycrit = 32
+    cifopt = '12345'
+    contmeth = 'A2'
+    do_cif  = 1
+    fr71_est  = 2
+    fr71_unit  = 2
+    mask_c = '++_++_++_++'
+    run = '01'
+    save_daily = True
+    strat_comb = '++_++_++_++'
+
+
+
 class FR713Factory(factory.DjangoModelFactory):
     '''A factory for creel effort estimates.
 

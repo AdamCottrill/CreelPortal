@@ -613,6 +613,47 @@ class FN127(models.Model):
                            self.ageid)
 
 
+
+class FR711(models.Model):
+    '''Class to hold creel strata settings.  this table contains
+    information about contact method (access or roving creel), whether or
+    not estimates are save daily, and which strata can be combined or must
+    be estimated separately (important for presenting final results as
+    there may not be a ++_++_++_++ strata.
+
+    '''
+
+    CONTMETH_CHOICES = (
+        ('A2', 'Access; Same days'),
+        ('R0', 'Roving; No interviews'),
+        ('R1', 'Roving; Not same days'),
+        ('R2', 'Roving; Same days'),
+    )
+
+    creel = models.ForeignKey(FN011, related_name='strata_settings')
+
+    atycrit = models.IntegerField()
+    cifopt = models.CharField(max_length=5)
+    contmeth = models.CharField(max_length=2,choices=CONTMETH_CHOICES,
+                                default='A2')
+    do_cif  = models.IntegerField()
+    fr71_est  = models.IntegerField()
+    fr71_unit  = models.IntegerField()
+    mask_c = models.CharField(max_length=11)
+    run = models.CharField(max_length=2)
+    save_daily = models.BooleanField()
+    strat_comb = models.CharField(max_length=11)
+
+
+    def __str__(self):
+        '''return the object type (strata config), and the prj_cd,
+        and the strat_comb.
+
+        '''
+        repr = "{} ({})".format(self.creel.prj_cd, self.strat_comb)
+
+        return repr
+
 class FR713(models.Model):
     '''Class to hold creel estimate of effort by strata.
 
