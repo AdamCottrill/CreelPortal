@@ -247,7 +247,7 @@ class FN026(models.Model):
     area_wt = models.FloatField(blank=True, null=True)
 
     ddlat = models.FloatField(blank=True, null=True)
-    ddlat = models.FloatField(blank=True, null=True)
+    ddlon = models.FloatField(blank=True, null=True)
 
     class Meta:
         verbose_name = "Spatial Strata"
