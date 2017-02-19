@@ -172,6 +172,7 @@ class EffortEstimates(generics.ListAPIView):
         slug = self.kwargs['slug']
 
         qs = FR713.objects.filter(creel__slug=slug).\
+             filter(date__isnull=True).\
              exclude(strat__contains='+')
 
         return qs
@@ -185,6 +186,7 @@ class CatchEstimates(generics.ListAPIView):
         slug = self.kwargs['slug']
 
         qs = FR714.objects.filter(creel__slug=slug).\
+             filter(date__isnull=True).\
              exclude(strat__contains='+')
 
         return qs

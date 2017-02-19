@@ -40,6 +40,9 @@ urlpatterns = [
         views.CreelDetailView.as_view(),
         name="creel_detail"),
 
+        url((r'^effort_estimates/' + prj_cd_regex + r'/$'),
+        views.effort_estimates,
+        name="effort_estimates_plots"),
 
     #api urls
     url(r'^api/v1/', include(router.urls)),

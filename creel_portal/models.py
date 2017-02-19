@@ -134,6 +134,21 @@ class FN022(models.Model):
         repr =  "<Season: {} ({}) [{}]>"
         return repr.format(self.ssn_des, self.ssn, self.creel.prj_cd)
 
+    @property
+    def label(self):
+        """a string that will be used in serialized respoonse for this strata.
+        If both the ssn, and ssn des are available, return them, otherwise,
+        return just the snn code.
+
+        Arguments:
+        - `self`:
+
+        """
+        if self.ssn_des:
+            label = '{} ({})'.format(self.ssn_des.title(), self.ssn)
+        else:
+            label = '{}'.format(self.ssn)
+        return label
 
 class FN023(models.Model):
     '''Class  to represent the daytypes used in each season of creel
@@ -161,9 +176,23 @@ class FN023(models.Model):
         repr =  "<DayType: {}({}) {}-{}>"
         return repr.format(self.dtp_nm, self.dtp, self.season.ssn,
                            self.season.creel.prj_cd)
-        #repr =  "<DayType: {}({}) [{}]>"
-        #return repr.format(self.dtp_nm, self.dtp,
-        #                   self.creel.prj_cd)
+
+    @property
+    def label(self):
+        """a string that will be used in serialized respoonse for this strata.
+        If both the dtp, and dtp des are available, return them, otherwise,
+        return just the snn code.
+
+        Arguments:
+        - `self`:
+
+        """
+        if self.dtp_nm:
+            label = '{} ({})'.format(self.dtp_nm.title(), self.dtp)
+        else:
+            label = '{}'.format(self.dtp)
+        return label
+
 
 
 class FN024(models.Model):
@@ -265,6 +294,24 @@ class FN026(models.Model):
                            self.creel.prj_cd)
 
 
+    @property
+    def label(self):
+        """a string that will be used in serialized respoonse for this strata.
+        If both the space, and space_des are available, return them, otherwise,
+        return just the snn code.
+
+        Arguments:
+        - `self`:
+
+        """
+        if self.space_des:
+            label = '{} ({})'.format(self.space_des.title(), self.space)
+        else:
+            label = '{}'.format(self.space)
+        return label
+
+
+
 class FN028(models.Model):
     '''Class to represent the fishing modes used in a creel.
     '''
@@ -291,6 +338,23 @@ class FN028(models.Model):
         repr =  "<FishingMode: {} ({}) [{}]>"
         return repr.format(self.mode_des, self.mode,
                            self.creel.prj_cd)
+
+    @property
+    def label(self):
+        """a string that will be used in serialized respoonse for this strata.
+        If both the mode, and mode_des are available, return them, otherwise,
+        return just the snn code.
+
+        Arguments:
+        - `self`:
+
+        """
+        if self.mode_des:
+            label = '{} ({})'.format(self.mode_des.title(), self.mode)
+        else:
+            label = '{}'.format(self.mode)
+        return label
+
 
 
 class FN111(models.Model):
