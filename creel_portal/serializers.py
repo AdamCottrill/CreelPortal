@@ -134,11 +134,13 @@ class FR713Serializer(serializers.ModelSerializer):
 
 class FR714Serializer(serializers.ModelSerializer):
 
-    mode = serializers.CharField(source='mode.mode', read_only=True)
-    season = serializers.CharField(source='ssn.ssn', read_only=True)
-    dtp = serializers.CharField(source='dtp.dtp_nm', read_only=True)
+
+    mode = serializers.CharField(source='mode.label', read_only=True)
+    season = serializers.CharField(source='season.label', read_only=True)
+    dtp = serializers.CharField(source='dtp.label', read_only=True)
     period = serializers.CharField(source='period.prd', read_only=True)
-    area = serializers.CharField(source='area.space', read_only=True)
+    area = serializers.CharField(source='area.label', read_only=True)
+
     species = serializers.CharField(source='species.common_name',
                                     read_only=True)
 

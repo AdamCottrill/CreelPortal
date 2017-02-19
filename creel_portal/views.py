@@ -30,3 +30,17 @@ def effort_estimates(request, slug):
     return render(request,
                   'creel_portal/creel_effort_plots.html',
                   {'creel': creel})
+
+
+def catch_estimates(request, slug):
+    """
+
+    Arguments:
+    - `request`:
+    """
+
+    creel = get_object_or_404(FN011, slug=slug)
+
+    return render(request,
+                  'creel_portal/creel_catch_plots.html',
+                  {'creel': creel})
