@@ -9,8 +9,8 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.12/crossfilter.js"></script>
 <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/reductio/0.6.3/reductio.js"></script>  -->
 
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.5/dc.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.5/dc.css">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dc/2.1.3/dc.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dc/2.1.3/dc.css">
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
@@ -43,43 +43,80 @@
 </div>
 
 
-
-<div class="row" >
-    <div class="col-md-6" >
-        <div id="eff-season-chart">
-            <strong>Effort By Season</strong>
-            <a class="reset" href="javascript:effSeasonChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="row" >
+            <div class="col-md-6" >
+                <div id="eff-season-chart">
+                    <strong>Effort By Season</strong>
+                    <a class="reset" href="javascript:effSeasonChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                </div>
+            </div>
+            <div class="col-md-6" >
+                <div id="eff-space-chart">
+                    <strong>Effort By Space</strong>
+                    <a class="reset" href="javascript:effSpaceChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-md-6" >
-        <div id="eff-space-chart">
-            <strong>Effort By Space</strong>
-            <a class="reset" href="javascript:effSpaceChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+</div>
+<div class="panel panel-default">
+    <div class="panel-body">
+
+        <div class="row" >
+            <div class="col-md-4" >
+                <div id="eff-daytype-chart">
+                    <strong>Effort By Day Type</strong>
+                    <a class="reset" href="javascript:effDaytypeChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                </div>
+            </div>
+
+            <div class="col-md-4" >
+                <div id="eff-period-chart">
+                    <strong>Effort By Period Type</strong>
+                    <a class="reset" href="javascript:effPeriodChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                </div>
+            </div>
+            <div class="col-md-4" >
+                <div id="eff-mode-chart">
+                    <strong>Effort By Fishing Mode</strong>
+                    <a class="reset" href="javascript:effModeChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="row" >
-    <div class="col-md-4" >
-        <div id="eff-daytype-chart">
-            <strong>Effort By Day Type</strong>
-            <a class="reset" href="javascript:effDaytypeChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-        </div>
-    </div>
+<p>Add buttons to switch between variables - harvest, catch, estimates, observed.</p>
 
-    <div class="col-md-4" >
-        <div id="eff-period-chart">
-            <strong>Effort By Period Type</strong>
-            <a class="reset" href="javascript:effPeriodChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
-        </div>
-    </div>
-    <div class="col-md-4" >
-        <div id="eff-mode-chart">
-            <strong>Effort By Fishing Mode</strong>
-            <a class="reset" href="javascript:effModeChart.filterAll();dc.redrawAll();" style="display: none;">reset</a>
+
+<h4>Effort by Strata</h4></h4>
+<div class="dc-data-count">
+</div>
+
+<div class='container' style='font: 12px sans-serif;'>
+    <div class='row'>
+        <div class='span12'>
+            <table class='table table-hover' id='dc-data-table'>
+                <thead>
+                    <tr class='header'>
+                        <td>Area</td>
+                        <td>Season</td>
+                        <td>Day Type</td>
+                        <td>Period</td>
+                        <td>Mode</td>
+                        <td>Estimated Effort</td>
+                        <td>Observed Effort</td>
+                    </tr>
+                </thead>
+            </table>
         </div>
     </div>
 </div>
+
+
+
 
 
 {% endblock content %}
@@ -89,118 +126,152 @@
 
 <script type="text/javascript">
 
-// var effSeasonChart = dc.barChart('#eff-season-chart');
-// var effSpaceChart = dc.barChart('#eff-space-chart');
+ // var effSeasonChart = dc.barChart('#eff-season-chart');
+ // var effSpaceChart = dc.barChart('#eff-space-chart');
 
- var effSeasonChart = dc.rowChart('#eff-season-chart');
- var effSpaceChart = dc.rowChart('#eff-space-chart');
+ // var chartGroup = "myCharts";
+ var effSeasonChart = dc.rowChart('#eff-season-chart'); //, chartGroup);
+ var effSpaceChart = dc.rowChart('#eff-space-chart'); //, chartGroup);
 
- var effModeChart = dc.pieChart('#eff-mode-chart');
- var effPeriodChart = dc.pieChart('#eff-period-chart');
- var effDaytypeChart = dc.pieChart('#eff-daytype-chart');
+ var effModeChart = dc.pieChart('#eff-mode-chart'); //, chartGroup);
+ var effPeriodChart = dc.pieChart('#eff-period-chart'); //, chartGroup);
+ var effDaytypeChart = dc.pieChart('#eff-daytype-chart'); //, chartGroup);
 
-    d3.json("{% url 'effort_estimates' creel.slug %}", function (error, data) {
+ var effortTable = dc.dataTable('#dc-data-table');//); //, chartGroup);
 
-        data = data.results
+ d3.json("{% url 'effort_estimates' creel.slug %}", function (error, data) {
 
-        var mydateformat = d3.time.format('%B %d, %Y');
-        var isodateformat = d3.time.format.iso;
+     data = data.results
 
-        data.forEach(function(d){
-            d.mode = d.mode;
-            d.season = d.season;
-            d.dtp = d.dtp;
-            d.period = d.period;
-            d.area = d.area;
-            d.date = isodateformat.parse(d.date);
-            d.effre = +d.effre;
-            d.effae = +d.effae;
-            d.effao_s = d.effao_s;
-            d.effro_s = d.effro_s;
-        });
+     var mydateformat = d3.time.format('%B %d, %Y');
+     var isodateformat = d3.time.format.iso;
 
-        var estimates = crossfilter(data);
+     data.forEach(function(d,i){
+         d.mode = d.mode;
+         d.season = d.season;
+         d.dtp = d.dtp;
+         d.period = d.period;
+         d.area = d.area;
+         d.date = isodateformat.parse(d.date);
+         d.effre = +d.effre;
+         d.effae = +d.effae;
+         d.effao_s = d.effao_s;
+         d.effro_s = d.effro_s;
+     });
 
-        var all = estimates.groupAll();
-        var all_effre = all.reduceSum(function(d){return d.effre;});
-        //var all_effae = all.reduceSum(function(d){return d.effae;});
+     var estimates = crossfilter(data);
 
-        //create a dimension for each strata
-        var modeDim = estimates.dimension(function(d) { return d.mode; });
-        var ssnDim = estimates.dimension(function(d) { return d.season; });
-        var daytypeDim = estimates.dimension(function(d) { return d.dtp; });
-        var periodDim = estimates.dimension(function(d) { return d.period; });
-        var areaDim = estimates.dimension(function(d) { return d.area; });
+     var all = estimates.groupAll();
+     var all_effre = all.reduceSum(function(d){return d.effre;});
+     //var all_effae = all.reduceSum(function(d){return d.effae;});
 
-        // create goups from each of our dimensions
-        var modeGroup = modeDim.group();
-        var ssnGroup = ssnDim.group();
-        var daytypeGroup = daytypeDim.group();
-        var periodGroup = periodDim.group();
-        var areaGroup = areaDim.group();
+     //create a dimension for each strata
+     var modeDim = estimates.dimension(function(d) { return d.mode; });
+     var ssnDim = estimates.dimension(function(d) { return d.season; });
+     var daytypeDim = estimates.dimension(function(d) { return d.dtp; });
+     var periodDim = estimates.dimension(function(d) { return d.period; });
+     var areaDim = estimates.dimension(function(d) { return d.area; });
 
-        // reducer functions for each group:
-        // sum for now, but could be more complicated later
+     // create goups from each of our dimensions
+     var modeGroup = modeDim.group();
+     var ssnGroup = ssnDim.group();
+     var daytypeGroup = daytypeDim.group();
+     var periodGroup = periodDim.group();
+     var areaGroup = areaDim.group();
 
-        var modeGroupeffre = modeDim.group().reduceSum(function(d) {return d.effre;});
-        var ssnGroupeffre = ssnDim.group().reduceSum(function(d) {return d.effre;});
-        var daytypeGroupeffre = daytypeDim.group().reduceSum(function(d) {return d.effre;});
-        var periodGroupeffre = periodDim.group().reduceSum(function(d) {return d.effre;});
-        var areaGroupeffre = areaDim.group().reduceSum(function(d) {return d.effre;});
+     // reducer functions for each group:
+     // sum for now, but could be more complicated later
 
-        // =================
-        //     CHARTS
+     var modeGroupeffre = modeDim.group().reduceSum(function(d) {return d.effre;});
+     var ssnGroupeffre = ssnDim.group().reduceSum(function(d) {return d.effre;});
+     var daytypeGroupeffre = daytypeDim.group().reduceSum(function(d) {return d.effre;});
+     var periodGroupeffre = periodDim.group().reduceSum(function(d) {return d.effre;});
+     var areaGroupeffre = areaDim.group().reduceSum(function(d) {return d.effre;});
 
-        var width = 500;
-        var height = 500;
+     // =================
+     //     CHARTS
 
+     var width = 500;
+     var height = 500;
 
-        var sm_width = width * 0.6;
-        var sm_height = width * 0.6;
-        var radius = (sm_width * 0.8)/2;
+     var sm_width = width * 0.6;
+     var sm_height = width * 0.6;
+     var radius = (sm_width * 0.8)/2;
 
-        effSeasonChart.width(width)
-                      .height(height)
-                      .dimension(ssnDim)
-                      .group(ssnGroupeffre)
-                      .x(d3.scale.linear().domain([0,100]))
-                      .elasticX(true)
-                      .render();
+     effSeasonChart.width(width)
+                   .height(height)
+                   .dimension(ssnDim)
+                   .group(ssnGroupeffre)
+                   .x(d3.scale.linear().domain([0,100]))
+                   .elasticX(true)
+                   .render();
 
-        effSpaceChart.width(width)
-                      .height(height)
-                      .dimension(areaDim)
-                      .group(areaGroupeffre)
-                      .x(d3.scale.linear().domain([0,100]))
-                      .elasticX(true)
-                      .render();
+     effSpaceChart.width(width)
+                  .height(height)
+                  .dimension(areaDim)
+                  .group(areaGroupeffre)
+                  .x(d3.scale.linear().domain([0,100]))
+                  .elasticX(true)
+                  .render();
 
-        effModeChart.width(sm_width)
+     effModeChart.width(sm_width)
+                 .height(sm_height)
+                 .radius(radius)
+                 .dimension(modeDim)
+                 .group(modeGroupeffre)
+                 .render();
+
+     effPeriodChart.width(sm_width)
+                   .height(sm_height)
+                   .dimension(periodDim)
+                   .group(periodGroupeffre)
+                   .radius(radius)
+     //.x(d3.scale.linear().domain([0,100]))
+     //.elasticX(true)
+                   .render();
+
+     effDaytypeChart.width(sm_width)
                     .height(sm_height)
+                    .dimension(daytypeDim)
+                    .group(daytypeGroupeffre)
                     .radius(radius)
-                    .dimension(modeDim)
-                    .group(modeGroupeffre)
+     //.x(d3.scale.linear().domain([0,100]))
+     //.elasticX(true)
                     .render();
 
-        effPeriodChart.width(sm_width)
-                    .height(sm_height)
-                    .dimension(periodDim)
-                      .group(periodGroupeffre)
-                      .radius(radius)
-                    //.x(d3.scale.linear().domain([0,100]))
-                    //.elasticX(true)
-                    .render();
+     effortTable.width(960).height(1200)
+     //.showGroups(true)
+                .dimension(modeDim)
+                .group(function(d){ return "" })
+                .columns([
+                    function(d) { return d.area; },
+                    function(d) { return d.season; },
+                    function(d) { return d.dtp; },
+                    function(d) { return d.period; },
+                    function(d) { return d.mode; },
+                    function(d) { return d.effre; },
+                    function(d) { return d.effro_s; }
+                ])
+                .sortBy(function(d){ return d.mode; })
+                .order(d3.ascending);
 
-        effDaytypeChart.width(sm_width)
-                      .height(sm_height)
-                      .dimension(daytypeDim)
-                       .group(daytypeGroupeffre)
-                       .radius(radius)
-                      //.x(d3.scale.linear().domain([0,100]))
-                      //.elasticX(true)
-                      .render();
-    }
-    )
+     //var recordCount =  dc.dataCount('.dc-data-count');
+     // record count will not render all option or the filter-count in the html.
+     var recordCount = dc.dataCount('.dc-data-count')
+                         .dimension(estimates)
+                         .group(all)
+                         .html({
+                             some: '<strong>%filter-count</strong> selected out of <strong>%total-count</strong> records' +
+                                   ' | <a href=\'javascript:dc.filterAll(); dc.renderAll();\'>Reset All</a>',
+                             all: 'All records selected. Please click on a graph to apply filters.'
+                         });
+
+
+     dc.renderAll();
+
+ }
+ )
+
 
 
 </script>
