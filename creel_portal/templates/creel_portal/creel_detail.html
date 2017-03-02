@@ -36,289 +36,273 @@
                 </table>
             </div>
         </div>
-    </div
-</div>
-<div class="col-md-8" >
-
-    <div class="panel panel-default">
-        <div class="panel-body">
-            <h3>this will be a leaflet map</h3>
-        </div>
-    </div>
-
-</div>
-</div>
-
-
-
-
-
-
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">Project Summary</h3>
-    </div>
-    <div class="panel-body">
-        {{ object.comment0 }}
-    </div>
-</div>
-
-
-
-
-
-
-
-<div class="panel panel-default">
-    <div class="panel-body">
         <h4>Explore:</h4>
-        <div id="button_bar" class="row" >
-            <p>
-                <a type ="btn" class="btn btn-link btn-default-sm" href="{% url 'effort_estimates_plots' object.slug %}" role="button">Effort</a>
-                <a type ="btn"  class="btn btn-link btn-default-sm" href="{% url 'catch_estimates_plots' object.slug %}" role="button">Catch/Harvest</a>
-                <a type ="btn"  class="btn btn-link btn-default-sm" href="#" role="button">Option Questions</a>
-            </p>
+        <div  class="row" >
+            <div  class="col-md-4" >
+                <a class="btn btn-primary btn-block" href="{% url 'effort_estimates_plots' object.slug %}" role="button">Effort</a>
+            </div>
+            <div  class="col-md-4" >
+                <a class="btn btn-primary btn-block" href="{% url 'catch_estimates_plots' object.slug %}" role="button">Catch/Harvest</a>
+            </div>
+            <div  class="col-md-4" >
+                <a class="btn btn-primary btn-block" href="#" role="button" disabled="disabled">Option Questions</a>
+            </div>
+        </div>
+    </div
+    <div class="col-md-8" >
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h3>this will be a leaflet map</h3>
+            </div>
         </div>
     </div>
-</div>
 
+    <div>
 
-<div>
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#summary" aria-controls="summary" role="tab" data-toggle="tab">Project Summary</a></li>
+            <li role="presentation"><a href="#strata" aria-controls="strata" role="tab" data-toggle="tab">Strata</a></li>
+            <li role="presentation"><a href="#effort" aria-controls="effort" role="tab" data-toggle="tab">Effort</a></li>
+            <li role="presentation"><a href="#catch" aria-controls="catch" role="tab" data-toggle="tab">Catch</a></li>
+        </ul>
 
-    <!-- Nav tabs -->
-    <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="active"><a href="#strata" aria-controls="strata" role="tab" data-toggle="tab">Strata</a></li>
-        <li role="presentation"><a href="#effort" aria-controls="effort" role="tab" data-toggle="tab">Effort</a></li>
-        <li role="presentation"><a href="#catch" aria-controls="catch" role="tab" data-toggle="tab">Catch</a></li>
-    </ul>
+        <!-- Tab panes -->
+        <div class="tab-content">
 
-    <!-- Tab panes -->
-    <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active" id="strata">
+            <div role="tabpanel" class="tab-pane active" id="summary">
 
-
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Seasons
-                        <a type ="btn"  class="btn btn-link btn-default-sm pull-right" href="#" role="button">Calendar</a>
-                    </h3>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Project Summary</h3>
+                    </div>
+                    <div class="panel-body">
+                        {{ object.comment0 }}
+                    </div>
                 </div>
-                <div class="panel-body">
-
-                    {% for ssn in object.seasons.all %}
-
+            </div>
+            <div role="tabpanel" class="tab-pane" id="strata">
+                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                     <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title"> {{ ssn.ssn_des|title }} ({{ssn.ssn}}) </h3>
+                        <div class="panel-heading" role="tab" id="headingOne">
+                            <h4 class="panel-title">
+                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    Seasons
+                                </a>
+                            </h4>
                         </div>
-                        <div class="panel-body">
+                        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                            <div class="panel-body">
 
-                            <div class="row">
-                                <div class="col-md-4"><strong>Season Start:</strong> {{ ssn.ssn_date0 }}</div>
-                                <div class="col-md-4"><strong>Season End:</strong> {{ ssn.ssn_date1 }}</div>
-                            </div>
+                                {% for ssn in object.seasons.all %}
 
-                            <div class="panel panel-default">
-                                <div class="panel-body">
-                                    <strong>DayTypes</strong>
-                                    <ul>
-                                        {% for dt in ssn.daytypes.all %}
-                                        <li>{{ dt.dtp_nm | title }} ({{ dt.dtp }})</li>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title"> {{ ssn.ssn_des|title }} ({{ssn.ssn}}) </h3>
+                                    </div>
+                                    <div class="panel-body">
+
+                                        <div class="row">
+                                            <div class="col-md-4"><strong>Season Start:</strong> {{ ssn.ssn_date0 }}</div>
+                                            <div class="col-md-4"><strong>Season End:</strong> {{ ssn.ssn_date1 }}</div>
+                                        </div>
+
+                                        <div class="panel panel-default">
+                                            <div class="panel-body">
+                                                <strong>DayTypes</strong>
+                                                <ul>
+                                                    {% for dt in ssn.daytypes.all %}
+                                                    <li>{{ dt.dtp_nm | title }} ({{ dt.dtp }})</li>
+                                                    <ul>
+                                                        {% for period in dt.periods.all %}
+                                                        <li> Period {{ period.prd }}: {{period.prdtm0}} - {{ period.prdtm1}}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        {% if ssn.exception_dates.all %}
+                                        <strong>Exception Dates:</strong>
                                         <ul>
-                                            {% for period in dt.periods.all %}
-                                            <li> Period {{ period.prd }}: {{period.prdtm0}} - {{ period.prdtm1}}</li>
+                                            {% for x in ssn.exception_dates.all %}
+                                            <li>{{ x.date }}</li>
                                             {% endfor %}
+                                            {% endif %}
                                         </ul>
-                                        {% endfor %}
-                                    </ul>
+                                    </div>
                                 </div>
-                            </div>
-                            {% if ssn.exception_dates.all %}
-                            <strong>Exception Dates:</strong>
-                            <ul>
-                                {% for x in ssn.exception_dates.all %}
-                                <li>{{ x.date }}</li>
                                 {% endfor %}
-                                {% endif %}
-                            </ul>
+                            </div>
                         </div>
                     </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading" role="tab" id="headingTwo">
+                            <h4 class="panel-title">
+                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    Spatial Strata
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                            <div class="panel-body">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Space</th>
+                                            <th>Descrption</th>
+                                            <th>Area Size</th>
+                                            <th>Area Count</th>
+                                            <th>Area List</th>
+                                            <th>Area Weight</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in object.spatial_strata.all %}
+                                        <tr>
+                                            <td>{{ item.space }}</td>
+                                            <td>{{ item.space_des }}</td>
+                                            <td>{{ item.space_siz }}</td>
+                                            <td>{{ item.area_count }}</td>
+                                            <td>{{ item.area_lst }}</td>
+                                            <td>{{ item.area_wt }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading" role="tab" id="headingThree">
+                            <h4 class="panel-title">
+                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    Fishing Modes
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                            <div class="panel-body">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Mode</th>
+                                            <th>Descrption</th>
+                                            <th>ATY Unit</th>
+                                            <th>Interview Unit</th>
+                                            <th>Check Flag</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in object.modes.all %}
+                                        <tr>
+                                            <td>{{ item.mode }}</td>
+                                            <td>{{ item.mode_des }}</td>
+                                            <td>{{ item.atyunit }}</td>
+                                            <td>{{ item.itvunit }}</td>
+                                            <td>{{ item.chkflag }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
 
-                    {% endfor %}
-
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </div>  <!-- tab pabel -->
+
+            <div role="tabpanel" class="tab-pane" id="effort">
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Effort</h3>
+                    </div>
+                    <div class="panel-body">
+
+                        {% with object.get_global_effort as effort %}
+                        <ul>
+                            <li>Observers Trip Count:{{ effort.tripno }}</li>
+                            <li>Estimated Trip Count:{{ effort.tripne }}</li>
+                            <li>Activity Count:{{ effort.atycnt_s }}</li>
+                            <li>Interview Count:{{ effort.itvcnt_s }}</li>
+                            <li>Angler Count:{{ effor.angler_s }}</li>
+                            <li>Rods :{{ effort.rod_s }}</li>
+                            <li>Total Angler Effort :{{ effort.effae }} (anlger-hours)</li>
+                            <li>Total Angler Effort :{{ effort.effre }} (rod-hours)</li>
+                        </ul>
+                        {% endwith %}
+                    </div>
+                </div>
+
+
+
             </div>
+            <div role="tabpanel" class="tab-pane" id="catch">
 
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Catch</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p>NOTE: add pie chart of species composition here</p>
 
+                        {% with object.get_global_catch as catch %}
 
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Spatial Strata</h3>
-                </div>
-                <div class="panel-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Species</th>
+                                    <th>Obs. Harvest</th>
+                                    <th>Est. Harvest</th>
+                                    <th>Obs. Targ. Harvest</th>
+                                    <th>Est. Targ. Harvest</th>
+                                    <th>Obs. Catch</th>
+                                    <th>Est. Catch</th>
+                                    <th>Obs. Targ. Catch</th>
+                                    <th>Est. Targ. Catch</th>
+                                    <th>Obs. Effort</th>
+                                    <th>Est. Effort</th>
+                                    <th>Obs. Targ. Effort</th>
+                                    <th>Est. Targ. Effort</th>
+                                    <th>Obs. Cpue</th>
+                                    <th>Est. Cpue</th>
+                                    <th>Obs. Targ. Cpue</th>
+                                    <th>Est. Targ. Cpue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for spc in catch %}
+                                <tr>
+                                    <td>{{ spc.species.common_name }}</td>
+                                    <td>{{ spc.hvsno_s }}</td>
+                                    <td>{{ spc.hvsne }}</td>
+                                    <td>{{ spc.hvsno1_s }}</td>
+                                    <td>{{ spc.hvsne1 }}</td>
+                                    <td>{{ spc.catno_s }}</td>
+                                    <td>{{ spc.catne }}</td>
+                                    <td>{{ spc.catno1_s }}</td>
+                                    <td>{{ spc.catne1 }}</td>
 
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Space</th>
-                                <th>Descrption</th>
-                                <th>Area Size</th>
-                                <th>Area Count</th>
-                                <th>Area List</th>
-                                <th>Area Weight</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in object.spatial_strata.all %}
-                            <tr>
-                                <td>{{ item.space }}</td>
-                                <td>{{ item.space_des }}</td>
-                                <td>{{ item.space_siz }}</td>
-                                <td>{{ item.area_count }}</td>
-                                <td>{{ item.area_lst }}</td>
-                                <td>{{ item.area_wt }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                                    <td>{{ spc.effao_s }}</td>
+                                    <td>{{ spc.effae }}</td>
+                                    <td>{{ spc.effao1_s }}</td>
+                                    <td>{{ spc.effae1 }}</td>
 
-
-
-
-
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Fishing Modes</h3>
-                </div>
-                <div class="panel-body">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Mode</th>
-                                <th>Descrption</th>
-                                <th>ATY Unit</th>
-                                <th>Interview Unit</th>
-                                <th>Check Flag</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in object.modes.all %}
-                            <tr>
-                                <td>{{ item.mode }}</td>
-                                <td>{{ item.mode_des }}</td>
-                                <td>{{ item.atyunit }}</td>
-                                <td>{{ item.itvunit }}</td>
-                                <td>{{ item.chkflag }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-
-
-        </div>
-        <div role="tabpanel" class="tab-pane" id="effort">
-
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Effort</h3>
-                </div>
-                <div class="panel-body">
-
-                    {% with object.get_global_effort as effort %}
-                    <ul>
-                        <li>Observers Trip Count:{{ effort.tripno }}</li>
-                        <li>Estimated Trip Count:{{ effort.tripne }}</li>
-                        <li>Activity Count:{{ effort.atycnt_s }}</li>
-                        <li>Interview Count:{{ effort.itvcnt_s }}</li>
-                        <li>Angler Count:{{ effor.angler_s }}</li>
-                        <li>Rods :{{ effort.rod_s }}</li>
-                        <li>Total Angler Effort :{{ effort.effae }} (anlger-hours)</li>
-                        <li>Total Angler Effort :{{ effort.effre }} (rod-hours)</li>
-                    </ul>
-                    {% endwith %}
-                </div>
-            </div>
-
-
-
-        </div>
-        <div role="tabpanel" class="tab-pane" id="catch">
-
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Catch</h3>
-                </div>
-                <div class="panel-body">
-                    <p>NOTE: add pie chart of species composition here</p>
-
-                    {% with object.get_global_catch as catch %}
-
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Species</th>
-                                <th>Obs. Harvest</th>
-                                <th>Est. Harvest</th>
-                                <th>Obs. Targ. Harvest</th>
-                                <th>Est. Targ. Harvest</th>
-                                <th>Obs. Catch</th>
-                                <th>Est. Catch</th>
-                                <th>Obs. Targ. Catch</th>
-                                <th>Est. Targ. Catch</th>
-                                <th>Obs. Effort</th>
-                                <th>Est. Effort</th>
-                                <th>Obs. Targ. Effort</th>
-                                <th>Est. Targ. Effort</th>
-                                <th>Obs. Cpue</th>
-                                <th>Est. Cpue</th>
-                                <th>Obs. Targ. Cpue</th>
-                                <th>Est. Targ. Cpue</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for spc in catch %}
-                            <tr>
-                                <td>{{ spc.species.common_name }}</td>
-                                <td>{{ spc.hvsno_s }}</td>
-                                <td>{{ spc.hvsne }}</td>
-                                <td>{{ spc.hvsno1_s }}</td>
-                                <td>{{ spc.hvsne1 }}</td>
-                                <td>{{ spc.catno_s }}</td>
-                                <td>{{ spc.catne }}</td>
-                                <td>{{ spc.catno1_s }}</td>
-                                <td>{{ spc.catne1 }}</td>
-
-                                <td>{{ spc.effao_s }}</td>
-                                <td>{{ spc.effae }}</td>
-                                <td>{{ spc.effao1_s }}</td>
-                                <td>{{ spc.effae1 }}</td>
-
-                                <td>{{ spc.cuenao }}</td>
-                                <td>{{ spc.cuenae }}</td>
-                                <td>{{ spc.cuenao1 }}</td>
-                                <td>{{ spc.cuenae1 }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                    {% endwith %}
+                                    <td>{{ spc.cuenao }}</td>
+                                    <td>{{ spc.cuenae }}</td>
+                                    <td>{{ spc.cuenao1 }}</td>
+                                    <td>{{ spc.cuenae1 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% endwith %}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 
-
-
-
-
-
-
-
-{% endblock content %}
+    {% endblock content %}
