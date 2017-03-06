@@ -10,6 +10,19 @@ class CreelListView(ListView):
     model = FN011
     template_name = "creel_portal/creel_list.html"
 
+    def get_queryset(self, **kwargs):
+        queryset = FN011.objects.order_by('lake','-prj_date0')
+        self.lake = self.kwargs.get('lake')
+
+        if self.lake:
+            queryset = queryset.filter(lake__lake_name=self.lake)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super(CreelListView, self).get_context_data(**kwargs)
+        context['lake'] = self.lake
+        return context
+
 
 class CreelDetailView(DetailView):
     model = FN011

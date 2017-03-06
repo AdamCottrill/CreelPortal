@@ -4,29 +4,81 @@
 
 {% block content %}
 
-<table class="table">
-    <tbody>
+{% if lake %}
+<h3>All creels run on Lake {{lake|title}}:</h3>
 
-        <thead>
-            <tr>
-                <th>Year</th>
-                <th>Project Code</th>
-                <th>Project Name</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-            </tr>
-        </thead>
 
-        {% for object in object_list %}
-        <tr>
-            <td>{{ object.year }}</td>
-            <td> <a href="{{ object.get_absolute_url }}">{{ object.prj_cd }}</a> </td>
-            <td>{{ object.prj_nm }}</td>
-            <td>{{ object.prj_date0 }}</td>
-            <td>{{ object.prj_date1 }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="panel panel-default">
+    <div class="panel-body">
+
+        <table class="table">
+            <tbody>
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th>Project Code</th>
+                        <th>Project Name</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                    </tr>
+                </thead>
+                {% for creel in object_list %}
+                <tr>
+                    <td>{{ creel.year }}</td>
+                    <td> <a href="{{ creel.get_absolute_url }}">{{ creel.prj_cd }}</a> </td>
+                    <td>{{ creel.prj_nm|title }}</td>
+                    <td>{{ creel.prj_date0 }}</td>
+                    <td>{{ creel.prj_date1 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+
+    </div>
+</div>
+
+
+
+
+{% else %}
+
+{% regroup object_list by lake as lake_list %}
+
+
+{% for lake in lake_list %}
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">  <a href="{% url 'creels_by_lake' lake.grouper.lake_name %}">Lake {{ lake.grouper.lake_name|title }} ({{ lake.grouper.abbrev }}) </a></h3>
+    </div>
+    <div class="panel-body">
+        <table class="table">
+            <tbody>
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th>Project Code</th>
+                        <th>Project Name</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                    </tr>
+                </thead>
+                {% for creel in lake.list|slice:":15" %}
+                <tr>
+                    <td>{{ creel.year }}</td>
+                    <td> <a href="{{ creel.get_absolute_url }}">{{ creel.prj_cd }}</a> </td>
+                    <td>{{ creel.prj_nm|title }}</td>
+                    <td>{{ creel.prj_date0 }}</td>
+                    <td>{{ creel.prj_date1 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endfor %}
+{% endif %}
 
 {% endblock content %}
