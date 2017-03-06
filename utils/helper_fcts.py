@@ -36,16 +36,22 @@ def prj_cd_shouldbe(prj_cd):
     return prj_cd
 
 
-def int_or_none(val, if_none=None):
+def int_or_none(val, default=None):
     """
 
     Arguments:
     - `x`:
     """
     if val is None:
-        return None
+        if default is not None:
+            return default
+        else:
+            return None
     elif val == "":
-        return None
+        if default is not None:
+            return default
+        else:
+            return None
     else:
         return int(val)
 
@@ -59,7 +65,7 @@ def time_or_none(val):
     from datetime import datetime
     if val is None:
         return None
-    elif val == "":
+    elif val=="" or val.replace(' ','')==':':
         return None
     else:
         return datetime.strptime(val,'%H:%M')

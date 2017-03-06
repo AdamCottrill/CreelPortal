@@ -145,7 +145,7 @@ class FN022(models.Model):
 
         """
         if self.ssn_des:
-            label = '{} ({})'.format(self.ssn_des.title(), self.ssn)
+            label = '{}-{}'.format(self.ssn, self.ssn_des.title())
         else:
             label = '{}'.format(self.ssn)
         return label
@@ -188,7 +188,7 @@ class FN023(models.Model):
 
         """
         if self.dtp_nm:
-            label = '{} ({})'.format(self.dtp_nm.title(), self.dtp)
+            label = '{}-{}'.format(self.dtp, self.dtp_nm.title())
         else:
             label = '{}'.format(self.dtp)
         return label
@@ -305,7 +305,7 @@ class FN026(models.Model):
 
         """
         if self.space_des:
-            label = '{} ({})'.format(self.space_des.title(), self.space)
+            label = '{}-{}'.format(self.space, self.space_des.title())
         else:
             label = '{}'.format(self.space)
         return label
@@ -350,7 +350,7 @@ class FN028(models.Model):
 
         """
         if self.mode_des:
-            label = '{} ({})'.format(self.mode_des.title(), self.mode)
+            label = '{}-{}'.format(self.mode, self.mode_des.title())
         else:
             label = '{}'.format(self.mode)
         return label
@@ -694,7 +694,8 @@ class FR711(models.Model):
         ('R2', 'Roving; Same days'),
     )
 
-    creel = models.ForeignKey(FN011, related_name='strata_settings')
+    creel = models.ForeignKey(FN011, related_name='creesys_settings')
+    run = models.CharField(max_length=2)
 
     atycrit = models.IntegerField()
     cifopt = models.CharField(max_length=5)
@@ -704,9 +705,14 @@ class FR711(models.Model):
     fr71_est  = models.IntegerField()
     fr71_unit  = models.IntegerField()
     mask_c = models.CharField(max_length=11)
-    run = models.CharField(max_length=2)
     save_daily = models.BooleanField()
     strat_comb = models.CharField(max_length=11)
+
+
+    class Meta:
+        verbose_name = "EffortEstimate"
+        ordering = ['creel', 'run']
+        unique_together = ['creel', 'run']
 
 
     def __str__(self):
@@ -741,7 +747,8 @@ class FR713(models.Model):
     mode = models.ForeignKey(FN028, related_name='effort_estimates',
                              blank=True, null=True)
 
-    run = models.CharField(max_length=2)
+    #TODO: run should be a fk to FR111 table
+    run = models.CharField(max_length=2, db_index=True)
     rec_tp = models.IntegerField(default=1)
     strat = models.CharField(max_length=11)
     date = models.DateField(blank=True, null=True)
@@ -760,8 +767,8 @@ class FR713(models.Model):
     effae_se = models.FloatField()
     effae_vr = models.FloatField(blank=True, null=True)
 
-    effpe = models.FloatField()
-    effpe_se = models.FloatField()
+    effpe = models.FloatField(blank=True, null=True)
+    effpe_se = models.FloatField(blank=True, null=True)
     effpe_vr = models.FloatField(blank=True, null=True)
 
     effro_s = models.FloatField()
@@ -803,8 +810,8 @@ class FR713(models.Model):
 
     class Meta:
         verbose_name = "EffortEstimate"
-        ordering = ['creel', 'strat', 'date', 'rec_tp']
-        unique_together = ['creel', 'strat', 'date', 'rec_tp']
+        ordering = ['creel', 'run', 'strat', 'date', 'rec_tp']
+        unique_together = ['creel', 'strat', 'date', 'rec_tp', 'run']
 
     def __str__(self):
         '''return the object type (EffortEstimate), and the prj_cd.
@@ -837,8 +844,9 @@ class FR714(models.Model):
     mode = models.ForeignKey(FN028, related_name='catch_estimates',
                              blank=True, null=True)
 
-    #new
-    run = models.CharField(max_length=2, blank=True, null=True)
+    #NEW
+    #run should be a fk to FR111 table
+    run = models.CharField(max_length=2, db_index=True)
     rec_tp = models.IntegerField()
     strat = models.CharField(max_length=11)
     date = models.DateField(blank=False, null=True)
@@ -847,8 +855,8 @@ class FR714(models.Model):
 
     angler1_s = models.IntegerField()
     rod1_s = models.IntegerField()
-    mescnt_s = models.IntegerField()
-    meswt_s = models.FloatField()
+    mescnt_s = models.IntegerField(blank=True, null=True)
+    meswt_s = models.FloatField(blank=True, null=True)
 
     catne1 = models.FloatField()
     catne1_pc = models.FloatField(blank=True, null=True)
@@ -873,10 +881,10 @@ class FR714(models.Model):
     effao1_ss = models.FloatField(blank=True, null=True)
 
     effpe1 = models.FloatField()
-    effpe1_se = models.FloatField()
+    effpe1_se = models.FloatField(blank=True, null=True)
     effpe1_vr = models.FloatField(blank=True, null=True)
 
-    effpo1_s = models.FloatField()
+    effpo1_s = models.FloatField(blank=True, null=True)
     effpo1_ss = models.FloatField(blank=True, null=True)
 
     effre1 = models.FloatField()
@@ -925,8 +933,9 @@ class FR714(models.Model):
 
     class Meta:
         verbose_name = "HarvestEstimate"
-        ordering = ['creel', 'strat', 'species', 'date', 'rec_tp', 'sek']
-        unique_together = ['creel', 'strat', 'species', 'date', 'rec_tp', 'sek']
+        ordering = ['creel','run', 'strat', 'species', 'date', 'rec_tp', 'sek']
+        unique_together = ['creel', 'strat', 'species', 'date', 'rec_tp',
+                           'sek','run']
 
     def __str__(self):
         '''return the object type (EffortEstimate), and the prj_cd.'''

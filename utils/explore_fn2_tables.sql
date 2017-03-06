@@ -119,6 +119,8 @@ select prj_cd, sam, spc, grp, fish, ageid, agea, agemt, conf, edge, nca from fn1
 select * from fr713 where prj_cd='LSM_SC00_BAS';
 select * from fr713 where strat = '++_++_++_++';
 
+select * from fr713 where effpe1 is null or effpe1 ='';
+
 select * from fr713;
 select count(*), count(prj_cd), count(strat), count(angler_s), count(angler_ss), count(atycnt_s), count(aty_days) from fr713;
 
@@ -126,7 +128,6 @@ select prj_cd, strat, angler_s, angler_ss, atycnt_s, aty_days, aty_nn, chkcnt_s,
 select distinct strat from fr713;
 PRAGMA table_info(fr713);
 
-select * from fr714;
 
 SELECT PRJ_CD,
        RUN,
@@ -236,12 +237,99 @@ from fr713;
 -- catch estimates by species
 
 --delete from Fr714;
+select * from fr714 limit 10;
 
 select * from fr714 where prj_cd like '%_SC00_BAS';
 select * from fr714 where strat = '++_++_++_++';
 
+select distinct prj_cd from fr714;
+
+select * from fr713 where prj_cd like '%00_BAT' and strat not like '%+%';
+
+select * from fr713 where prj_cd like '%11_bsr' and strat not like '%+%';
+
 select prj_cd, strat, spc, sek, rod1_s, angler1_s, catno1_s, catno1_ss, catno_s, catno_ss, cif1_nn, hvsno1_s, hvsno1_ss, hvsno_s, hvsno_ss, mescnt_s, rec_tp, [run] from fr714
 order by prj_cd, strat, spc, sek;
+
+SELECT PRJ_CD,
+       RUN,
+       DATE,
+       STRAT,
+       REC_TP,
+       SPC,
+       SEK,
+       ANGLER1_S,
+       CATEA1_XY,
+       CATEA_XY,
+       CATEP1_XY,
+       CATEP_XY,
+       CATER1_XY,
+       CATER_XY,
+       CATNE,
+       CATNE1,
+       CATNE1_PC,
+       CATNE1_SE,
+       CATNE1_VR,
+       CATNE_SE,
+       CATNE_VR,
+       CATNO1_S,
+       CATNO1_SS,
+       CATNO_S,
+       CATNO_SS,
+       CIF1_NN,
+       CUENAE,
+       CUENAE1,
+       CUENAO,
+       CUENAO1,
+       EFFAE1,
+       EFFAE1_PC,
+       EFFAE1_SE,
+       EFFAE1_VR,
+       EFFAO1_S,
+       EFFAO1_SS,
+       EFFPE1,
+       EFFPE1_SE,
+       EFFPE1_VR,
+       EFFPO1_S,
+       EFFPO1_SS,
+       EFFRE1,
+       EFFRE1_SE,
+       EFFRE1_VR,
+       EFFRO1_S,
+       EFFRO1_SS,
+       HVSCAT_PC,
+       HVSEA1_XY,
+       HVSEA_XY,
+       HVSEP1_XY,
+       HVSEP_XY,
+       HVSER1_XY,
+       HVSER_XY,
+       HVSNE,
+       HVSNE1,
+       HVSNE1_SE,
+       HVSNE1_VR,
+       HVSNE_SE,
+       HVSNE_VR,
+       HVSNO1_S,
+       HVSNO1_SS,
+       HVSNO_S,
+       HVSNO_SS,
+       MESCNT_S,
+       MESWT_S,
+       ROD1_S
+  FROM fr714
+ ORDER BY PRJ_CD,
+          RUN,
+          DATE,
+          STRAT,
+          REC_TP,
+          SPC,
+          SEK;
+
+
+
+
+
 
 PRAGMA table_info(fr714);
 select count(*),
@@ -316,3 +404,16 @@ Count(STRAT) from fr714;
 ---=================================================
 -- biosample counts by speceies and strata
 select * from fr523 limit 10;
+
+select * from fr521 limit 25;
+select * from fr522 limit 25;
+select * from fr524 limit 25;
+
+-- strat design table and contact method
+-- stratcomb indicates which strata can be combined and those that can't
+-- also indicates whether or not daily estimates should be returned
+select * from fr711 limit 25;
+select * from fr713 where strat like '%+%';
+select * from fr713 where prj_cd like '%BAT';
+
+select * from fr71s1 limit 25;
