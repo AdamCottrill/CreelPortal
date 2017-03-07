@@ -64,4 +64,9 @@ urlpatterns = [
     url((r'^api/v1/catch_estimates/' + prj_cd_regex + r'/$'),
         api_views.CatchEstimates.as_view(), name='catch_estimates'),
 
+
+    url((r'^api/v1/creel_spaces/' + prj_cd_regex + r'/$'),
+        api_views.CreelSpaces.as_view(), name='creel_spaces'),
+
+
 ]

@@ -1,5 +1,16 @@
 {% extends "base.html" %}
 
+{% block extrahead %}
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
+
+<script src='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.js'></script>
+<link href='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.css' rel='stylesheet' />
+
+
+{% endblock extrahead %}
+
+
 
 {% block content %}
 
@@ -50,11 +61,7 @@
         </div>
     </div
     <div class="col-md-8" >
-        <div class="panel panel-default">
-            <div class="panel-body">
-                <h3>this will be a leaflet map</h3>
-            </div>
-        </div>
+        <div id="map" style="width: 700px; height: 700px;"></div>
     </div>
 
     <div>
@@ -303,6 +310,56 @@
             </div>
         </div>
     </div>
+
+    <script type="text/javascript">
+
+
+     // intiailize map based on the lake this creel occurs in
+     var lat = {{ creel.lake.ddlat }}
+     var lon =  {{ creel.lake.ddlon }}
+     var zoom =  {{ creel.lake.zoom }}
+
+     var  map = new L.map('map').setView([lat,lon], zoom);
+
+     function drawMap(){
+
+         function onEachFeature(feature, layer) {
+             if (feature.properties && feature.properties.popupContent) {
+                 layer.bindPopup(feature.properties.popupContent);
+             }
+         };
+
+         var dataurl = "{%  url 'creel_spaces' creel.slug %}";
+         // Download GeoJSON via Ajax
+         $.getJSON(dataurl, function (data) {
+
+             for (var i in data.results){
+                 var x = data.results[i];
+                 var geojsonFeature = {
+                     "type": "Feature",
+                     "properties": {
+                         "popupContent": x.popupContent
+                     },
+                     "geometry": {
+                         "type": "Point",
+                         "coordinates": [x.ddlon, x.ddlat]
+                     }
+                 };
+                 L.geoJson(geojsonFeature, {onEachFeature: onEachFeature}).addTo(map);
+                 }
+         });
+
+         L.mapbox.accessToken = 'pk.eyJ1IjoiYWNvdHRyaWxsIiwiYSI6ImNpazVmb3Q2eDAwMWZpZm0yZTQ1cjF3NTkifQ.Pb1wCYs0lKgjnTGz43DjVQ';
+         // Replace 'mapbox.streets' with your map id.
+         var mapboxTiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=' + L.mapbox.accessToken, {
+             attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
+         }).addTo(map);
+
+     }
+
+     drawMap();
+
+    </script>
 
 
     {% endblock content %}

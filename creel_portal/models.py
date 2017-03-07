@@ -3,6 +3,9 @@ from django.db import models
 from django.template.defaultfilters import slugify
 from django.urls import reverse
 
+
+from djgeojson.fields import PointField
+
 from datetime import datetime
 
 # Create your models here.
@@ -30,6 +33,10 @@ class Lake(models.Model):
 
     abbrev = models.CharField(max_length=10, unique=True)
     lake_name = models.CharField(max_length=50)
+
+    ddlat = models.FloatField(default = 45.0)
+    ddlon = models.FloatField(default = -82.0)
+    zoom =  models.IntegerField(default=7)
 
     class Meta:
         verbose_name = "Lake"
@@ -275,6 +282,8 @@ class FN026(models.Model):
                                 blank=True, null=True)
     area_wt = models.FloatField(blank=True, null=True)
 
+
+    geom = PointField(blank=True, null=True)
     ddlat = models.FloatField(blank=True, null=True)
     ddlon = models.FloatField(blank=True, null=True)
 
@@ -310,6 +319,14 @@ class FN026(models.Model):
             label = '{}'.format(self.space)
         return label
 
+
+    @property
+    def popupContent(self):
+        if self.space_des:
+            return "<p>Space: {} ({})</p>".format(self.space_des.title(),
+                                                  self.space)
+        else:
+            return "<p>Space: {}</p>".format(self.space)
 
 
 class FN028(models.Model):

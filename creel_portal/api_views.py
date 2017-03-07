@@ -190,3 +190,17 @@ class CatchEstimates(generics.ListAPIView):
              exclude(strat__contains='+')
 
         return qs
+
+
+class CreelSpaces(generics.ListAPIView):
+    serializer_class = FN026Serializer
+
+    def get_queryset(self):
+        """
+        """
+        slug = self.kwargs['slug']
+
+        qs = FN026.objects.filter(creel__slug=slug).\
+             filter(ddlat__isnull=False, ddlon__isnull=False)
+
+        return qs

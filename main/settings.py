@@ -25,7 +25,7 @@ SECRET_KEY = 'e$3_%3son0au!5yy-wum0yo@)-(r_huz(-4=nohk8@xtl53$iz'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['142.143.160.42', '127.0.0.1']
 
 
 # Application definition
@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'djgeojson',
     'creel_portal',
 ]
 

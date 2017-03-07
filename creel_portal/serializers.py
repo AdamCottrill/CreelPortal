@@ -58,8 +58,9 @@ class FN026Serializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = FN026
-        fields = ('id', 'creel', 'space', 'space_siz', 'area_cnt', 'area_lst',
-                  'area_wt', 'ddlat', 'ddlon')
+        fields = ('id', 'creel', 'space', 'space_des', 'space_siz',
+                  'popupContent', 'area_cnt', 'area_lst', 'area_wt',
+                  'ddlat', 'ddlon')
 
 
 class FN028Serializer(serializers.HyperlinkedModelSerializer):
