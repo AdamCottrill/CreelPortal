@@ -59,7 +59,7 @@ class FN026Serializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = FN026
         fields = ('id', 'creel', 'space', 'space_des', 'space_siz',
-                  'popupContent', 'area_cnt', 'area_lst', 'area_wt',
+                  'label', 'area_cnt', 'area_lst', 'area_wt',
                   'ddlat', 'ddlon')
 
 
@@ -126,11 +126,13 @@ class FR713Serializer(serializers.ModelSerializer):
     dtp = serializers.CharField(source='dtp.label', read_only=True)
     period = serializers.CharField(source='period.prd', read_only=True)
     area = serializers.CharField(source='area.label', read_only=True)
+    ddlat = serializers.FloatField(source='area.ddlat', read_only=True)
+    ddlon = serializers.FloatField(source='area.ddlon', read_only=True)
 
     class Meta:
         model = FR713
         fields = ('id', 'mode', 'season', 'dtp', 'period', 'area', 'date',
-                  'effre', 'effae', 'effao_s', 'effro_s')
+                  'effre', 'effae', 'effao_s', 'effro_s', 'ddlat', 'ddlon')
 
 
 class FR714Serializer(serializers.ModelSerializer):

@@ -282,8 +282,10 @@ class FN026(models.Model):
                                 blank=True, null=True)
     area_wt = models.FloatField(blank=True, null=True)
 
+    label = models.CharField(max_length=110, blank=False,
+                             help_text="Space Label")
 
-    geom = PointField(blank=True, null=True)
+    #geom = PointField(blank=True, null=True)
     ddlat = models.FloatField(blank=True, null=True)
     ddlon = models.FloatField(blank=True, null=True)
 
@@ -302,32 +304,46 @@ class FN026(models.Model):
         return repr.format(self.space_des, self.space,
                            self.creel.prj_cd)
 
+    def save(self, *args, **kwargs):
+        """from:http://stackoverflow.com/questions/7971689/
+             generate-slug-field-in-existing-table
 
-    @property
-    def label(self):
-        """a string that will be used in serialized respoonse for this strata.
-        If both the space, and space_des are available, return them, otherwise,
-        return just the snn code.
-
-        Arguments:
-        - `self`:
-
+        Create a space label as a combination of the space description
+        and space code.
         """
+
         if self.space_des:
-            label = '{}-{}'.format(self.space, self.space_des.title())
+            self.label = '{}-{}'.format(self.space, self.space_des.title())
         else:
-            label = '{}'.format(self.space)
-        return label
+            self.label = '{}'.format(self.space)
+        super(FN026, self).save( *args, **kwargs)
 
 
-    @property
-    def popupContent(self):
-        if self.space_des:
-            return "<p>Space: {} ({})</p>".format(self.space_des.title(),
-                                                  self.space)
-        else:
-            return "<p>Space: {}</p>".format(self.space)
-
+#    @property
+#    def label(self):
+#        """a string that will be used in serialized respoonse for this strata.
+#        If both the space, and space_des are available, return them, otherwise,
+#        return just the snn code.
+#
+#        Arguments:
+#        - `self`:
+#
+#        """
+#        if self.space_des:
+#            label = '{}-{}'.format(self.space, self.space_des.title())
+#        else:
+#            label = '{}'.format(self.space)
+#        return label
+#
+#
+#    @property
+#    def popupContent(self):
+#        if self.space_des:
+#            return "<p>Space: {} ({})</p>".format(self.space_des.title(),
+#                                                  self.space)
+#        else:
+#            return "<p>Space: {}</p>".format(self.space)
+#
 
 class FN028(models.Model):
     '''Class to represent the fishing modes used in a creel.

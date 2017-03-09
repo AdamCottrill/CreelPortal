@@ -11,14 +11,14 @@
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dc/2.1.3/dc.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dc/2.1.3/dc.css">
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.js"></script>
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
 
 <script src='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.js'></script>
 <link href='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.css' rel='stylesheet' />
 
-<!-- <script src="{% static 'leaflet-bubble.js' %}"></script> -->
+<script src="{% static 'leaflet-bubble.js' %}"></script>
 
 <style type="text/css" media="screen">
  #filter-buttons a {
@@ -36,7 +36,7 @@
     <div class="col-md-12" >
         <div class="panel panel-default">
             <div class="panel-body">
-                <h3>this will be a leaflet map</h3>
+                <div id="map" style="width: 1000px; height: 600px;"></div>
             </div>
         </div>
     </div>
@@ -126,6 +126,74 @@
 
 <script type="text/javascript">
 
+
+ //function get_spaces() {
+ //    return $.getJSON("{%  url 'creel_spaces' creel.slug %}");
+ //}
+
+ var spaces = {{ spaces|safe }};
+
+ function get_net_set_points(x, pts){
+     // give a list/array, extract format the elements
+     // for use with leaflet.
+     var len = x.length
+     var points={};
+
+     // create an list of objects that will use the area string as their key
+
+     for (var i = 0; i < len; i++) {
+         var tmp = x[i];
+         // if it exists, add the values from this iteration
+         if (points[tmp.area] !=undefined){
+             points[tmp.area].effae += tmp.effae;
+             points[tmp.area].effao_s += tmp.effao_s;
+             points[tmp.area].effre += tmp.effre;
+             points[tmp.area].effro_s += tmp.effro_s;
+         } else {
+             // if not, create on
+             points[tmp.area] = {
+                 area: tmp.area,
+                 ddlat: tmp.ddlat,
+                 ddlon: tmp.ddlon,
+                 effae: tmp.effae,
+                 effao_s: tmp.effao_s,
+                 effre: tmp.effre,
+                 effro_s: tmp.effro_s,
+             };
+         }
+     }
+     return points
+ }
+
+
+ function points_to_geojson(points){
+     // this function takes a list of points and converts it to geoJson format
+     // required by leaflet-bubble.js
+     var features = []
+     _.each(points, function (d){
+
+         features.push({
+             "type": "Feature",
+             "geometry":{
+                 "type": "Point",
+                 "coordinates": [d.ddlon, d.ddlat]},
+             "properties":{
+                 "Space": d.area,
+                 "est_effort_angler": d.effae.toFixed(1),
+                 "obs_effort_agler": d.effao_s.toFixed(1),
+                 "est_effort_rods": d.effre.toFixed(1),
+                 'obs_effort_rods': d.effro_s.toFixed(1)
+             }});
+     });
+
+     var geojson =  {"type": "FeatureCollection",
+                     "features": features };
+
+     return geojson
+ }
+
+
+
  // var effSeasonChart = dc.barChart('#eff-season-chart');
  // var effSpaceChart = dc.barChart('#eff-space-chart');
 
@@ -157,6 +225,9 @@
          d.effae = +d.effae;
          d.effao_s = d.effao_s;
          d.effro_s = d.effro_s;
+         d.ddlat = +d.ddlat;
+         d.ddlon = +d.ddlon;
+
      });
 
      var estimates = crossfilter(data);
@@ -269,8 +340,90 @@
 
      dc.renderAll();
 
- }
- )
+
+     // =================
+     //     MAP
+
+
+     // intiailize map based on the lake this creel occurs in
+     var lat = {{ creel.lake.ddlat }}
+     var lon =  {{ creel.lake.ddlon }}
+     var zoom =  {{ creel.lake.zoom }}
+
+     var  map = new L.map('map').setView([lat,lon], zoom);
+
+     function drawMap(){
+
+
+         L.mapbox.accessToken = 'pk.eyJ1IjoiYWNvdHRyaWxsIiwiYSI6ImNpazVmb3Q2eDAwMWZpZm0yZTQ1cjF3NTkifQ.Pb1wCYs0lKgjnTGz43DjVQ';
+         // Replace 'mapbox.streets' with your map id.
+         var mapboxTiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=' + L.mapbox.accessToken, {
+             attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
+         }).addTo(map);
+
+
+         var spaceMarkers = new L.FeatureGroup();
+         spaceMarkers.clearLayers();
+
+
+         $.each( spaces, function(i, x) {
+             var marker = L.circle([x.ddlat, x.ddlon], 25, {
+                 color:'red',
+                 fillColor: 'red',
+                 fillOpacity: 1
+             });
+             popup = "<p>Space: " + x.label + "</p>"
+             marker.bindPopup(popup);
+             spaceMarkers.addLayer(marker);
+
+         });
+
+         var bubbleMarkers = new L.FeatureGroup();
+         // areaDim will response to filters and only include the
+         // selected records
+         var effortPoints = get_net_set_points(areaDim.top(Infinity));
+         var geojsonPts = points_to_geojson(effortPoints);
+         //
+         bubbleMarkers.clearLayers();
+         bubbles = L.bubbleLayer(geojsonPts, { property: "est_effort_angler",
+                                               legend: false,
+                                               max_radius : 40,
+                                               scale: 'YlGnBu',
+                                               tooltip : "Estimated Effort"
+         });
+
+         // add the bubbles first so that the net centroid markers are on top
+         bubbleMarkers.addLayer(bubbles);
+         map.addLayer(bubbles);
+
+         map.addLayer(spaceMarkers);
+         var bounds =spaceMarkers.getBounds();
+         if (bounds.isValid()){
+             map.fitBounds(bounds, {padding: [50,50]});
+         }
+
+
+     }
+
+     drawMap();
+
+     // refresh our map each time one of the charts change
+     dcCharts = [effSeasonChart, effSpaceChart, effModeChart, effPeriodChart, effDaytypeChart];
+
+     _.each(dcCharts, function (dcChart) {
+         dcChart.on("filtered", function (chart, filter) {
+             map.eachLayer(function (layer) {
+                 map.removeLayer(layer)
+             });
+             drawMap();
+         });
+     });
+
+
+
+
+ } )
+
 
 
 

@@ -36,7 +36,7 @@
     <div class="col-md-12" >
         <div class="panel panel-default">
             <div class="panel-body">
-                <h3>this will be a leaflet map</h3>
+                <div id="map" style="width: 1000px; height: 600px;"></div>
             </div>
         </div>
     </div>
@@ -95,186 +95,233 @@
     </div>
 </div>
 
-        <p>Add buttons to switch between variables - harvest, catch, estimates, observed.</p>
+<p>Add buttons to switch between variables - harvest, catch, estimates, observed.</p>
 
 
-        <h4>Cacth by Strata</h4></h4>
-        <div class="dc-data-count">
+<h4>Cacth by Strata</h4></h4>
+<div class="dc-data-count">
+</div>
+
+<div class='container' style='font: 12px sans-serif;'>
+    <div class='row'>
+        <div class='span12'>
+            <table class='table table-hover' id='dc-data-table'>
+                <thead>
+                    <tr class='header'>
+                        <td>Area</td>
+                        <td>Season</td>
+                        <td>Day Type</td>
+                        <td>Period</td>
+                        <td>Mode</td>
+                        <td>Sek</td>
+                        <td>Species</td>
+                        <td>Estimated Catch</td>
+                    </tr>
+                </thead>
+            </table>
         </div>
-
-        <div class='container' style='font: 12px sans-serif;'>
-            <div class='row'>
-                <div class='span12'>
-                    <table class='table table-hover' id='dc-data-table'>
-                        <thead>
-                            <tr class='header'>
-                                <td>Area</td>
-                                <td>Season</td>
-                                <td>Day Type</td>
-                                <td>Period</td>
-                                <td>Mode</td>
-                                <td>Sek</td>
-                                <td>Species</td>
-                                <td>Estimated Catch</td>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
-            </div>
-        </div>
+    </div>
+</div>
 
 
 
-        {% endblock content %}
+{% endblock content %}
 
 
-        {% block javascript %}
+{% block javascript %}
 
-        <script type="text/javascript">
+<script type="text/javascript">
 
-         // var catSeasonChart = dc.barChart('#catch-season-chart');
-         // var catSpaceChart = dc.barChart('#catch-space-chart');
+ // var catSeasonChart = dc.barChart('#catch-season-chart');
+ // var catSpaceChart = dc.barChart('#catch-space-chart');
 
-         var catSpeciesChart = dc.pieChart('#catch-species-chart');
-         var catSeasonChart = dc.rowChart('#catch-season-chart');
-         var catSpaceChart = dc.rowChart('#catch-space-chart');
-
-
-         var catModeChart = dc.pieChart('#catch-mode-chart');
-         var catPeriodChart = dc.pieChart('#catch-period-chart');
-         var catDaytypeChart = dc.pieChart('#catch-daytype-chart');
-
-         var catchTable = dc.dataTable('#dc-data-table');//); //, chartGroup);
-
-         d3.json("{% url 'catch_estimates' creel.slug %}", function (error, data) {
-
-             data = data.results
-
-             var mydateformat = d3.time.format('%B %d, %Y');
-             var isodateformat = d3.time.format.iso;
-
-             data.forEach(function(d){
-                 d.mode = d.mode;
-                 d.season = d.season;
-                 d.dtp = d.dtp;
-                 d.period = d.period;
-                 d.species = d.species;
-                 d.area = d.area;
-                 d.date = isodateformat.parse(d.date);
-                 d.sek = d.sek;
-                 d.catne = d.catne;
-             });
-
-             var estimates = crossfilter(data);
-
-             var all = estimates.groupAll();
-             var all_catne = all.reduceSum(function(d){return d.catne;});
-             //var all_catae = all.reduceSum(function(d){return d.catae;});
-
-             //create a dimension for each strata
-             var modeDim = estimates.dimension(function(d) { return d.mode; });
-             var ssnDim = estimates.dimension(function(d) { return d.season; });
-             var daytypeDim = estimates.dimension(function(d) { return d.dtp; });
-             var periodDim = estimates.dimension(function(d) { return d.period; });
-             var areaDim = estimates.dimension(function(d) { return d.area; });
-             var speciesDim = estimates.dimension(function(d) { return d.species; });
-
-             // create goups from each of our dimensions
-             var modeGroup = modeDim.group();
-             var ssnGroup = ssnDim.group();
-             var daytypeGroup = daytypeDim.group();
-             var periodGroup = periodDim.group();
-             var areaGroup = areaDim.group();
-             var speciesGroup = speciesDim.group();
-
-             // reducer functions for each group:
-             // sum for now, but could be more complicated later
-
-             var modeGroupcatne = modeDim.group().reduceSum(function(d) {return d.catne;});
-             var ssnGroupcatne = ssnDim.group().reduceSum(function(d) {return d.catne;});
-             var daytypeGroupcatne = daytypeDim.group().reduceSum(function(d) {return d.catne;});
-             var periodGroupcatne = periodDim.group().reduceSum(function(d) {return d.catne;});
-             var areaGroupcatne = areaDim.group().reduceSum(function(d) {return d.catne;});
-             var speciesGroupcatne = speciesDim.group().reduceSum(function(d) {return d.catne;});
-
-             // =================
-             //     CHARTS
-
-             var width = 400;
-             var height = 400;
-             var radius = (width * 0.7)/2;
-
-             catSpeciesChart.width(width)
-                            .height(height)
-                            .radius(radius)
-                            .dimension(speciesDim)
-                            .group(speciesGroupcatne);
+ var catSpeciesChart = dc.pieChart('#catch-species-chart');
+ var catSeasonChart = dc.rowChart('#catch-season-chart');
+ var catSpaceChart = dc.rowChart('#catch-space-chart');
 
 
-             catSeasonChart.width(width)
-                           .height(height)
-                           .dimension(ssnDim)
-                           .group(ssnGroupcatne)
-                           .x(d3.scale.linear().domain([0,100]))
-                           .elasticX(true);
+ var catModeChart = dc.pieChart('#catch-mode-chart');
+ var catPeriodChart = dc.pieChart('#catch-period-chart');
+ var catDaytypeChart = dc.pieChart('#catch-daytype-chart');
 
-             catSpaceChart.width(width)
-                          .height(height)
-                          .dimension(areaDim)
-                          .group(areaGroupcatne)
-                          .x(d3.scale.linear().domain([0,100]))
-                          .elasticX(true);
+ var catchTable = dc.dataTable('#dc-data-table');//); //, chartGroup);
 
-             catModeChart.width(width)
-                         .height(height)
-                         .radius(radius)
-                         .dimension(modeDim)
-                         .group(modeGroupcatne);
+ d3.json("{% url 'catch_estimates' creel.slug %}", function (error, data) {
 
-             catPeriodChart.width(width)
-                           .height(height)
-                           .dimension(periodDim)
-                           .group(periodGroupcatne)
-                           .radius(radius);
+     data = data.results
 
-             catDaytypeChart.width(width)
-                            .height(height)
-                            .dimension(daytypeDim)
-                            .group(daytypeGroupcatne)
-                            .radius(radius);
+     var mydateformat = d3.time.format('%B %d, %Y');
+     var isodateformat = d3.time.format.iso;
 
-             catchTable.width(2 * width).height(1200)
-             //.showGroups(true
-                        .dimension(modeDim)
-                        .group(function(d){ return "" })
-                        .columns([
-                            function(d) { return d.area; },
-                            function(d) { return d.season; },
-                            function(d) { return d.dtp; },
-                            function(d) { return d.period; },
-                            function(d) { return d.mode; },
-                            function(d) { return d.sek; },
-                            function(d) { return d.species; },
-                            function(d) { return d.catne; }
-                        ])
-                        .sortBy(function(d){ return d.area; })
-                        .order(d3.ascending);
+     data.forEach(function(d){
+         d.mode = d.mode;
+         d.season = d.season;
+         d.dtp = d.dtp;
+         d.period = d.period;
+         d.species = d.species;
+         d.area = d.area;
+         d.date = isodateformat.parse(d.date);
+         d.sek = d.sek;
+         d.catne = d.catne;
+     });
 
-             //var recordCount =  dc.dataCount('.dc-data-count');
-             // record count will not render all option or the filter-count in the html.
-             var recordCount = dc.dataCount('.dc-data-count')
-                                 .dimension(estimates)
-                                 .group(all)
-                                 .html({
-                                     some: '<strong>%filter-count</strong> selected out of <strong>%total-count</strong> records' +
-                                           ' | <a href=\'javascript:dc.filterAll(); dc.renderAll();\'>Reset All</a>',
-                                     all: 'All records selected. Please click on a graph to apply filters.'
-                                 });
+     var estimates = crossfilter(data);
+
+     var all = estimates.groupAll();
+     var all_catne = all.reduceSum(function(d){return d.catne;});
+     //var all_catae = all.reduceSum(function(d){return d.catae;});
+
+     //create a dimension for each strata
+     var modeDim = estimates.dimension(function(d) { return d.mode; });
+     var ssnDim = estimates.dimension(function(d) { return d.season; });
+     var daytypeDim = estimates.dimension(function(d) { return d.dtp; });
+     var periodDim = estimates.dimension(function(d) { return d.period; });
+     var areaDim = estimates.dimension(function(d) { return d.area; });
+     var speciesDim = estimates.dimension(function(d) { return d.species; });
+
+     // create goups from each of our dimensions
+     var modeGroup = modeDim.group();
+     var ssnGroup = ssnDim.group();
+     var daytypeGroup = daytypeDim.group();
+     var periodGroup = periodDim.group();
+     var areaGroup = areaDim.group();
+     var speciesGroup = speciesDim.group();
+
+     // reducer functions for each group:
+     // sum for now, but could be more complicated later
+
+     var modeGroupcatne = modeDim.group().reduceSum(function(d) {return d.catne;});
+     var ssnGroupcatne = ssnDim.group().reduceSum(function(d) {return d.catne;});
+     var daytypeGroupcatne = daytypeDim.group().reduceSum(function(d) {return d.catne;});
+     var periodGroupcatne = periodDim.group().reduceSum(function(d) {return d.catne;});
+     var areaGroupcatne = areaDim.group().reduceSum(function(d) {return d.catne;});
+     var speciesGroupcatne = speciesDim.group().reduceSum(function(d) {return d.catne;});
+
+     // =================
+     //     CHARTS
+
+     var width = 400;
+     var height = 400;
+     var radius = (width * 0.7)/2;
+
+     catSpeciesChart.width(width)
+                    .height(height)
+                    .radius(radius)
+                    .dimension(speciesDim)
+                    .group(speciesGroupcatne);
 
 
-             dc.renderAll();
+     catSeasonChart.width(width)
+                   .height(height)
+                   .dimension(ssnDim)
+                   .group(ssnGroupcatne)
+                   .x(d3.scale.linear().domain([0,100]))
+                   .elasticX(true);
 
-         })
+     catSpaceChart.width(width)
+                  .height(height)
+                  .dimension(areaDim)
+                  .group(areaGroupcatne)
+                  .x(d3.scale.linear().domain([0,100]))
+                  .elasticX(true);
+
+     catModeChart.width(width)
+                 .height(height)
+                 .radius(radius)
+                 .dimension(modeDim)
+                 .group(modeGroupcatne);
+
+     catPeriodChart.width(width)
+                   .height(height)
+                   .dimension(periodDim)
+                   .group(periodGroupcatne)
+                   .radius(radius);
+
+     catDaytypeChart.width(width)
+                    .height(height)
+                    .dimension(daytypeDim)
+                    .group(daytypeGroupcatne)
+                    .radius(radius);
+
+     catchTable.width(2 * width).height(1200)
+     //.showGroups(true
+               .dimension(modeDim)
+               .group(function(d){ return "" })
+               .columns([
+                   function(d) { return d.area; },
+                   function(d) { return d.season; },
+                   function(d) { return d.dtp; },
+                   function(d) { return d.period; },
+                   function(d) { return d.mode; },
+                   function(d) { return d.sek; },
+                   function(d) { return d.species; },
+                   function(d) { return d.catne; }
+               ])
+               .sortBy(function(d){ return d.area; })
+               .order(d3.ascending);
+
+     //var recordCount =  dc.dataCount('.dc-data-count');
+     // record count will not render all option or the filter-count in the html.
+     var recordCount = dc.dataCount('.dc-data-count')
+                         .dimension(estimates)
+                         .group(all)
+                         .html({
+                             some: '<strong>%filter-count</strong> selected out of <strong>%total-count</strong> records' +
+                                   ' | <a href=\'javascript:dc.filterAll(); dc.renderAll();\'>Reset All</a>',
+                             all: 'All records selected. Please click on a graph to apply filters.'
+                         });
+
+
+     dc.renderAll();
+
+ })
+
+
+ // intiailize map based on the lake this creel occurs in
+ var lat = {{ creel.lake.ddlat }}
+ var lon =  {{ creel.lake.ddlon }}
+ var zoom =  {{ creel.lake.zoom }}
+
+ var  map = new L.map('map').setView([lat,lon], zoom);
+
+ function drawMap(){
+
+     function onEachFeature(feature, layer) {
+         if (feature.properties && feature.properties.popupContent) {
+             layer.bindPopup(feature.properties.popupContent);
+         }
+     };
+
+     var dataurl = "{%  url 'creel_spaces' creel.slug %}";
+     // Download GeoJSON via Ajax
+     $.getJSON(dataurl, function (data) {
+
+         for (var i in data.results){
+             var x = data.results[i];
+             var geojsonFeature = {
+                 "type": "Feature",
+                 "properties": {
+                     "popupContent": x.popupContent
+                 },
+                 "geometry": {
+                     "type": "Point",
+                     "coordinates": [x.ddlon, x.ddlat]
+                 }
+             };
+             L.geoJson(geojsonFeature, {onEachFeature: onEachFeature}).addTo(map);
+         }
+     });
+
+     L.mapbox.accessToken = 'pk.eyJ1IjoiYWNvdHRyaWxsIiwiYSI6ImNpazVmb3Q2eDAwMWZpZm0yZTQ1cjF3NTkifQ.Pb1wCYs0lKgjnTGz43DjVQ';
+     // Replace 'mapbox.streets' with your map id.
+     var mapboxTiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=' + L.mapbox.accessToken, {
+         attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
+             }).addTo(map);
+
+         }
+
+         drawMap();
+
 
 
         </script>

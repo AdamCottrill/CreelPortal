@@ -313,6 +313,9 @@
 
     <script type="text/javascript">
 
+     // add the creel locations here as a json string.
+     var spaces = {{ spaces|safe }};
+
 
      // intiailize map based on the lake this creel occurs in
      var lat = {{ creel.lake.ddlat }}
@@ -323,31 +326,20 @@
 
      function drawMap(){
 
-         function onEachFeature(feature, layer) {
-             if (feature.properties && feature.properties.popupContent) {
-                 layer.bindPopup(feature.properties.popupContent);
+         var spaceMarkers = new L.FeatureGroup();
+         spaceMarkers.clearLayers();
+
+         $.each( spaces, function(i, x) {
+             if(x.ddlat & x.ddlon){
+                 var marker = L.marker([x.ddlat, x.ddlon]);
+                 popup = "<p>Space: " + x.label + "</p>"
+                 marker.bindPopup(popup);
+
+                 spaceMarkers.addLayer(marker);
              }
-         };
-
-         var dataurl = "{%  url 'creel_spaces' creel.slug %}";
-         // Download GeoJSON via Ajax
-         $.getJSON(dataurl, function (data) {
-
-             for (var i in data.results){
-                 var x = data.results[i];
-                 var geojsonFeature = {
-                     "type": "Feature",
-                     "properties": {
-                         "popupContent": x.popupContent
-                     },
-                     "geometry": {
-                         "type": "Point",
-                         "coordinates": [x.ddlon, x.ddlat]
-                     }
-                 };
-                 L.geoJson(geojsonFeature, {onEachFeature: onEachFeature}).addTo(map);
-                 }
          });
+
+         map.addLayer(spaceMarkers);
 
          L.mapbox.accessToken = 'pk.eyJ1IjoiYWNvdHRyaWxsIiwiYSI6ImNpazVmb3Q2eDAwMWZpZm0yZTQ1cjF3NTkifQ.Pb1wCYs0lKgjnTGz43DjVQ';
          // Replace 'mapbox.streets' with your map id.
