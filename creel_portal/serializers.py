@@ -144,6 +144,10 @@ class FR714Serializer(serializers.ModelSerializer):
     period = serializers.CharField(source='period.prd', read_only=True)
     area = serializers.CharField(source='area.label', read_only=True)
 
+    ddlat = serializers.FloatField(source='area.ddlat', read_only=True)
+    ddlon = serializers.FloatField(source='area.ddlon', read_only=True)
+
+
     species = serializers.CharField(source='species.common_name',
                                     read_only=True)
 
@@ -151,4 +155,4 @@ class FR714Serializer(serializers.ModelSerializer):
         model = FR714
         fields = ('id', 'mode', 'season', 'dtp', 'period', 'area', 'species',
                   'date', 'sek', 'catne', 'catne1', 'hvsno_s', 'hvsno1_s',
-                  'hvsne', 'hvsne1')
+                  'hvsne', 'hvsne1', 'ddlat', 'ddlon')

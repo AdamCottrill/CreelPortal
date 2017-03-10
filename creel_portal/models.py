@@ -4,7 +4,7 @@ from django.template.defaultfilters import slugify
 from django.urls import reverse
 
 
-from djgeojson.fields import PointField
+
 
 from datetime import datetime
 
@@ -285,7 +285,6 @@ class FN026(models.Model):
     label = models.CharField(max_length=110, blank=False,
                              help_text="Space Label")
 
-    #geom = PointField(blank=True, null=True)
     ddlat = models.FloatField(blank=True, null=True)
     ddlon = models.FloatField(blank=True, null=True)
 

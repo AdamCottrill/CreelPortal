@@ -133,7 +133,7 @@
 
  var spaces = {{ spaces|safe }};
 
- function get_net_set_points(x, pts){
+ function get_map_points(x, pts){
      // give a list/array, extract format the elements
      // for use with leaflet.
      var len = x.length
@@ -381,7 +381,7 @@
          var bubbleMarkers = new L.FeatureGroup();
          // areaDim will response to filters and only include the
          // selected records
-         var effortPoints = get_net_set_points(areaDim.top(Infinity));
+         var effortPoints = get_map_points(areaDim.top(Infinity));
          var geojsonPts = points_to_geojson(effortPoints);
          //
          bubbleMarkers.clearLayers();
