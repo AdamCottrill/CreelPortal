@@ -9,8 +9,8 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.12/crossfilter.js"></script>
 <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/reductio/0.6.3/reductio.js"></script>  -->
 
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dc/2.1.3/dc.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dc/2.1.3/dc.css">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dc/2.0.1/dc.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dc/2.0.1/dc.css">
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.js"></script>
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
@@ -41,6 +41,56 @@
         </div>
     </div>
 </div>
+
+
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        Filters
+        <span>
+            <a href="javascript:dc.filterAll(); dc.renderAll();" class="btn btn-primary btn-xs pull-right" role="button">Reset All</a>
+        </span>
+
+    </div>
+    <div class="panel-body">
+
+        <div class="row">
+            <div id="filters" class="col-md-4" >
+                <table>
+                    <tr>
+                        <td><strong>Season(s):</strong></td>
+                        <td id="season-filter">None</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Space Filters:</strong></td>
+                        <td id="space-filter">None</td>
+                    </tr>
+                </table>
+            </div>
+            <div id="filters" class="col-md-4" >
+                <table>
+                    <tr>
+                        <td><strong>Period Filter:</strong></td>
+                        <td id="period-filter">None</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Day Type Filters:<strong></td>
+                            <td id="daytype-filter">None</td>
+                    </tr>
+                </table>
+            </div>
+            <div id="filters" class="col-md-4" >
+                <table>
+                    <tr>
+                        <td><strong>Fishing Mode Filters:</strong></td>
+                        <td id="mode-filter">None</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 <div class="panel panel-default">
@@ -236,6 +286,8 @@
      var all_effre = all.reduceSum(function(d){return d.effre;});
      //var all_effae = all.reduceSum(function(d){return d.effae;});
 
+     var n = all.reduceCount().value();
+
      //create a dimension for each strata
      var modeDim = estimates.dimension(function(d) { return d.mode; });
      var ssnDim = estimates.dimension(function(d) { return d.season; });
@@ -277,6 +329,19 @@
                    .elasticX(true)
                    .render();
 
+     effSeasonChart.on("renderlet", function(chart) {
+         dc.events.trigger(function() {
+             myfilters=effSeasonChart.filters();
+             if (!myfilters || !myfilters.length){
+                 d3.select("#season-filter").text('None');
+             } else {
+                 d3.select("#season-filter").text(myfilters);
+                 //d3.select("#season-count").text(myfilters.length);
+             }
+         });
+     });
+
+
      effSpaceChart.width(width)
                   .height(height)
                   .dimension(areaDim)
@@ -285,12 +350,38 @@
                   .elasticX(true)
                   .render();
 
+     effSpaceChart.on("renderlet", function(chart) {
+         dc.events.trigger(function() {
+             myfilters=effSpaceChart.filters();
+             if (!myfilters || !myfilters.length){
+                 d3.select("#space-filter").text('None');
+             } else {
+                 d3.select("#space-filter").text(myfilters);
+                 //d3.select("#space-count").text(myfilters.length);
+             }
+         });
+     });
+
      effModeChart.width(sm_width)
                  .height(sm_height)
                  .radius(radius)
                  .dimension(modeDim)
                  .group(modeGroupeffre)
                  .render();
+
+     effModeChart.on("renderlet", function(chart) {
+         dc.events.trigger(function() {
+             myfilters=effModeChart.filters();
+             if (!myfilters || !myfilters.length){
+                 d3.select("#mode-filter").text('None');
+             } else {
+                 d3.select("#mode-filter").text(myfilters);
+                 //d3.select("#mode-count").text(myfilters.length);
+             }
+         });
+     });
+
+
 
      effPeriodChart.width(sm_width)
                    .height(sm_height)
@@ -301,6 +392,22 @@
      //.elasticX(true)
                    .render();
 
+
+     effPeriodChart.on("renderlet", function(chart) {
+         dc.events.trigger(function() {
+             myfilters=effPeriodChart.filters();
+             if (!myfilters || !myfilters.length){
+                 d3.select("#period-filter").text('None');
+             } else {
+                 d3.select("#period-filter").text(myfilters);
+                 //d3.select("#period-count").text(myfilters.length);
+             }
+         });
+     });
+
+
+
+
      effDaytypeChart.width(sm_width)
                     .height(sm_height)
                     .dimension(daytypeDim)
@@ -309,6 +416,21 @@
      //.x(d3.scale.linear().domain([0,100]))
      //.elasticX(true)
                     .render();
+
+     effDaytypeChart.on("renderlet", function(chart) {
+         dc.events.trigger(function() {
+             myfilters=effDaytypeChart.filters();
+             if (!myfilters || !myfilters.length){
+                 d3.select("#daytype-filter").text('None');
+             } else {
+                 d3.select("#daytype-filter").text(myfilters);
+                 //d3.select("#daytype-count").text(myfilters.length);
+             }
+         });
+     });
+
+
+
 
      effortTable.width(2 * width).height(1200)
      //.showGroups(true
@@ -334,7 +456,7 @@
                          .html({
                              some: '<strong>%filter-count</strong> selected out of <strong>%total-count</strong> records' +
                                    ' | <a href=\'javascript:dc.filterAll(); dc.renderAll();\'>Reset All</a>',
-                             all: 'All records selected. Please click on a graph to apply filters.'
+                             all: 'All <strong>%total-count</strong> records selected. Please click on a graph to apply filters.'
                          });
 
 
