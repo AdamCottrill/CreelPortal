@@ -56,7 +56,24 @@
                     {% block navbar_other_apps %}
                     {% endblock %}
                 </ul>
+
+                <div class="col-sm-3">
+                    <form class="navbar-form navbar-left" role="search" action={% url 'creel_list' %}>
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="q"
+                                   placeholder="Project Code Or Name">
+                            <div class="input-group-btn">
+                                <button class="btn btn-default" type="submit">
+                                    <i class="glyphicon glyphicon-search"></i>
+                                </button>
+                            </div>
+                        </div><!-- /input-group -->
+                    </form>
+                </div>
+
+
             </div><!-- /.navbar-collapse -->
+
         </header>
 
         <div id="messages">

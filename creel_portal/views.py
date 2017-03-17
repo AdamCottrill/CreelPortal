@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.views.generic import ListView, DetailView
 from django.template import RequestContext
 from django.shortcuts import  get_object_or_404
+from django.db.models import Q
+
 
 import json
 from django.core.serializers.json import DjangoJSONEncoder
@@ -18,14 +20,21 @@ class CreelListView(ListView):
     def get_queryset(self, **kwargs):
         queryset = FN011.objects.order_by('lake','-prj_date0')
         self.lake = self.kwargs.get('lake')
+        self.q = self.request.GET.get("q")
 
         if self.lake:
             queryset = queryset.filter(lake__lake_name=self.lake)
+
+        if self.q:
+            queryset = queryset.filter(Q(prj_cd__icontains=self.q) |
+                                       Q(prj_nm__icontains=self.q))
+
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super(CreelListView, self).get_context_data(**kwargs)
         context['lake'] = self.lake
+        context['q'] = self.q
         return context
 
 

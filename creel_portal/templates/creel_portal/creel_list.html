@@ -4,9 +4,11 @@
 
 {% block content %}
 
+
 {% if lake %}
 <h3>All creels run on Lake {{lake|title}}:</h3>
 
+{% if object_list %}
 
 <div class="panel panel-default">
     <div class="panel-body">
@@ -38,13 +40,19 @@
     </div>
 </div>
 
-
-
-
 {% else %}
+<h3>Oops! There doesn't appear to be any creels that match that criteria.</h3>
+{% endif %}  {% comment %} if object list {% endcomment %}
+
+{% endif %}
+
+{% if object_list %}
+
+{% if q %}
+<h3>Creels that contain "{{q}}" in their project code or name:</h3>
+{% endif %}
 
 {% regroup object_list by lake as lake_list %}
-
 
 {% for lake in lake_list %}
 
@@ -79,6 +87,20 @@
 </div>
 
 {% endfor %}
+
+{% else %}
+
+{% if q %}
+<h3>Oops! There doesn't appear to be any creels with "{{q}}" in their project code or name.</h3>
+{% else %}
+<h3>Oops! There doesn't appear to be any creels that match that criteria.</h3>
 {% endif %}
+
+{% endif %}
+
+
+
+
+
 
 {% endblock content %}
