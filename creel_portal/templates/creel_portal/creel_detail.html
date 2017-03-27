@@ -162,17 +162,42 @@
                                             <th>Area Count</th>
                                             <th>Area List</th>
                                             <th>Area Weight</th>
+                                            <th></th>
+
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {% for item in object.spatial_strata.all %}
                                         <tr>
                                             <td>{{ item.space }}</td>
-                                            <td>{{ item.space_des }}</td>
+                                            <td>{{ item.space_des|title }}</td>
                                             <td>{{ item.space_siz }}</td>
                                             <td>{{ item.area_count }}</td>
                                             <td>{{ item.area_lst }}</td>
                                             <td>{{ item.area_wt }}</td>
+
+                                            <td>
+
+                                                {% url 'edit_creel_space' item.creel.slug item.space as the_url %}
+
+                                            {% if item.ddlat and item.ddlon %}
+
+                                                <a class="btn btn-xs btn-primary" href="{{ the_url }}" role="button">
+                                                    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Edit
+                                                </a>
+
+                                            </button>
+                                            {% else %}
+
+                                            <a class="btn btn-xs btn-danger" href="{{ the_url }}" role="button">
+                                                <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Add
+                                            </a>
+
+
+                                                {% endif %}
+
+                                            </td>
+
                                         </tr>
                                         {% endfor %}
                                     </tbody>
@@ -204,7 +229,7 @@
                                         {% for item in object.modes.all %}
                                         <tr>
                                             <td>{{ item.mode }}</td>
-                                            <td>{{ item.mode_des }}</td>
+                                            <td>{{ item.mode_des|title }}</td>
                                             <td>{{ item.atyunit }}</td>
                                             <td>{{ item.itvunit }}</td>
                                             <td>{{ item.chkflag }}</td>

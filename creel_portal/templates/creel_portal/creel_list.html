@@ -1,12 +1,18 @@
 {% extends "base.html" %}
 
 
-
 {% block content %}
 
 
-{% if lake %}
+{% if lake or q %}
+
+{% if lake and object_list %}
 <h3>All creels run on Lake {{lake|title}}:</h3>
+{% endif %}
+
+{% if q and object_list %}
+<h3>Creels that contain "{{q}}" in their project code or name:</h3>
+{% endif %}
 
 {% if object_list %}
 
@@ -41,16 +47,22 @@
 </div>
 
 {% else %}
-<h3>Oops! There doesn't appear to be any creels that match that criteria.</h3>
-{% endif %}  {% comment %} if object list {% endcomment %}
-
-{% endif %}
-
-{% if object_list %}
 
 {% if q %}
-<h3>Creels that contain "{{q}}" in their project code or name:</h3>
+<h3>Oops! There doesn't appear to be any creels with "{{q}}" in their project code or name.</h3>
+{% else %}
+<h3>Oops! There doesn't appear to be any creels that match that criteria.</h3>
 {% endif %}
+
+{% endif %}  {% comment %} if object list {% endcomment %}
+
+
+
+
+{% else %}
+
+
+{% if object_list %}
 
 {% regroup object_list by lake as lake_list %}
 
@@ -58,7 +70,7 @@
 
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">  <a href="{% url 'creels_by_lake' lake.grouper.lake_name %}">Lake {{ lake.grouper.lake_name|title }} ({{ lake.grouper.abbrev }}) </a></h3>
+        <h3 class="panel-title"> Lake {{ lake.grouper.lake_name|title }} ({{ lake.grouper.abbrev }})</h3>
     </div>
     <div class="panel-body">
         <table class="table">
@@ -83,16 +95,17 @@
                 {% endfor %}
             </tbody>
         </table>
+        {% if not q %}
+        <a class="btn btn-info"  href="{% url 'creels_by_lake' lake.grouper.lake_name %}">All Lake {{ lake.grouper.lake_name|title }} creels</a>
+        {% endif %}
     </div>
+
 </div>
 
 {% endfor %}
 
 {% else %}
 
-{% if q %}
-<h3>Oops! There doesn't appear to be any creels with "{{q}}" in their project code or name.</h3>
-{% else %}
 <h3>Oops! There doesn't appear to be any creels that match that criteria.</h3>
 {% endif %}
 

@@ -55,6 +55,11 @@ urlpatterns = [
         name="catch_estimates_plots"),
 
 
+    url((r'^edit_creel_space/' + prj_cd_regex + r'/(?P<space>[\w+]{2})/$'),
+        views.edit_creel_space,
+        name="edit_creel_space"),
+
+
     #api urls
     url(r'^api/v1/', include(router.urls)),
 

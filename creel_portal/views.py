@@ -1,15 +1,15 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView
 from django.template import RequestContext
 from django.shortcuts import  get_object_or_404
 from django.db.models import Q
 
-
 import json
 from django.core.serializers.json import DjangoJSONEncoder
 
 
-from creel_portal.models import FN011
+from creel_portal.models import FN011, FN026
+from creel_portal.forms import FN026Form
 
 
 
@@ -55,6 +55,30 @@ class CreelDetailView(DetailView):
 
         return context
 
+
+
+def edit_creel_space(request, slug, space):
+    """
+    Arguments:
+    - `request`:
+    - `slug`:
+    - `space`:
+    """
+
+    space = get_object_or_404(FN026, creel__slug=slug, space=space)
+
+    if request.method == 'POST':
+        form = FN026Form(request.POST, instance=space)
+        if form.is_valid():
+            form.save()
+            return redirect('creel_detail', slug=space.creel.slug)
+    else:
+        form = FN026Form(instance=space)
+
+    return render(request,
+                  'creel_portal/edit_creel_space.html',
+                  {'form':form,
+                   'space': space})
 
 
 
