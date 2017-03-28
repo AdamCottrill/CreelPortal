@@ -253,16 +253,18 @@
                     <div class="panel-body">
 
                         {% with object.get_global_effort as effort %}
-                        <ul>
-                            <li>Observers Trip Count:{{ effort.tripno }}</li>
-                            <li>Estimated Trip Count:{{ effort.tripne }}</li>
-                            <li>Activity Count:{{ effort.atycnt_s }}</li>
-                            <li>Interview Count:{{ effort.itvcnt_s }}</li>
-                            <li>Angler Count:{{ effor.angler_s }}</li>
-                            <li>Rods :{{ effort.rod_s }}</li>
-                            <li>Total Angler Effort :{{ effort.effae }} (anlger-hours)</li>
-                            <li>Total Angler Effort :{{ effort.effre }} (rod-hours)</li>
-                        </ul>
+                        <table class="table table-striped table-hover">
+                            <tbody>
+                                <tr><td>Observed Trip Count</td><td>{{ effort.tripno }}</tr></td>
+                                <tr><td>Estimated Trip Count</td><td>{{ effort.tripne }}</tr></td>
+                                <tr><td>Activity Count</td><td>{{ effort.atycnt_s }}</tr></td>
+                                <tr><td>Interview Count</td><td>{{ effort.itvcnt_s }}</tr></td>
+                                <tr><td>Angler Count</td><td>{{ effort.angler_s }}</tr></td>
+                                <tr><td>Rods </td><td>{{ effort.rod_s }}</tr></td>
+                                <tr><td>Total Angler Effort </td><td>{{ effort.effae }} (anlger-hours)</tr></td>
+                                <tr><td>Total Angler Effort </td><td>{{ effort.effre }} (rod-hours)</tr></td>
+                            </tbody>
+                        </table>
                         {% endwith %}
                     </div>
                 </div>
@@ -281,7 +283,7 @@
 
                         {% with object.get_global_catch as catch %}
 
-                        <table class="table">
+                        <table class="table table-striped table-hover">
                             <thead>
                                 <tr>
                                     <th>Species</th>
