@@ -25,8 +25,7 @@ SECRET_KEY = 'e$3_%3son0au!5yy-wum0yo@)-(r_huz(-4=nohk8@xtl53$iz'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-
-ALLOWED_HOSTS = ['172.16.28.181', '142.143.160.42', '127.0.0.1']
+ALLOWED_HOSTS = ['142.143.160.56',  '142.143.160.42', '127.0.0.1']
 
 # Application definition
 
@@ -72,15 +71,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'main.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/1.10/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db/db.sqlite3'),
-    }
-}
 
 
 # Password validation
@@ -121,9 +111,22 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+#for cherrypy
+STATIC_ROOT = os.path.join(BASE_DIR, "../static/")
+
+
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.10/howto/static-files/
+
+
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.abspath(os.path.join(BASE_DIR, "../media"))
+
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES':[
