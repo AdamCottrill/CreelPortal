@@ -3,15 +3,14 @@ from django.db import models
 from django.template.defaultfilters import slugify
 from django.urls import reverse
 
-
-
+from aldjemy.meta import AldjemyMeta
 
 from datetime import datetime
 
 # Create your models here.
 
 #note = move this to main.models
-class Species(models.Model):
+class Species(models.Model, metaclass= AldjemyMeta):
     species_code = models.IntegerField(unique=True)
     common_name = models.CharField(max_length=30)
     scientific_name = models.CharField(max_length=50, null=True, blank=True)
@@ -27,8 +26,9 @@ class Species(models.Model):
             spc_str = "<Species: %s>" % self.common_name
         return spc_str
 
+
 #note = move this to main.models
-class Lake(models.Model):
+class Lake(models.Model, metaclass= AldjemyMeta):
     '''A lookup table to hold the names of the different lakes'''
 
     abbrev = models.CharField(max_length=10, unique=True)
@@ -46,8 +46,9 @@ class Lake(models.Model):
         return "<Lake: {} ({})>".format(self.lake_name, self.abbrev)
 
 
+
 #note = move this to main.models too
-class FN011(models.Model):
+class FN011(models.Model, metaclass= AldjemyMeta):
     '''Class to hold a record for each project
     '''
 
@@ -82,6 +83,7 @@ class FN011(models.Model):
         verbose_name = "Creel List"
         ordering = ['-prj_date1']
 
+
     @models.permalink
     def get_absolute_url(self):
         '''return the url for the project'''
@@ -93,7 +95,6 @@ class FN011(models.Model):
         '''return the creel name and project code as its string
         representation'''
         return "<Creel: {} ({})>".format(self.prj_nm, self.prj_cd)
-
 
     def save(self, *args, **kwargs):
         """
@@ -117,7 +118,7 @@ class FN011(models.Model):
         return self.catch_estimates.filter(strat='++_++_++_++').all()
 
 
-class FN022(models.Model):
+class FN022(models.Model, metaclass= AldjemyMeta):
     '''Class to represent the seasons (temporal strata) used in each creel.
     '''
 
@@ -157,7 +158,7 @@ class FN022(models.Model):
             label = '{}'.format(self.ssn)
         return label
 
-class FN023(models.Model):
+class FN023(models.Model, metaclass= AldjemyMeta):
     '''Class  to represent the daytypes used in each season of creel
     '''
     #creel = models.ForeignKey(FN011)
@@ -202,7 +203,7 @@ class FN023(models.Model):
 
 
 
-class FN024(models.Model):
+class FN024(models.Model, metaclass= AldjemyMeta):
     '''Class to represent the period used in each day types of each season
     of creel.
     '''
@@ -232,7 +233,7 @@ class FN024(models.Model):
                            self.daytype.season.creel.prj_cd)
 
 
-class FN025(models.Model):
+class FN025(models.Model, metaclass= AldjemyMeta):
     '''Class to represent the day type exceptions so that holidays can be
     treated as weekends.
     '''
@@ -266,7 +267,7 @@ class FN025(models.Model):
                            self.season.creel.prj_cd)
 
 
-class FN026(models.Model):
+class FN026(models.Model, metaclass= AldjemyMeta):
     '''Class to represent the spatial strat used in a creel.
     '''
 
@@ -302,6 +303,7 @@ class FN026(models.Model):
         repr =  "<Space: {} ({}) [{}]>"
         return repr.format(self.space_des, self.space,
                            self.creel.prj_cd)
+
 
     def save(self, *args, **kwargs):
         """from:http://stackoverflow.com/questions/7971689/
@@ -344,7 +346,7 @@ class FN026(models.Model):
 #            return "<p>Space: {}</p>".format(self.space)
 #
 
-class FN028(models.Model):
+class FN028(models.Model, metaclass= AldjemyMeta):
     '''Class to represent the fishing modes used in a creel.
     '''
 
@@ -371,6 +373,7 @@ class FN028(models.Model):
         return repr.format(self.mode_des, self.mode,
                            self.creel.prj_cd)
 
+
     @property
     def label(self):
         """a string that will be used in serialized respoonse for this strata.
@@ -388,8 +391,7 @@ class FN028(models.Model):
         return label
 
 
-
-class FN111(models.Model):
+class FN111(models.Model, metaclass= AldjemyMeta):
     '''Class to represent the creel logs.
     '''
 
@@ -420,6 +422,7 @@ class FN111(models.Model):
 
         repr =  "<InterviewLog: {} ({})>"
         return repr.format(self.sama, self.creel.prj_cd)
+
 
     @property
     def daytype(self):
@@ -506,7 +509,7 @@ class FN111(models.Model):
         return repr
 
 
-class FN112(models.Model):
+class FN112(models.Model, metaclass= AldjemyMeta):
     '''Class to represent the activity counts associated with a creel log.
     '''
 
@@ -535,8 +538,7 @@ class FN112(models.Model):
                            self.atytm0, self.atytm1)
 
 
-
-class FN121(models.Model):
+class FN121(models.Model, metaclass= AldjemyMeta):
     '''Class to represent the creel intervews.
     '''
 
@@ -583,10 +585,7 @@ class FN121(models.Model):
 
 
 
-
-
-
-class FN123(models.Model):
+class FN123(models.Model, metaclass= AldjemyMeta):
     '''Class to represent the creel catch counts.
     '''
 
@@ -615,7 +614,7 @@ class FN123(models.Model):
                            self.species.species_code)
 
 
-class FN125(models.Model):
+class FN125(models.Model, metaclass= AldjemyMeta):
     '''Class to represent the attributes of sampled fish..
     '''
 
@@ -674,8 +673,7 @@ class FN125(models.Model):
                            self.grp, self.fish)
 
 
-
-class FN127(models.Model):
+class FN127(models.Model, metaclass= AldjemyMeta):
     '''Class to represent the attributes of and age estimate for a
     particular fish.
 
@@ -709,8 +707,7 @@ class FN127(models.Model):
                            self.ageid)
 
 
-
-class FR711(models.Model):
+class FR711(models.Model, metaclass= AldjemyMeta):
     '''Class to hold creel strata settings.  this table contains
     information about contact method (access or roving creel), whether or
     not estimates are save daily, and which strata can be combined or must
@@ -756,7 +753,8 @@ class FR711(models.Model):
 
         return repr
 
-class FR713(models.Model):
+
+class FR713(models.Model, metaclass= AldjemyMeta):
     '''Class to hold creel estimate of effort by strata.
 
     TODO - figure out if we need strat, if it should be build
@@ -852,7 +850,7 @@ class FR713(models.Model):
         return repr.format(self.creel.prj_cd, self.strat)
 
 
-class FR714(models.Model):
+class FR714(models.Model, metaclass= AldjemyMeta):
     '''Class to hold creel estimate of harvest by strata and species.
 
     TODO - figure out if we need strat, if it should be build
@@ -959,8 +957,6 @@ class FR714(models.Model):
     catep1_xy = models.FloatField(blank=True, null=True)
     hvsep_xy = models.FloatField(blank=True, null=True)
     hvsep1_xy = models.FloatField(blank=True, null=True)
-
-
 
 
     class Meta:
