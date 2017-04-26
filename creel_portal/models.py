@@ -110,12 +110,71 @@ class FN011(models.Model, metaclass= AldjemyMeta):
 
 
     def get_global_effort(self):
+        """Return the final effort estimates for this creel at the highest
+        level of aggregation.  If strat_comb indicates that all strata
+        are to be collapsed, then the result is one element list
+        containing the estimates.  If strat_comb indicates that one or
+        more strata are not to be combined, this function returns a
+        list with one element corresponding to each strata level.
 
-        return self.effort_estimates.filter(strat='++_++_++_++').first()
+        By default, the last run a creel is always returned.  This
+        assumes that each run is an improvement on previous runs.
+        This could be re-considered if necessary."""
+
+
+        #get the globals for a creel:
+        # return the estimates from the last run
+        #TODO - we need to get multiple objects if the comb_strat contains
+        #any '??'
+        #effort = self.creel_run.order_by('-run').first().\
+        #         strata.filter(stratum_label='++_++_++_++').\
+        #         first().effort_estimates.get()
+
+        my_run = self.creel_run.order_by('-run').first()
+
+        mask_re = my_run.strat_comb.replace('?','\w').replace('+','\+')
+
+        my_strata = my_run.strata.filter(stratum_label__regex=mask_re).all()
+
+        estimates = []
+        for x in my_strata:
+            strata = [x.season, x.daytype, x.period, x.area, x.mode]
+            tmp = x.effort_estimates.get()
+            estimates.append({'strata': strata, 'estimates': tmp})
+
+        return estimates
+
 
     def get_global_catch(self):
+        '''Return the final catch estimates for this creel at the highest
+        level of aggregation.  If strat_comb indicates that all strata
+        are to be collapsed, then the result is one element list
+        containing the estimates.  If strat_comb indicates that one or
+        more strata are not to be combined, this function returns a
+        list with one element corresponding to each strata level.
 
-        return self.catch_estimates.filter(strat='++_++_++_++').all()
+        By default, the last run a creel is always returned.  This
+        assumes that each run is an improvement on previous runs.
+        This could be re-considered if necessary.
+
+        '''
+
+        #catch_est = self.creel_run.order_by('-run').first().\
+        #            strata.filter(stratum_label='++_++_++_++').\
+        #            first().catch_estimates.all()
+        #return catch_est
+
+        my_run = self.creel_run.order_by('-run').first()
+
+        mask_re = my_run.strat_comb.replace('?','\w').replace('+','\+')
+        my_strata = my_run.strata.filter(stratum_label__regex=mask_re).all()
+        estimates = []
+        for x in my_strata:
+            strata = [x.season, x.daytype, x.period, x.area, x.mode]
+            tmp = x.catch_estimates.all()
+            estimates.append({'strata': strata, 'estimates': tmp})
+
+        return estimates
 
 
 class FN022(models.Model, metaclass= AldjemyMeta):
@@ -391,26 +450,124 @@ class FN028(models.Model, metaclass= AldjemyMeta):
         return label
 
 
+
+class FR711(models.Model, metaclass= AldjemyMeta):
+    '''Class to hold creel strata settings.  this table contains
+    information about contact method (access or roving creel), whether or
+    not estimates are save daily, and which strata can be combined or must
+    be estimated separately (important for presenting final results as
+    there may not be a ++_++_++_++ strata.
+
+    '''
+
+    CONTMETH_CHOICES = (
+        ('A2', 'Access; Same days'),
+        ('R0', 'Roving; No interviews'),
+        ('R1', 'Roving; Not same days'),
+        ('R2', 'Roving; Same days'),
+    )
+
+    creel = models.ForeignKey(FN011, related_name='creel_run')
+    run = models.CharField(max_length=2, default='01')
+
+    atycrit = models.IntegerField()
+    cifopt = models.CharField(max_length=5)
+    contmeth = models.CharField(max_length=2,choices=CONTMETH_CHOICES,
+                                default='A2')
+    do_cif  = models.IntegerField()
+    fr71_est  = models.IntegerField()
+    fr71_unit  = models.IntegerField()
+    mask_c = models.CharField(max_length=11, default="++_++_++_++")
+    save_daily = models.BooleanField()
+    strat_comb = models.CharField(max_length=11, default="++_++_++_++")
+
+    class Meta:
+        verbose_name = "EffortEstimate"
+        ordering = ['creel', 'run']
+        unique_together = ['creel', 'run']
+
+
+    def __str__(self):
+        '''return the object type (strata config), and the prj_cd,
+        and the strat_comb.
+
+        '''
+        repr = "{} (run:{} strat_comb:{})".format(self.creel.prj_cd,
+                                self.run,
+                                self.strat_comb)
+
+        return repr
+
+
+
+class Strata(models.Model, metaclass= AldjemyMeta):
+    """A table that lies at the intersection of the design and data
+    tables.  For new creels, we may want to add a build method that will
+    create the stratum table using the cartesian product of all strata in
+    the creel plus any defined in FR711
+    """
+    creel_run = models.ForeignKey(FR711, related_name='strata')
+
+    stratum_label = models.CharField(max_length=11)
+
+    #optional foreign keys:
+    season = models.ForeignKey(FN022, related_name='strata', blank=True,
+                               null=True)
+    daytype = models.ForeignKey(FN023, related_name='strata', blank=True,
+                                null=True)
+    period = models.ForeignKey(FN024, related_name='strata', blank=True,
+                                null=True)
+    area = models.ForeignKey(FN026, related_name='strata', blank=True,
+                             null=True)
+    mode = models.ForeignKey(FN028, related_name='strata', blank=True,
+                             null=True)
+
+    class Meta:
+        unique_together = ['creel_run', 'stratum_label']
+        ordering = ['creel_run__creel__prj_cd',
+                    'creel_run__run',
+                    'stratum_label']
+
+    def __str__(self):
+        '''return the object type, the interview log number (sama), the stratum,
+        and project code of the creel this record is assoicated
+       with.
+
+        '''
+
+        repr =  "{}(run:{}): {}"
+        return repr.format(self.creel_run.creel.prj_cd,
+                           self.creel_run.run,
+                           self.stratum_label)
+
+
 class FN111(models.Model, metaclass= AldjemyMeta):
     '''Class to represent the creel logs.
     '''
 
+    #stratum = models.ForeignKey(Strata, related_name='interview_logs')
     creel = models.ForeignKey(FN011, related_name='interview_logs')
+    season = models.ForeignKey(FN022, related_name='interview_logs')
+    daytype = models.ForeignKey(FN023, related_name='interview_logs')
+    period = models.ForeignKey(FN024, related_name='interview_logs')
     area = models.ForeignKey(FN026, related_name='interview_logs')
     mode = models.ForeignKey(FN028, related_name='interview_logs')
 
+
     sama = models.CharField(max_length=6, blank=False)
-    date = models.DateField(blank=False)
+    date = models.DateField(blank=False, db_index=True)
     samtm0 = models.TimeField(blank=False,
                               help_text="Interview Period Start")
     weather = models.CharField(max_length=200, blank=False)
     help_str = 'Comments about current interview period.'
     comment1 = models.CharField(max_length=200, blank=True, null=True,
                                 help_text=help_str)
+    daycode =  models.CharField(max_length=1, blank=False, db_index=True)
+
 
     class Meta:
         verbose_name = "Inveriew Log"
-        ordering = ['creel', 'sama']
+        ordering = ['creel__prj_cd', 'sama']
         unique_together = ['creel', 'sama']
 
     def __str__(self):
@@ -420,45 +577,9 @@ class FN111(models.Model, metaclass= AldjemyMeta):
 
         '''
 
-        repr =  "<InterviewLog: {} ({})>"
-        return repr.format(self.sama, self.creel.prj_cd)
-
-
-    @property
-    def daytype(self):
-        """get the day type associated with this interview log.  The day type
-        is determined by the creel, season, and date.  If a record
-        exsits for this date in the exception dates table (FN025) use it,
-        otherwise get the day type from the FN024 table.
-
-        Arguments:
-        - `self`:
-
-        """
-
-        exception = FN025.objects.filter(season=self.season).\
-                  filter(date=self.date).first()
-        if exception:
-            daytype = FN023.objects.filter(season=self.season).\
-                      filter(dtp=exception.dtp1).get()
-        else:
-            daytype = FN023.objects.filter(season=self.season).\
-                      filter(dow_lst__contains=self.dow).get()
-        return daytype
-
-    @property
-    def period(self):
-        """get the period associated with this interview log.  The period is
-        determined by the creel, season, date, and start time.
-
-        Arguments:
-        - `self`:
-
-        """
-        period = FN024.objects.filter(daytype=self.daytype).\
-              filter(prdtm0__lte=self.samtm0).\
-              order_by('-prdtm0').first()
-        return period
+        repr =  "<InterviewLog: {} ({} {})>"
+        return repr.format(self.sama, self.stratum.creel.prj_cd,
+                           self.stratum.stratum)
 
     @property
     def dow(self):
@@ -471,42 +592,81 @@ class FN111(models.Model, metaclass= AldjemyMeta):
         dow = int(datetime.strftime(self.date, '%w')) + 1
         return dow
 
-
-    @property
-    def season(self):
-        """Given the project_code and date, return the corresponding season
-        for this creel log by finding the season that has start and
-        end dates span the date of the creel log.
-
-        Arguments:
-        - `self`:
-
-        """
-
-        mydate = self.date.date()
-        ssn = FN022.objects.filter(creel=self.creel).\
-              filter(ssn_date0__lte=mydate).\
-              filter(ssn_date1__gte=mydate).get()
-
-        return ssn
-
-
-    @property
-    def stratum(self):
-        """the stratum method should return the space, mode, day type,
-        period and season of an interview log, as a FishNet-2 stratum
-        string of the form: "XX_XX_XX_XX (SSN_[DayType][Period]_Area_Mode)."
-
-        """
-        myseason=self.season.ssn
-        myspace = self.area.space
-        myperiod = self.period.prd
-        mydaytype = self.daytype.dtp
-        mymode = self.mode.mode
-
-        repr = '{}_{}{}_{}_{}'.format(myseason, mydaytype, myperiod,
-                                      myspace, mymode)
-        return repr
+#    @property
+#    def daytype(self):
+#        """get the day type associated with this interview log.  The day type
+#        is determined by the creel, season, and date.  If a record
+#        exsits for this date in the exception dates table (FN025) use it,
+#        otherwise get the day type from the FN024 table.
+#
+#        Arguments:
+#        - `self`:
+#
+#        """
+#
+#        #exception = FN025.objects.filter(season=self.season).\
+#        #          filter(date=self.date).first()
+#        #if exception:
+#        #    daytype = FN023.objects.filter(season=self.season).\
+#        #              filter(dtp=exception.dtp1).get()
+#        #else:
+#        #    daytype = FN023.objects.filter(season=self.season).\
+#        #              filter(dow_lst__contains=self.dow).get()
+#        #return daytype
+#        return self.stratum.daytype.dtp
+#
+#    @property
+#    def period(self):
+#        """get the period associated with this interview log.  The period is
+#        determined by the creel, season, date, and start time.
+#
+#        Arguments:
+#        - `self`:
+#
+#        """
+#        #period = FN024.objects.filter(daytype=self.daytype).\
+#        #      filter(prdtm0__lte=self.samtm0).\
+#        #      order_by('-prdtm0').first()
+#        #return period
+#        return self.stratum.period.prd
+#
+#    @property
+#    def season(self):
+#        """Given the project_code and date, return the corresponding season
+#        for this creel log by finding the season that has start and
+#        end dates span the date of the creel log.
+#
+#        Arguments:
+#        - `self`:
+#
+#        """
+#
+#        #mydate = self.date.date()
+#        #ssn = FN022.objects.filter(creel=self.creel).\
+#        #      filter(ssn_date0__lte=mydate).\
+#        #      filter(ssn_date1__gte=mydate).get()
+#        #
+#        #return ssn
+#        return self.stratum.season.ssn
+#
+#    @property
+#    def stratum(self):
+#        """the stratum method should return the space, mode, day type,
+#        period and season of an interview log, as a FishNet-2 stratum
+#        string of the form: "XX_XX_XX_XX (SSN_[DayType][Period]_Area_Mode)."
+#
+#        """
+##        myseason=self.season.ssn
+##        myspace = self.area.space
+##        myperiod = self.period.prd
+##        mydaytype = self.daytype.dtp
+##        mymode = self.mode.mode
+##
+##        repr = '{}_{}{}_{}_{}'.format(myseason, mydaytype, myperiod,
+##                                      myspace, mymode)
+##        return repr
+#
+#        return self.stratum.stratum
 
 
 class FN112(models.Model, metaclass= AldjemyMeta):
@@ -533,8 +693,10 @@ class FN112(models.Model, metaclass= AldjemyMeta):
         number (sama), the start time, and the end time.
         '''
 
-        repr =  "ActivityCount: {}-{} {}-{}"
-        return repr.format(self.sama.creel.prj_cd, self.sama.sama,
+        repr =  "ActivityCount: {}-{} {} {}-{}"
+        return repr.format(self.sama.stratum.creel.prj_cd,
+                           self.sama.sama,
+                           self.sama.stratum.stratum,
                            self.atytm0, self.atytm1)
 
 
@@ -542,11 +704,11 @@ class FN121(models.Model, metaclass= AldjemyMeta):
     '''Class to represent the creel intervews.
     '''
 
-    creel = models.ForeignKey(FN011, related_name='interviews')
+    #creel = models.ForeignKey(FN011, related_name='interviews')
     sama = models.ForeignKey(FN111, related_name='interviews')
 
-    area = models.ForeignKey(FN026, related_name='interviews')
-    mode = models.ForeignKey(FN028, related_name='interviews')
+    #area = models.ForeignKey(FN026, related_name='interviews')
+    #mode = models.ForeignKey(FN028, related_name='interviews')
 
     sam = models.CharField(max_length=6)
     itvseq = models.IntegerField()
@@ -570,8 +732,8 @@ class FN121(models.Model, metaclass= AldjemyMeta):
 
     class Meta:
         verbose_name = "Inveriew"
-        ordering = ['creel', 'sam']
-        unique_together = ['creel', 'sam']
+        ordering = ['strata__creel__prj_cd', 'sam']
+        #unique_together = ['creel', 'sam']
 
     def __str__(self):
         '''return the object type, the interview log number (sama), the stratum,
@@ -581,8 +743,7 @@ class FN121(models.Model, metaclass= AldjemyMeta):
         '''
 
         repr =  "<Interview: {} ({})>"
-        return repr.format(self.sam, self.creel.prj_cd)
-
+        return repr.format(self.sam, self.stratum.creel.prj_cd)
 
 
 class FN123(models.Model, metaclass= AldjemyMeta):
@@ -609,7 +770,7 @@ class FN123(models.Model, metaclass= AldjemyMeta):
 
         '''
         repr = "<Catch: {}-{}-{}>"
-        return repr.format(self.interview.creel.prj_cd,
+        return repr.format(self.interview.stratum.creel.prj_cd,
                            self.interview.sam,
                            self.species.species_code)
 
@@ -667,7 +828,7 @@ class FN125(models.Model, metaclass= AldjemyMeta):
 
         '''
         repr = "<Fish: {}-{}-{}-{}-{}>"
-        return repr.format(self.catch.interview.creel.prj_cd,
+        return repr.format(self.catch.interview.stratum.creel.prj_cd,
                            self.catch.interview.sam,
                            self.catch.species.species_code,
                            self.grp, self.fish)
@@ -699,7 +860,7 @@ class FN127(models.Model, metaclass= AldjemyMeta):
 
         '''
         repr = "<AgeEstimate: {}-{}-{}-{}-{}-{}>"
-        return repr.format(self.fish.catch.interview.creel.prj_cd,
+        return repr.format(self.fish.catch.interview.stratum.creel.prj_cd,
                            self.fish.catch.interview.sam,
                            self.fish.catch.species.species_code,
                            self.fish.grp,
@@ -707,51 +868,6 @@ class FN127(models.Model, metaclass= AldjemyMeta):
                            self.ageid)
 
 
-class FR711(models.Model, metaclass= AldjemyMeta):
-    '''Class to hold creel strata settings.  this table contains
-    information about contact method (access or roving creel), whether or
-    not estimates are save daily, and which strata can be combined or must
-    be estimated separately (important for presenting final results as
-    there may not be a ++_++_++_++ strata.
-
-    '''
-
-    CONTMETH_CHOICES = (
-        ('A2', 'Access; Same days'),
-        ('R0', 'Roving; No interviews'),
-        ('R1', 'Roving; Not same days'),
-        ('R2', 'Roving; Same days'),
-    )
-
-    creel = models.ForeignKey(FN011, related_name='creesys_settings')
-    run = models.CharField(max_length=2)
-
-    atycrit = models.IntegerField()
-    cifopt = models.CharField(max_length=5)
-    contmeth = models.CharField(max_length=2,choices=CONTMETH_CHOICES,
-                                default='A2')
-    do_cif  = models.IntegerField()
-    fr71_est  = models.IntegerField()
-    fr71_unit  = models.IntegerField()
-    mask_c = models.CharField(max_length=11)
-    save_daily = models.BooleanField()
-    strat_comb = models.CharField(max_length=11)
-
-
-    class Meta:
-        verbose_name = "EffortEstimate"
-        ordering = ['creel', 'run']
-        unique_together = ['creel', 'run']
-
-
-    def __str__(self):
-        '''return the object type (strata config), and the prj_cd,
-        and the strat_comb.
-
-        '''
-        repr = "{} ({})".format(self.creel.prj_cd, self.strat_comb)
-
-        return repr
 
 
 class FR713(models.Model, metaclass= AldjemyMeta):
@@ -764,23 +880,25 @@ class FR713(models.Model, metaclass= AldjemyMeta):
 
     '''
 
-    creel = models.ForeignKey(FN011, related_name='effort_estimates')
+    stratum = models.ForeignKey(Strata, related_name='effort_estimates')
 
-    season = models.ForeignKey(FN022, related_name='effort_estimates',
-                              blank=True, null=True)
-    dtp = models.ForeignKey(FN023, related_name='effort_estimates',
-                            blank=True, null=True)
-    period = models.ForeignKey(FN024, related_name='effort_estimates',
-                               blank=True, null=True)
-    area = models.ForeignKey(FN026, related_name='effort_estimates',
-                             blank=True, null=True)
-    mode = models.ForeignKey(FN028, related_name='effort_estimates',
-                             blank=True, null=True)
-
+#    creel = models.ForeignKey(FN011, related_name='effort_estimates')
+#
+#    season = models.ForeignKey(FN022, related_name='effort_estimates',
+#                              blank=True, null=True)
+#    dtp = models.ForeignKey(FN023, related_name='effort_estimates',
+#                            blank=True, null=True)
+#    period = models.ForeignKey(FN024, related_name='effort_estimates',
+#                               blank=True, null=True)
+#    area = models.ForeignKey(FN026, related_name='effort_estimates',
+#                             blank=True, null=True)
+#    mode = models.ForeignKey(FN028, related_name='effort_estimates',
+#                             blank=True, null=True)
+#
     #TODO: run should be a fk to FR111 table
     run = models.CharField(max_length=2, db_index=True)
     rec_tp = models.IntegerField(default=1)
-    strat = models.CharField(max_length=11)
+    #strat = models.CharField(max_length=11)
     date = models.DateField(blank=True, null=True)
 
     chkcnt_s = models.IntegerField(blank=True, null=True)
@@ -840,14 +958,17 @@ class FR713(models.Model, metaclass= AldjemyMeta):
 
     class Meta:
         verbose_name = "EffortEstimate"
-        ordering = ['creel', 'run', 'strat', 'date', 'rec_tp']
-        unique_together = ['creel', 'strat', 'date', 'rec_tp', 'run']
+        ordering = ['stratum__creel_run__creel__prj_cd',  'run',
+                    'stratum__stratum_label', 'date', 'rec_tp']
+        unique_together = ['stratum', 'date', 'rec_tp', 'run']
 
     def __str__(self):
         '''return the object type (EffortEstimate), and the prj_cd.
         '''
-        repr = "<EffortEstimate: {} ({})>"
-        return repr.format(self.creel.prj_cd, self.strat)
+        repr = "<EffortEstimate: {} (run:{} strat:{})>"
+        return repr.format(self.stratum.creel_run.creel.prj_cd,
+                           self.stratum.creel_run.run,
+                           self.stratum.stratum_label)
 
 
 class FR714(models.Model, metaclass= AldjemyMeta):
@@ -859,26 +980,27 @@ class FR714(models.Model, metaclass= AldjemyMeta):
     collapsed 'all' estimate.
 
     '''
-
-    creel = models.ForeignKey(FN011, related_name='catch_estimates')
+    stratum = models.ForeignKey(Strata, related_name='catch_estimates')
     species = models.ForeignKey(Species, related_name='catch_estimates')
 
-    season = models.ForeignKey(FN022, related_name='catch_estimates',
-                              blank=True, null=True)
-    dtp = models.ForeignKey(FN023, related_name='catch_estimates',
-                            blank=True, null=True)
-    period = models.ForeignKey(FN024, related_name='catch_estimates',
-                               blank=True, null=True)
-    area = models.ForeignKey(FN026, related_name='catch_estimates',
-                             blank=True, null=True)
-    mode = models.ForeignKey(FN028, related_name='catch_estimates',
-                             blank=True, null=True)
+#    creel = models.ForeignKey(FN011, related_name='catch_estimates')
+#
+#    season = models.ForeignKey(FN022, related_name='catch_estimates',
+#                              blank=True, null=True)
+#    dtp = models.ForeignKey(FN023, related_name='catch_estimates',
+#                            blank=True, null=True)
+#    period = models.ForeignKey(FN024, related_name='catch_estimates',
+#                               blank=True, null=True)
+#    area = models.ForeignKey(FN026, related_name='catch_estimates',
+#                             blank=True, null=True)
+#    mode = models.ForeignKey(FN028, related_name='catch_estimates',
+#                             blank=True, null=True)
 
     #NEW
     #run should be a fk to FR111 table
     run = models.CharField(max_length=2, db_index=True)
     rec_tp = models.IntegerField()
-    strat = models.CharField(max_length=11)
+    #strat = models.CharField(max_length=11)
     date = models.DateField(blank=False, null=True)
     sek = models.BooleanField()
     cif1_nn = models.IntegerField()
@@ -961,13 +1083,22 @@ class FR714(models.Model, metaclass= AldjemyMeta):
 
     class Meta:
         verbose_name = "HarvestEstimate"
-        ordering = ['creel','run', 'strat', 'species', 'date', 'rec_tp', 'sek']
-        unique_together = ['creel', 'strat', 'species', 'date', 'rec_tp',
+        ordering = ['stratum__creel_run__creel__prj_cd',
+                    'stratum__creel_run__run',
+                    'stratum__stratum_label',
+                    'species',
+                    'date', 'rec_tp', 'sek']
+        unique_together = ['stratum', 'species', 'date', 'rec_tp',
                            'sek','run']
 
     def __str__(self):
         '''return the object type (EffortEstimate), and the prj_cd.'''
-        repr = "<HarvestEstimate: {} ({}-{}-{})>"
+
+        repr = "<HarvestEstimate: {} ({} run:{} strat:{} sek:{})>"
+
         targetted = 'Targetted' if self.sek else 'NonTargetted'
         return repr.format(self.species.species_code,
-                           self.creel.prj_cd, self.strat, targetted)
+                           self.stratum.creel_run.creel.prj_cd,
+                           self.stratum.creel_run.run,
+                           self.stratum.stratum_label,
+                           targetted)

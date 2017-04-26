@@ -37,7 +37,7 @@ urlpatterns = [
         name='home',),
 
 
-    url(r'^(?P<lake>[a-z]{1,10})/$', views.CreelListView.as_view(),
+    url(r'^(?P<lake>[a-zA-Z]{1,10})/$', views.CreelListView.as_view(),
         name='creels_by_lake',),
 
 

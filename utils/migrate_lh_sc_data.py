@@ -17,8 +17,9 @@
 import django
 import os
 
-os.chdir('/home/adam/Documents/djcode/creel_portal')
+os.chdir('./..')
 django.setup()
+
 
 
 import django_settings
@@ -30,7 +31,8 @@ from utils.helper_fcts import *
 
 
 #SRC_DB = '/home/adam/Documents/work/Superior/SC_master.db'
-SRC_DB = '/home/adam/Documents/work/Superior/lhmu_sc_warehouse.db'
+#SRC_DB = '/home/adam/Documents/work/Superior/lhmu_sc_warehouse.db'
+SRC_DB = 'C:/1work/ScrapBook/lhmu_sc_warehouse_clean.db'
 
 conn = sqlite3.connect(SRC_DB)
 cursor = conn.cursor()
@@ -39,7 +41,7 @@ cursor = conn.cursor()
 #lake.save()
 
 lake = Lake.objects.get(abbrev='HU')
-
+print("Working on Lake " + str(lake))
 #==================================
 #    FN011  - Project Details
 
@@ -116,11 +118,6 @@ for record in rs:
     objects.append(item)
 FN023.objects.bulk_create(objects)
 
-# a total hack to accomodate an exception date that
-# occurs after the last date of the creel (was May 18th)
-x = FN022.objects.filter(creel__prj_cd='NPW_SC12_BSR').get()
-x.ssn_date1 = datetime(2012, 5, 21)
-x.save()
 
 print("Done adding FN023 records.")
 
@@ -228,6 +225,63 @@ FN028.objects.bulk_create(objects)
 print("Done adding FN028 records.")
 
 
+#==================================
+#          FR711
+
+#the FR711 table holds the settings for the analysis -
+# the type of creel, the activity unit and the strata mask.
+
+sql = """select prj_cd, run, contmeth, do_cif, fr71_est,
+         fr71_unit, atycrit, cifopt, strat_comb, save_daily,
+         mask_c from fr711 order by prj_cd, run;
+"""
+
+cursor.execute(sql)
+rs = cursor.fetchall()
+col_names = [x[0].lower() for x in cursor.description]
+objects = []
+for record in rs:
+    x = {k:v for k,v in zip(col_names, record)}
+    prj_cd = x.pop('prj_cd')
+    try:
+        x['creel'] = FN011.objects.get(prj_cd=prj_cd)
+    except:
+        msg = "{} not found.".format(prj_cd)
+        continue
+    item = FR711(**x)
+    #item.save()
+    objects.append(item)
+FR711.objects.bulk_create(objects)
+print("Done adding FR711 records.")
+
+
+#==================================
+#          STRATA
+
+#now we need to build the strata for each project from the design tables and the
+# strat_mask in the FR711 table:
+
+fr711s = FR711.objects.all()
+
+all_strata = []
+for creel_run in fr711s:
+    combined_strata = get_combined_strata(creel_run)
+    all_strata.extend(combined_strata)
+    other_strata = get_strata(creel_run)
+    all_strata.extend(other_strata)
+
+objects = []
+col_names = ['creel_run_id', 'stratum_label', 'season_id',
+             'area_id', 'daytype_id', 'period_id', 'mode_id']
+
+for x in all_strata:
+    x = {k:v for k,v in zip(col_names, x)}
+    item = Strata(**x)
+    objects.append(item)
+Strata.objects.bulk_create(objects)
+print("Done adding Strata records.")
+
+
 
 #==================================
 #    FN111  - Interview Logs
@@ -240,21 +294,48 @@ rs = cursor.fetchall()
 col_names = [x[0].lower() for x in cursor.description]
 objects = []
 for record in rs:
+
     x = {k:v for k,v in zip(col_names, record)}
     prj_cd = x.pop('prj_cd')
     yr = datetime.strptime(prj_cd[6:8],'%y').year
     my_date = datetime.strptime(x['date'],'%Y-%m-%d')
     my_date = my_date.replace(year=yr)
+    my_time = datetime.strptime(x['samtm0'],'%H:%M').time()
+
     x['date'] = my_date
-    x['samtm0'] = datetime.strptime(x['samtm0'],'%H:%M')
+    x['samtm0'] = my_time
+
     creel = FN011.objects.get(prj_cd=prj_cd)
     x['creel'] = creel
-    mode_code = x['mode']
-    mode = FN028.objects.get(creel=creel, mode=mode_code)
-    x['mode'] = mode
+
+    season = FN022.objects.filter(creel__prj_cd=prj_cd).\
+             filter(ssn_date0__lte = my_date).\
+             filter(ssn_date1__gte = my_date).get()
+    x['season'] = season
+
+    my_dow = int(datetime.strftime(my_date, '%w')) + 1
+    daytype = FN023.objects.filter(season=season).\
+              filter(dow_lst__contains=str(my_dow)).get()
+    x['daytype'] = daytype
+
+    period = FN024.objects.filter(daytype=daytype).\
+             filter(prdtm0__lte = my_time, prdtm1__gt = my_time).get()
+    x['period'] = period
+
+    exception_date = FN025.objects.filter(season=season, date=my_date).first()
+    if exception_date:
+        x['daycode'] = exception_date.dtp1
+    else:
+        x['daycode'] = daytype.dtp
+
     area_code = x['area']
     area = FN026.objects.get(creel=creel, area_lst=area_code)
     x['area'] = area
+
+    mode_code = x['mode']
+    mode = FN028.objects.get(creel=creel, mode=mode_code)
+    x['mode'] = mode
+
     item = FN111(**x)
     #item.save()
     objects.append(item)
@@ -278,7 +359,7 @@ for record in rs:
     prj_cd = x.pop('prj_cd')
     sama = x.pop('sama')
     sama = FN111.objects.filter(creel__prj_cd=prj_cd,
-                                sama=sama).first()
+                                sama=sama).get()
     if sama is None:
         print("oops! can't find FN111 for: " + str(record))
     else:
@@ -317,9 +398,9 @@ for record in rs:
     my_date = my_date.replace(year=yr)
 
     creel = FN011.objects.get(prj_cd=prj_cd)
-    mode_code = x['mode']
+    mode_code = x.pop('mode')
     mode = FN028.objects.get(creel=creel, mode=mode_code)
-    area_code = x['area']
+    area_code = x.pop('area')
     area = FN026.objects.get(creel=creel, area_lst=area_code)
 
     interview_time = time_or_none(x['efftm0'])
@@ -336,10 +417,10 @@ for record in rs:
                                      order_by('samtm0').first()
 
     #related objects
-    x['creel'] = creel
+    #x['creel'] = creel
     x['sama'] = sama
-    x['mode'] = mode
-    x['area'] = area
+    #x['mode'] = mode
+    #x['area'] = area
 
     #data conversion
     x['date']=  my_date
@@ -385,7 +466,7 @@ for record in rs:
     sam = x.pop('sam')
     spc = x.pop('spc')
 
-    interview = FN121.objects.get(creel__prj_cd=prj_cd, sam=sam)
+    interview = FN121.objects.get(sama__creel__prj_cd=prj_cd, sam=sam)
     species = Species.objects.get(species_code=spc)
     #related objects
     x['interview'] = interview
@@ -489,7 +570,6 @@ print("Done adding FN123 records.")
 ##  print("Done adding FN127 records.")
 ##
 
-#TODO: add 711 inforamtion here:
 
 
 
@@ -557,32 +637,46 @@ objects = []
 for record in rs:
     x = {k:v for k,v in zip(col_names, record)}
     prj_cd = x.pop('prj_cd')
+    stratum_code = x.pop('strat')
+    run = x.pop('run')
+
     yr = datetime.strptime(prj_cd[6:8],'%y').year
 
-    stratum = x.get('strat')
+    #stratum = Strata.objects.filter(creel_run__creel__prj_cd=prj_cd).\
+    #          filter(stratum_label=stratum_code, run=run).get()
 
-    creel = FN011.objects.get(prj_cd=prj_cd)
-    #get all of the related objects:
-    mode = creel.modes.filter(mode=stratum[9:]).first()
-    season = creel.seasons.filter(ssn=stratum[:2]).first()
-    if season:
-        daytype = season.daytypes.filter(dtp=stratum[3]).first()
-    else:
-        daytype = None
-    if daytype:
-        period = daytype.periods.filter(prd=stratum[4]).first()
-    else:
-        period = None
+    try:
+        stratum = Strata.objects.filter(creel_run__creel__prj_cd=prj_cd).\
+              filter(stratum_label=stratum_code, creel_run__run=run).get()
+    except:
+        print("Could not find strata for prj_cd:{} Strata:{} Run:{} ".
+              format(prj_cd, stratum_code, run))
+        next
 
-    space = creel.spatial_strata.filter(space=stratum[6:8]).first()
+#    creel = FN011.objects.get(prj_cd=prj_cd)
+#    #get all of the related objects:
+#    mode = creel.modes.filter(mode=stratum[9:]).first()
+#    season = creel.seasons.filter(ssn=stratum[:2]).first()
+#    if season:
+#        daytype = season.daytypes.filter(dtp=stratum[3]).first()
+#    else:
+#        daytype = None
+#    if daytype:
+#        period = daytype.periods.filter(prd=stratum[4]).first()
+#    else:
+#        period = None
+#
+#    space = creel.spatial_strata.filter(space=stratum[6:8]).first()
+#
+#
+#    x['creel'] = creel
+#    x['mode'] = mode
+#    x['season'] = season
+#    x['period'] = period
+#    x['dtp'] = daytype
+#    x['area'] = space
 
-
-    x['creel'] = creel
-    x['mode'] = mode
-    x['season'] = season
-    x['period'] = period
-    x['dtp'] = daytype
-    x['area'] = space
+    x['stratum'] = stratum
 
     if x.get('date'):
         if x.get('date') == '':
@@ -592,7 +686,7 @@ for record in rs:
             my_date = my_date.replace(year=yr)
             x['date'] = my_date
 
-    x['run'] = int_or_none(x['run'])
+    #x['run'] = int_or_none(x['run'])
     x['rec_tp'] = int_or_none(x['rec_tp'])
     x['angler_mn'] = float_or_none(x['angler_mn'])
     x['angler_s'] = int_or_none(x['angler_s'])
@@ -739,34 +833,47 @@ for record in rs:
     x = {k:v for k,v in zip(col_names, record)}
 
     prj_cd = x.pop('prj_cd')
+    stratum_code = x.pop('strat')
+    run = x.pop('run')
+
     yr = datetime.strptime(prj_cd[6:8],'%y').year
 
-    stratum = x.get('strat')
+    try:
+        stratum = Strata.objects.filter(creel_run__creel__prj_cd=prj_cd).\
+              filter(stratum_label=stratum_code, creel_run__run=run).get()
+    except:
+        print("Could not find strata for prj_cd:{} Strata:{} Run:{} ".
+              format(prj_cd, stratum_code, run))
+        next
 
-    creel = FN011.objects.get(prj_cd=prj_cd)
+#    stratum = x.get('strat')
+#
+#    creel = FN011.objects.get(prj_cd=prj_cd)
+#
+#    mode = creel.modes.filter(mode=stratum[9:]).first()
+#    season = creel.seasons.filter(ssn=stratum[:2]).first()
+#    if season:
+#        daytype = season.daytypes.filter(dtp=stratum[3]).first()
+#    else:
+#        daytype = None
+#    if daytype:
+#        period = daytype.periods.filter(prd=stratum[4]).first()
+#    else:
+#        period = None
+#
+#    space = creel.spatial_strata.filter(space=stratum[6:8]).first()
+#
+#    x['creel'] = creel
+#    x['mode'] = mode
+#    x['season'] = season
+#    x['period'] = period
+#    x['dtp'] = daytype
+#    x['area'] = space
+#
+    x['stratum'] = stratum
 
     spc = x.pop('spc')
     species = Species.objects.get(species_code=spc)
-
-    mode = creel.modes.filter(mode=stratum[9:]).first()
-    season = creel.seasons.filter(ssn=stratum[:2]).first()
-    if season:
-        daytype = season.daytypes.filter(dtp=stratum[3]).first()
-    else:
-        daytype = None
-    if daytype:
-        period = daytype.periods.filter(prd=stratum[4]).first()
-    else:
-        period = None
-
-    space = creel.spatial_strata.filter(space=stratum[6:8]).first()
-
-    x['creel'] = creel
-    x['mode'] = mode
-    x['season'] = season
-    x['period'] = period
-    x['dtp'] = daytype
-    x['area'] = space
     x['species'] = species
 
     if x.get('date'):
@@ -778,7 +885,7 @@ for record in rs:
             x['date'] = my_date
 
 
-    x['run'] = int_or_none(x['run'])
+#    x['run'] = int_or_none(x['run'])
     x['rec_tp'] = int_or_none(x['rec_tp'])
     x['sek'] = bool_or_none(x['sek'])
     x['angler1_s'] = int_or_none(x['angler1_s'])
