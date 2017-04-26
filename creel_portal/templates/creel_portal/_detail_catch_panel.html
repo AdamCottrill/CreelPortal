@@ -1,0 +1,51 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Catch Estimates {% if strata %} for {{ strata }} {% endif %}</h3>
+    </div>
+    <div class="panel-body">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Species</th>
+                    <th>Obs. Harvest</th>
+                    <th>Est. Harvest</th>
+                    <th>Obs. Targ. Harvest</th>
+                    <th>Est. Targ. Harvest</th>
+                    <th>Obs. Catch</th>
+                    <th>Est. Catch</th>
+                    <th>Obs. Targ. Catch</th>
+                    <th>Est. Targ. Catch</th>
+                    <th>Obs. Targ. Effort</th>
+                    <th>Est. Targ. Effort</th>
+                    <th>Obs. Cpue</th>
+                    <th>Est. Cpue</th>
+                    <th>Obs. Targ. Cpue</th>
+                    <th>Est. Targ. Cpue</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for spc in catch %}
+                <tr>
+                    <td>{{ spc.species.common_name }}</td>
+                    <td>{{ spc.hvsno_s }}</td>
+                    <td>{{ spc.hvsne }}</td>
+                    <td>{{ spc.hvsno1_s }}</td>
+                    <td>{{ spc.hvsne1 }}</td>
+                    <td>{{ spc.catno_s }}</td>
+                    <td>{{ spc.catne }}</td>
+                    <td>{{ spc.catno1_s }}</td>
+                    <td>{{ spc.catne1 }}</td>
+
+                    <td>{{ spc.effao1_s }}</td>
+                    <td>{{ spc.effae1 }}</td>
+
+                    <td>{{ spc.cuenao }}</td>
+                    <td>{{ spc.cuenae }}</td>
+                    <td>{{ spc.cuenao1 }}</td>
+                    <td>{{ spc.cuenae1 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

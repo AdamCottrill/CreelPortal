@@ -138,7 +138,8 @@ class FN011(models.Model, metaclass= AldjemyMeta):
 
         estimates = []
         for x in my_strata:
-            strata = [x.season, x.daytype, x.period, x.area, x.mode]
+            #strata = [x.season, x.daytype, x.period, x.area, x.mode]
+            strata = x.stratum_label
             tmp = x.effort_estimates.get()
             estimates.append({'strata': strata, 'estimates': tmp})
 
@@ -170,7 +171,8 @@ class FN011(models.Model, metaclass= AldjemyMeta):
         my_strata = my_run.strata.filter(stratum_label__regex=mask_re).all()
         estimates = []
         for x in my_strata:
-            strata = [x.season, x.daytype, x.period, x.area, x.mode]
+            #strata = [x.season, x.daytype, x.period, x.area, x.mode]
+            strata = x.stratum_label
             tmp = x.catch_estimates.all()
             estimates.append({'strata': strata, 'estimates': tmp})
 

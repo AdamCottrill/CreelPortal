@@ -1,0 +1,19 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Effort{%if strata %} for {{ strata }}{%endif%}</h3>
+    </div>
+    <div class="panel-body">
+        <table class="table table-striped table-hover">
+            <tbody>
+                <tr><td>Observed Trip Count</td><td>{{ estimates.tripno }}</tr></td>
+                <tr><td>Estimated Trip Count</td><td>{{ estimates.tripne }}</tr></td>
+                <tr><td>Activity Count</td><td>{{ estimates.atycnt_s }}</tr></td>
+                <tr><td>Interview Count</td><td>{{ estimates.itvcnt_s }}</tr></td>
+                <tr><td>Angler Count</td><td>{{ estimates.angler_s }}</tr></td>
+                <tr><td>Rods </td><td>{{ estimates.rod_s }}</tr></td>
+                <tr><td>Total Angler Estimates </td><td>{{ estimates.effae }} (anlger-hours)</tr></td>
+                <tr><td>Total Angler Estimates </td><td>{{ estimates.effre }} (rod-hours)</tr></td>
+            </tbody>
+        </table>
+    </div>
+</div>
