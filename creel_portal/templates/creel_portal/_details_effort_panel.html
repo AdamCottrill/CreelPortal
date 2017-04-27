@@ -1,18 +1,33 @@
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">Effort{%if strata %} for {{ strata }}{%endif%}</h3>
+        <h3 class="panel-title">Effort Estimates{%if strata != "++_++_++_++" %} for {{ strata }}{%endif%}</h3>
     </div>
     <div class="panel-body">
         <table class="table table-striped table-hover">
+
+            <thead>
+                <tr>
+                    <td>Observed Trip Count</td>
+                    <td>Estimated Trip Count</td>
+                    <td>Activity Count</td>
+                    <td>Interview Count</td>
+                    <td>Angler Count</td>
+                    <td>Rods </td>
+                    <td>Total Angler Estimates (ang-hrs) </td>
+                    <td>Total Angler Estimates (rod-hrs) </td>
+                </tr>
+            </thead>
             <tbody>
-                <tr><td>Observed Trip Count</td><td>{{ estimates.tripno }}</tr></td>
-                <tr><td>Estimated Trip Count</td><td>{{ estimates.tripne }}</tr></td>
-                <tr><td>Activity Count</td><td>{{ estimates.atycnt_s }}</tr></td>
-                <tr><td>Interview Count</td><td>{{ estimates.itvcnt_s }}</tr></td>
-                <tr><td>Angler Count</td><td>{{ estimates.angler_s }}</tr></td>
-                <tr><td>Rods </td><td>{{ estimates.rod_s }}</tr></td>
-                <tr><td>Total Angler Estimates </td><td>{{ estimates.effae }} (anlger-hours)</tr></td>
-                <tr><td>Total Angler Estimates </td><td>{{ estimates.effre }} (rod-hours)</tr></td>
+                <tr>
+                    <td>{{ estimates.tripno }}</td>
+                    <td>{{ estimates.tripne }}</td>
+                    <td>{{ estimates.atycnt_s }}</td>
+                    <td>{{ estimates.cif_nn }}</td>
+                    <td>{{ estimates.angler_s }}</td>
+                    <td>{{ estimates.rod_s }}</td>
+                    <td>{{ estimates.effae }}</td>
+                    <td>{{ estimates.effre }}</td>
+                </tr>
             </tbody>
         </table>
     </div>

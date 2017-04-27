@@ -1,11 +1,14 @@
 from django.db import models
-
+from django.core.serializers.json import DjangoJSONEncoder
 from django.template.defaultfilters import slugify
 from django.urls import reverse
 
 from aldjemy.meta import AldjemyMeta
+from sqlalchemy import func
 
 from datetime import datetime
+
+import json
 
 # Create your models here.
 
@@ -145,6 +148,17 @@ class FN011(models.Model, metaclass= AldjemyMeta):
 
         return estimates
 
+    @property
+    def final_run(self):
+        """Return the final creel run - assumes that the run with the highest
+        number is preferred. This may not be case.
+
+        Arguments:
+        - `self`:
+
+        """
+        return self.creel_run.order_by('-run').first()
+
 
     def get_global_catch(self):
         '''Return the final catch estimates for this creel at the highest
@@ -177,6 +191,71 @@ class FN011(models.Model, metaclass= AldjemyMeta):
             estimates.append({'strata': strata, 'estimates': tmp})
 
         return estimates
+
+
+    def get_catch_totals(self):
+        """this function returns a json string containing the observed and
+        estimated catch and harvest numbers for this creel.  This
+        function uses sqlalchemy to actually get the results as group
+        by queries like this are almost impossible in django.
+
+        If the creel has only one final strata, this query should
+        return numbers that are exactly the same as the global strata
+        (++_++_++_++), but in cases where strata are maintained
+        seperatately (and that strata does not exist), this query
+        returns the equivalent values by summing accross all
+        individual strata estiamtes.
+
+        Arguments:
+        - `self`:
+
+        """
+
+
+        prj_cd = self.prj_cd
+
+        columns = ['common_name',
+                   'catne',
+                   'catne1',
+                   'catno_s',
+                   'catno1_s',
+                   'hvsno_s',
+                   'hvsno1_s',
+                   'hvsne',
+                   'hvsne1']
+
+        #a sub-query to get the final run of this particular creel:
+        last_run = FR711.sa.query(func.max(FR711.sa.run))\
+                           .join(FR711.sa.creel)\
+                           .filter(FN011.sa.prj_cd==prj_cd)
+        #calculate the total catch numbers by species by summing accross
+        # all strata estimates for the last run of this creel.
+        catch_totals = FR714.sa.query(Species.sa.common_name,
+                             func.sum(FR714.sa.catne),
+                             func.sum(FR714.sa.catne1),
+                             func.sum(FR714.sa.catno_s),
+                             func.sum(FR714.sa.catno1_s),
+                             func.sum(FR714.sa.hvsno_s),
+                             func.sum(FR714.sa.hvsno1_s),
+                             func.sum(FR714.sa.hvsne),
+                             func.sum(FR714.sa.hvsne1))\
+                      .join(FR714.sa.species)\
+                      .join(FR714.sa.stratum)\
+                      .join(Strata.sa.creel_run)\
+                      .join(FR711.sa.creel)\
+                      .filter(FN011.sa.prj_cd==prj_cd)\
+                      .filter(FR711.sa.run==last_run)\
+                      .filter(FR714.sa.rec_tp==2)\
+                      .group_by(Species.sa.common_name).all()
+
+        catch_dict = []
+        for x in catch_totals:
+            print(x)
+            catch_dict.append(dict(zip(columns, x)))
+
+        return json.dumps(catch_dict, cls=DjangoJSONEncoder)
+
+
 
 
 class FN022(models.Model, metaclass= AldjemyMeta):
@@ -469,6 +548,19 @@ class FR711(models.Model, metaclass= AldjemyMeta):
         ('R2', 'Roving; Same days'),
     )
 
+    FR71_UNIT_CHOICES = (
+         (0, 'Rods'),
+         (1, 'Anglers'),
+         (2, 'Parties')
+    )
+
+
+    FR71_EST_CHOICES = (
+        (1, '1-stage'),
+        (2, '2-stage')
+    )
+
+
     creel = models.ForeignKey(FN011, related_name='creel_run')
     run = models.CharField(max_length=2, default='01')
 
@@ -477,8 +569,8 @@ class FR711(models.Model, metaclass= AldjemyMeta):
     contmeth = models.CharField(max_length=2,choices=CONTMETH_CHOICES,
                                 default='A2')
     do_cif  = models.IntegerField()
-    fr71_est  = models.IntegerField()
-    fr71_unit  = models.IntegerField()
+    fr71_est  = models.IntegerField(choices=FR71_EST_CHOICES)
+    fr71_unit  = models.IntegerField(choices=FR71_UNIT_CHOICES)
     mask_c = models.CharField(max_length=11, default="++_++_++_++")
     save_daily = models.BooleanField()
     strat_comb = models.CharField(max_length=11, default="++_++_++_++")
@@ -579,9 +671,8 @@ class FN111(models.Model, metaclass= AldjemyMeta):
 
         '''
 
-        repr =  "<InterviewLog: {} ({} {})>"
-        return repr.format(self.sama, self.stratum.creel.prj_cd,
-                           self.stratum.stratum)
+        repr =  "<InterviewLog: {} ({})>"
+        return repr.format(self.sama, self.creel.prj_cd)
 
     @property
     def dow(self):
@@ -695,10 +786,9 @@ class FN112(models.Model, metaclass= AldjemyMeta):
         number (sama), the start time, and the end time.
         '''
 
-        repr =  "ActivityCount: {}-{} {} {}-{}"
-        return repr.format(self.sama.stratum.creel.prj_cd,
+        repr =  "ActivityCount: {}-{} {}-{}"
+        return repr.format(self.sama.creel.prj_cd,
                            self.sama.sama,
-                           self.sama.stratum.stratum,
                            self.atytm0, self.atytm1)
 
 
