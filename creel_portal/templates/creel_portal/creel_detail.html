@@ -408,6 +408,10 @@
     </div>
 </div>
 
+{% endblock content %}
+
+{% block javascript %}
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 
     <script type="text/javascript">
@@ -453,7 +457,7 @@
      // catch plots
 
 
-     // data arrays:
+     // data arrays for plots:
      let species = [];
      let catne = [];
      let catne1 = [];
@@ -463,22 +467,6 @@
      let hvsno1_s = [];
      let hvsne = [];
      let hvsne1 = [];
-
-     // load the catch data into the proper arrays
-     var catch_data = {{ object.get_catch_totals|safe }};
-     $.each(catch_data, function(i,d){
-             if(d.catne>0){
-                 species.push(d.common_name);
-                 catne.push(d.catne);
-                 catne1.push(d.catne1);
-                 catno_s.push(d.catno_s);
-                 catno1_s.push(d.catno1_s);
-                 hvsno_s.push(d.hvsno_s);
-                 hvsno1_s.push(d.hvsno1_s);
-                 hvsne.push(d.hvsne);
-                 hvsne1.push(d.hvsne1);
-             }
-         });
 
 
 
@@ -492,6 +480,27 @@
      let myChart;
      let x = [];
      let chart_title = estObs + ' ' + catchHarvest;
+
+
+     var populate_arrays = function(){
+
+         // load the catch data into the proper arrays
+         var catch_data = {{ object.get_catch_totals|safe }};
+         $.each(catch_data, function(i,d){
+             if(d.catne>0){
+                 species.push(d.common_name);
+                 catne.push(d.catne);
+                 catne1.push(d.catne1);
+                 catno_s.push(d.catno_s);
+                 catno1_s.push(d.catno1_s);
+                 hvsno_s.push(d.hvsno_s);
+                 hvsno1_s.push(d.hvsno1_s);
+                 hvsne.push(d.hvsne);
+                 hvsne1.push(d.hvsne1);
+             }
+         });
+     }
+
 
 
      $("#targetButtons :input").change(function() {
@@ -669,7 +678,7 @@
 
          drawMap();
 
-         //chartTitle = estObs + ' ' + catchHarvest;
+         populate_arrays();
          chartTitle = makeTitle();
          colours = randomColorGenerator(catne.length);
          x = get_xvars();
@@ -684,4 +693,4 @@
     </script>
 
 
-    {% endblock content %}
+{% endblock javascript %}

@@ -824,8 +824,8 @@ class FN121(models.Model, metaclass= AldjemyMeta):
 
     class Meta:
         verbose_name = "Inveriew"
-        ordering = ['strata__creel__prj_cd', 'sam']
-        #unique_together = ['creel', 'sam']
+        ordering = ['sama__creel__prj_cd', 'sam']
+        #unique_together = ['sama__creel_id', 'sam']
 
     def __str__(self):
         '''return the object type, the interview log number (sama), the stratum,
@@ -835,7 +835,7 @@ class FN121(models.Model, metaclass= AldjemyMeta):
         '''
 
         repr =  "<Interview: {} ({})>"
-        return repr.format(self.sam, self.stratum.creel.prj_cd)
+        return repr.format(self.sam, self.sama.creel.prj_cd)
 
 
 class FN123(models.Model, metaclass= AldjemyMeta):

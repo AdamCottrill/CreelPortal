@@ -171,10 +171,11 @@ class EffortEstimates(generics.ListAPIView):
         """
         slug = self.kwargs['slug']
 
-        qs = FR713.objects.filter(creel__slug=slug).\
+        final_run = FN011.objects.get(slug=slug).final_run.run
+        qs = FR713.objects.filter(stratum__creel_run__creel__slug=slug).\
              filter(date__isnull=True).\
-             exclude(strat__contains='+')
-
+             filter(stratum__creel_run__run=final_run).\
+             exclude(stratum__stratum_label__contains='+')
         return qs
 
 class CatchEstimates(generics.ListAPIView):
@@ -185,9 +186,12 @@ class CatchEstimates(generics.ListAPIView):
         """
         slug = self.kwargs['slug']
 
-        qs = FR714.objects.filter(creel__slug=slug).\
+        final_run = FN011.objects.get(slug=slug).final_run.run
+
+        qs = FR714.objects.filter(stratum__creel_run__creel__slug=slug).\
              filter(date__isnull=True).\
-             exclude(strat__contains='+')
+             filter(stratum__creel_run__run=final_run).\
+             exclude(stratum__stratum_label__contains='+')
 
         return qs
 

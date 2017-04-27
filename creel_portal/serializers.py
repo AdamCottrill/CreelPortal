@@ -87,6 +87,10 @@ class FN112Serializer(serializers.HyperlinkedModelSerializer):
 
 class FN121Serializer(serializers.HyperlinkedModelSerializer):
 
+    creel = serializers.CharField(source='sama.creel', read_only=True)
+    area = serializers.CharField(source='sama.area', read_only=True)
+    mode = serializers.CharField(source='sama.mode', read_only=True)
+
     class Meta:
         model = FN121
         fields = ('id', 'creel', 'sama', 'area', 'mode', 'sam', 'itvseq',
@@ -121,13 +125,14 @@ class FN127Serializer(serializers.HyperlinkedModelSerializer):
 
 class FR713Serializer(serializers.ModelSerializer):
 
-    mode = serializers.CharField(source='mode.label', read_only=True)
-    season = serializers.CharField(source='season.label', read_only=True)
-    dtp = serializers.CharField(source='dtp.label', read_only=True)
-    period = serializers.CharField(source='period.prd', read_only=True)
-    area = serializers.CharField(source='area.label', read_only=True)
-    ddlat = serializers.FloatField(source='area.ddlat', read_only=True)
-    ddlon = serializers.FloatField(source='area.ddlon', read_only=True)
+    mode = serializers.CharField(source='stratum.mode.label', read_only=True)
+    season = serializers.CharField(source='stratum.season.label',
+                                   read_only=True)
+    dtp = serializers.CharField(source='stratum.daytype.label', read_only=True)
+    period = serializers.CharField(source='stratum.period.prd', read_only=True)
+    area = serializers.CharField(source='stratum.area.label', read_only=True)
+    ddlat = serializers.FloatField(source='stratum.area.ddlat', read_only=True)
+    ddlon = serializers.FloatField(source='stratum.area.ddlon', read_only=True)
 
     class Meta:
         model = FR713
@@ -138,14 +143,15 @@ class FR713Serializer(serializers.ModelSerializer):
 class FR714Serializer(serializers.ModelSerializer):
 
 
-    mode = serializers.CharField(source='mode.label', read_only=True)
-    season = serializers.CharField(source='season.label', read_only=True)
-    dtp = serializers.CharField(source='dtp.label', read_only=True)
-    period = serializers.CharField(source='period.prd', read_only=True)
-    area = serializers.CharField(source='area.label', read_only=True)
+    mode = serializers.CharField(source='stratum.mode.label', read_only=True)
+    season = serializers.CharField(source='stratum.season.label',
+                                   read_only=True)
+    dtp = serializers.CharField(source='stratum.daytype.label', read_only=True)
+    period = serializers.CharField(source='stratum.period.prd', read_only=True)
+    area = serializers.CharField(source='stratum.area.label', read_only=True)
 
-    ddlat = serializers.FloatField(source='area.ddlat', read_only=True)
-    ddlon = serializers.FloatField(source='area.ddlon', read_only=True)
+    ddlat = serializers.FloatField(source='stratum.area.ddlat', read_only=True)
+    ddlon = serializers.FloatField(source='stratum.area.ddlon', read_only=True)
 
 
     species = serializers.CharField(source='species.common_name',
