@@ -20,6 +20,8 @@ router.register(r'spatial_strata', api_views.SpaceViewSet)
 router.register(r'fishing_modes', api_views.ModeViewSet)
 
 #data tables
+router.register(r'creel_runs', api_views.CreelRunViewSet)
+router.register(r'strata', api_views.StrataViewSet)
 router.register(r'interview_logs', api_views.InterviewLogViewSet)
 router.register(r'activity_counts', api_views.ActivityCountViewSet)
 router.register(r'interviews', api_views.InterviewViewSet)

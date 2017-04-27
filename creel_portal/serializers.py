@@ -71,6 +71,34 @@ class FN028Serializer(serializers.HyperlinkedModelSerializer):
                   'chkflag')
 
 
+
+class FR711Serializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = FR711
+        fields = ('id', 'creel',
+                  'run',
+                  'atycrit',
+                  'cifopt',
+                  'contmeth',
+                  'do_cif',
+                  'fr71_est',
+                  'fr71_unit',
+                  'mask_c',
+                  'save_daily',
+                  'strat_comb')
+
+
+class StrataSerializer(serializers.HyperlinkedModelSerializer):
+    creel = serializers.CharField(source='creel_run.creel', read_only=True)
+    run = serializers.CharField(source='creel_run.run', read_only=True)
+
+    class Meta:
+        model = Strata
+        fields = ('id', 'creel', 'run','season', 'daytype',
+                  'period', 'area', 'mode')
+
+
 class FN111Serializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
