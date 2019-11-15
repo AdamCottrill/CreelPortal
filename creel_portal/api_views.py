@@ -4,7 +4,7 @@ from creel_portal.models import Lake, Species
 from creel_portal.models import (FN011, FN022, FN023, FN024, FN025, FN026,
                                  FN028, FN111, FN112, FN121, FN123, FN125,
                                  FN127)
-from creel_portal.models import FR713, FR714
+from creel_portal.models import Strata, FR711, FR713, FR714
 
 
 # serializers for common elements
@@ -19,6 +19,9 @@ from creel_portal.serializers import (FN011Serializer, FN022Serializer,
 from creel_portal.serializers import (FN111Serializer, FN112Serializer,
                                       FN121Serializer, FN123Serializer,
                                       FN125Serializer, FN127Serializer)
+
+# creel settings
+from creel_portal.serializers import FR711Serializer, StrataSerializer
 
 # creel results
 from creel_portal.serializers import FR713Serializer, FR714Serializer
@@ -107,6 +110,25 @@ class ModeViewSet(viewsets.ModelViewSet):
 
 
 
+class CreelRunViewSet(viewsets.ModelViewSet):
+    """API endpoint that allows Fishing Mode strata  associated with a creel
+    to be viewed or edited.
+
+    """
+    queryset = FR711.objects.all()
+    serializer_class = FR711Serializer
+
+
+class StrataViewSet(viewsets.ModelViewSet):
+    """API endpoint that allows Fishing Mode strata  associated with a creel
+    to be viewed or edited.
+
+    """
+    queryset = Strata.objects.all()
+    serializer_class = StrataSerializer
+
+
+
 class InterviewLogViewSet(viewsets.ModelViewSet):
     """API endpoint that allows Interview Logs associated with a creel
     to be viewed or edited.
@@ -171,10 +193,11 @@ class EffortEstimates(generics.ListAPIView):
         """
         slug = self.kwargs['slug']
 
-        qs = FR713.objects.filter(creel__slug=slug).\
+        final_run = FN011.objects.get(slug=slug).final_run.run
+        qs = FR713.objects.filter(stratum__creel_run__creel__slug=slug).\
              filter(date__isnull=True).\
-             exclude(strat__contains='+')
-
+             filter(stratum__creel_run__run=final_run).\
+             exclude(stratum__stratum_label__contains='+')
         return qs
 
 class CatchEstimates(generics.ListAPIView):
@@ -185,9 +208,12 @@ class CatchEstimates(generics.ListAPIView):
         """
         slug = self.kwargs['slug']
 
-        qs = FR714.objects.filter(creel__slug=slug).\
+        final_run = FN011.objects.get(slug=slug).final_run.run
+
+        qs = FR714.objects.filter(stratum__creel_run__creel__slug=slug).\
              filter(date__isnull=True).\
-             exclude(strat__contains='+')
+             filter(stratum__creel_run__run=final_run).\
+             exclude(stratum__stratum_label__contains='+')
 
         return qs
 

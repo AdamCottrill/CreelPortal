@@ -28,11 +28,16 @@ lake.save()
 lake = Lake(lake_name='Superior', abbrev='SU')
 lake.save()
 
-
+#  HOME
 csv_file = '/home/adam/Documents/work/Species_CodeTable.txt'
+#  WORK
+csv_file = 'C:/1work/scrapbook/Species_CodeTable.txt'
 with open(csv_file, 'r') as f:
     reader = csv.reader(f)
     spc_list = list(reader)
+
+
+
 
 objects = []
 for spc in spc_list:
@@ -41,4 +46,4 @@ for spc in spc_list:
     objects.append(species)
 
 Species.objects.bulk_create(objects)
-#
+print("Done adding Species.")

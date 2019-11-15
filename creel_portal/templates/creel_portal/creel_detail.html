@@ -8,6 +8,25 @@
 <link href='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.css' rel='stylesheet' />
 
 
+<style type="text/css" media="screen">
+ .tab-content {
+     padding: 5px;
+ }
+
+ .nav-tabs {
+     margin-bottom: 5px;
+     margin-top: 20px;
+ }
+
+ .btn-default:active, {
+     background-color: #8064A2;
+     border-color: #8064A2;
+ }
+
+</style>
+
+
+
 {% endblock extrahead %}
 
 
@@ -25,7 +44,7 @@
                     <tbody>
                         <tr>
                             <td>Project Name:</td>
-                            <td>{{ object.prj_nm }}</td>
+                            <td>{{ object.prj_nm|title }}</td>
                         </tr>
                         <tr>
                             <td>Project Code:</td>
@@ -43,28 +62,70 @@
                             <td>Project End:</td>
                             <td>{{ object.prj_date1 }}</td>
                         </tr>
+
+                        <tr>
+                            <td>Contact Method:</td>
+                            <td>{{ object.final_run.get_contmeth_display }} ({{ object.final_run.contmeth }})</td>
+                        </tr>
+                        <tr>
+                            <td>Strata Combine Mask:</td>
+                            <td>{{ object.final_run.strat_comb }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>Estimation Method:</td>
+                            <td>{{ object.final_run.get_fr71_est_display }}</td>
+                        </tr>
+
+                        <tr>
+                            <td>Estimation Unit:</td>
+                            <td>{{ object.final_run.get_fr71_unit_display }}</td>
+                        </tr>
+
+
+                        <tr>
+                            <td>Final Run:</td>
+                            <td>{{ object.final_run.run }}</td>
+                        </tr>
+
+
                     </tbody>
                 </table>
             </div>
         </div>
-        <h4>Explore:</h4>
-        <div  class="row" >
-            <div  class="col-md-4" >
-                <a class="btn btn-primary btn-block" href="{% url 'effort_estimates_plots' object.slug %}" role="button">Effort</a>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Explore:</h3>
             </div>
-            <div  class="col-md-4" >
-                <a class="btn btn-primary btn-block" href="{% url 'catch_estimates_plots' object.slug %}" role="button">Catch/Harvest</a>
-            </div>
-            <div  class="col-md-4" >
-                <a class="btn btn-primary btn-block" href="#" role="button" disabled="disabled">Option Questions</a>
+            <div class="panel-body">
+
+                <div  class="row" >
+                    <div  class="col-md-4" >
+                        <a class="btn btn-primary btn-block" href="{% url 'effort_estimates_plots' object.slug %}" role="button">Effort</a>
+                    </div>
+                    <div  class="col-md-4" >
+                        <a class="btn btn-primary btn-block" href="{% url 'catch_estimates_plots' object.slug %}" role="button">Catch/Harvest</a>
+                    </div>
+                    <div  class="col-md-4" >
+                        <a class="btn btn-primary btn-block" href="#" role="button" disabled="disabled">Option Questions</a>
+                    </div>
+                </div>
+
+
             </div>
         </div>
+
+
     </div
     <div class="col-md-8" >
         <div id="map" style="width: 700px; height: 700px;"></div>
     </div>
 
     <div>
+
+
+
 
         <!-- Nav tabs -->
         <ul class="nav nav-tabs" role="tablist">
@@ -180,7 +241,7 @@
 
                                                 {% url 'edit_creel_space' item.creel.slug item.space as the_url %}
 
-                                            {% if item.ddlat and item.ddlon %}
+                                                {% if item.ddlat and item.ddlon %}
 
                                                 <a class="btn btn-xs btn-primary" href="{{ the_url }}" role="button">
                                                     <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Edit
@@ -194,7 +255,7 @@
                                             </a>
 
 
-                                                {% endif %}
+                                            {% endif %}
 
                                             </td>
 
@@ -246,139 +307,361 @@
 
             <div role="tabpanel" class="tab-pane" id="effort">
 
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Effort</h3>
-                    </div>
-                    <div class="panel-body">
+                {% with object.get_global_effort as effort_estimates %}
 
-                        {% with object.get_global_effort as effort %}
-                        <table class="table table-striped table-hover">
-                            <tbody>
-                                <tr><td>Observed Trip Count</td><td>{{ effort.tripno }}</tr></td>
-                                <tr><td>Estimated Trip Count</td><td>{{ effort.tripne }}</tr></td>
-                                <tr><td>Activity Count</td><td>{{ effort.atycnt_s }}</tr></td>
-                                <tr><td>Interview Count</td><td>{{ effort.itvcnt_s }}</tr></td>
-                                <tr><td>Angler Count</td><td>{{ effort.angler_s }}</tr></td>
-                                <tr><td>Rods </td><td>{{ effort.rod_s }}</tr></td>
-                                <tr><td>Total Angler Effort </td><td>{{ effort.effae }} (anlger-hours)</tr></td>
-                                <tr><td>Total Angler Effort </td><td>{{ effort.effre }} (rod-hours)</tr></td>
-                            </tbody>
-                        </table>
-                        {% endwith %}
-                    </div>
-                </div>
+                {% for effort in effort_estimates %}
 
+                {% include 'creel_portal/_details_effort_panel.html' with strata=effort.strata estimates=effort.estimates %}
 
+                {% endfor %}
+
+                {% endwith %}
 
             </div>
             <div role="tabpanel" class="tab-pane" id="catch">
 
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Catch</h3>
+                        <h3 class="panel-title">Catch, Harvest and CPUE</h3>
                     </div>
                     <div class="panel-body">
-                        <p>NOTE: add pie chart of species composition here</p>
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="row" >
+                                    <div class="col-md-3" >
+                                        <div id="estObsButtons" class="btn-group" data-toggle="buttons">
+                                            <label class="btn btn-default btn-xs active">
+                                                <input type="radio" name="estObs" data-value="estimated" checked> Estimated
+                                            </label>
+                                            <label class="btn btn-default btn-xs">
+                                                <input type="radio" name="estObs" data-value="observed"> Observed
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3" >
+                                        <div id="catchHarvestButtons" class="btn-group" data-toggle="buttons">
+                                            <label class="btn btn-default btn-xs active">
+                                                <input type="radio" name="catchHarvest" data-value="catch" checked> Catch
+                                            </label>
+                                            <label class="btn btn-default btn-xs">
+                                                <input type="radio" name="catchHarvest" data-value="harvest"> Harvest
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3" >
+                                        <div id="targetButtons" class="btn-group" data-toggle="buttons">
+                                            <label class="btn btn-default btn-xs active">
+                                                <input type="radio" name="targeted" data-value="all" checked> All
+                                            </label>
 
-                        {% with object.get_global_catch as catch %}
+                                            <label class="btn btn-default btn-xs">
+                                                <input type="radio" name="targeted" data-value="targeted"> Targeted
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3" >
+                                        <div id="chartTypeButtons" class="btn-group" data-toggle="buttons">
+                                            <label class="btn btn-default btn-xs active">
+                                                <input type="radio" name="chartType" data-value="bar" checked> Bar
+                                            </label>
+                                            <label class="btn btn-default btn-xs">
+                                                <input type="radio" name="chartType" data-value="pie"> Pie
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div>
+                                    <canvas id="myChart" style="width: 500px; height: 200px"></canvas>
+                                </div>
+                            </div>
+                        </div>
 
-                        <table class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Species</th>
-                                    <th>Obs. Harvest</th>
-                                    <th>Est. Harvest</th>
-                                    <th>Obs. Targ. Harvest</th>
-                                    <th>Est. Targ. Harvest</th>
-                                    <th>Obs. Catch</th>
-                                    <th>Est. Catch</th>
-                                    <th>Obs. Targ. Catch</th>
-                                    <th>Est. Targ. Catch</th>
-                                    <th>Obs. Effort</th>
-                                    <th>Est. Effort</th>
-                                    <th>Obs. Targ. Effort</th>
-                                    <th>Est. Targ. Effort</th>
-                                    <th>Obs. Cpue</th>
-                                    <th>Est. Cpue</th>
-                                    <th>Obs. Targ. Cpue</th>
-                                    <th>Est. Targ. Cpue</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for spc in catch %}
-                                <tr>
-                                    <td>{{ spc.species.common_name }}</td>
-                                    <td>{{ spc.hvsno_s }}</td>
-                                    <td>{{ spc.hvsne }}</td>
-                                    <td>{{ spc.hvsno1_s }}</td>
-                                    <td>{{ spc.hvsne1 }}</td>
-                                    <td>{{ spc.catno_s }}</td>
-                                    <td>{{ spc.catne }}</td>
-                                    <td>{{ spc.catno1_s }}</td>
-                                    <td>{{ spc.catne1 }}</td>
-
-                                    <td>{{ spc.effao_s }}</td>
-                                    <td>{{ spc.effae }}</td>
-                                    <td>{{ spc.effao1_s }}</td>
-                                    <td>{{ spc.effae1 }}</td>
-
-                                    <td>{{ spc.cuenao }}</td>
-                                    <td>{{ spc.cuenae }}</td>
-                                    <td>{{ spc.cuenao1 }}</td>
-                                    <td>{{ spc.cuenae1 }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                        {% with object.get_global_catch as catch_estimates %}
+                        {% for catch in catch_estimates %}
+                        {% include 'creel_portal/_detail_catch_panel.html' with strata=catch.strata catch=catch.estimates %}
+                        {% endfor %}
                         {% endwith %}
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <script type="text/javascript">
+{% endblock content %}
 
-     // add the creel locations here as a json string.
-     var spaces = {{ spaces|safe }};
+{% block javascript %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 
 
-     // intiailize map based on the lake this creel occurs in
-     var lat = {{ creel.lake.ddlat }}
+
+
+
+<script type="text/javascript">
+
+ // add the creel locations here as a json string.
+ var spaces = {{ spaces|safe }};
+
+
+ // intiailize map based on the lake this creel occurs in
+ var lat = {{ creel.lake.ddlat }}
      var lon =  {{ creel.lake.ddlon }}
-     var zoom =  {{ creel.lake.zoom }}
+         var zoom =  {{ creel.lake.zoom }}
 
-     var  map = new L.map('map').setView([lat,lon], zoom);
+             var  map = new L.map('map').setView([lat,lon], zoom);
 
-     function drawMap(){
+ function drawMap(){
 
-         var spaceMarkers = new L.FeatureGroup();
-         spaceMarkers.clearLayers();
+     var spaceMarkers = new L.FeatureGroup();
+     spaceMarkers.clearLayers();
 
-         $.each( spaces, function(i, x) {
-             if(x.ddlat & x.ddlon){
-                 var marker = L.marker([x.ddlat, x.ddlon]);
-                 popup = "<p>Space: " + x.label + "</p>"
-                 marker.bindPopup(popup);
+     $.each( spaces, function(i, x) {
+         if(x.ddlat & x.ddlon){
+             var marker = L.marker([x.ddlat, x.ddlon]);
+             popup = "<p>Space: " + x.label + "</p>"
+             marker.bindPopup(popup);
 
-                 spaceMarkers.addLayer(marker);
-             }
-         });
+             spaceMarkers.addLayer(marker);
+         }
+     });
 
-         map.addLayer(spaceMarkers);
+     map.addLayer(spaceMarkers);
 
-         L.mapbox.accessToken = 'pk.eyJ1IjoiYWNvdHRyaWxsIiwiYSI6ImNpazVmb3Q2eDAwMWZpZm0yZTQ1cjF3NTkifQ.Pb1wCYs0lKgjnTGz43DjVQ';
-         // Replace 'mapbox.streets' with your map id.
-         var mapboxTiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=' + L.mapbox.accessToken, {
-             attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
-         }).addTo(map);
+     L.mapbox.accessToken = 'pk.eyJ1IjoiYWNvdHRyaWxsIiwiYSI6ImNpazVmb3Q2eDAwMWZpZm0yZTQ1cjF3NTkifQ.Pb1wCYs0lKgjnTGz43DjVQ';
+     // Replace 'mapbox.streets' with your map id.
+     var mapboxTiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=' + L.mapbox.accessToken, {
+         attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
+     }).addTo(map);
 
+ }
+
+
+ //============================================================
+ // catch plots
+
+ var catch_data = {{ object.get_catch_totals|safe }};
+
+ // data arrays for plots:
+ let species = [];
+ let catne = [];
+ let catne1 = [];
+ let catno_s = [];
+ let catno1_s = [];
+ let hvsno_s = [];
+ let hvsno1_s = [];
+ let hvsne = [];
+ let hvsne1 = [];
+
+ //=====================================
+ // plot for catch counts by species:
+ let estObs = "estimated";
+ let catchHarvest = "catch";
+ let targeted = false;
+ let chartType = 'bar'
+ let colours = [];
+ let myChart;
+ let x = [];
+ let chart_title = estObs + ' ' + catchHarvest;
+
+
+ const populate_arrays = function(){
+   
+     // load the catch data into the proper arrays
+     $.each(catch_data, function(i,d){
+         if(d.xcatne>0){
+             species.push(d.common_name);
+             catne.push(d.xcatne);
+             catne1.push(d.xcatne1);
+             catno_s.push(d.xcatno_s);
+             catno1_s.push(d.xcatno1_s);
+             hvsno_s.push(d.xhvsno_s);
+             hvsno1_s.push(d.xhvsno1_s);
+             hvsne.push(d.xhvsne);
+             hvsne1.push(d.xhvsne1);
+         }
+     });
+ }
+
+ $("#targetButtons :input").change(function() {
+     var what =  $(this).data("value");
+     if (what==='targeted'){
+         targeted = true;
+     } else {
+         targeted = false;
      }
+     myChart.destroy();
+     x = get_xvars();
+     chartTitle = makeTitle();
+     makeplot(species, x, colours, chartTitle, chartType)
+
+ });
+
+ $("#chartTypeButtons :input").change(function() {
+     chartType = $(this).data("value");
+     myChart.destroy();
+     x = get_xvars();
+     chartTitle = makeTitle();
+     makeplot(species, x, colours, chartTitle, chartType)
+
+ });
+
+
+ $("#catchHarvestButtons :input").change(function() {
+     catchHarvest = $(this).data("value");
+     myChart.destroy();
+     x = get_xvars();
+     chartTitle = makeTitle();
+     makeplot(species, x, colours, chartTitle, chartType)
+
+ });
+
+
+ $("#estObsButtons :input").change(function() {
+     estObs = $(this).data("value");
+     myChart.destroy();
+     x = get_xvars();
+     chartTitle = makeTitle();
+     makeplot(species, x, colours, chartTitle, chartType)
+
+ });
+
+ var makeTitle = function(){
+
+     String.prototype.toProperCase = function () {
+         return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+     };
+
+     let targ = targeted ? " in targeted effort" : "";
+     let mytitle = estObs + ' ' + catchHarvest + targ;
+     return mytitle.toProperCase();
+
+ }
+
+ var get_xvars = function(){
+     let what;
+     if(!targeted){
+         if(estObs==='estimated'){
+             if(catchHarvest==='harvest'){
+                 what = hvsne;
+             } else {
+                 what = catne;
+             }
+         } else {
+             if(catchHarvest==='harvest'){
+                 what = hvsno_s;
+             } else {
+                 what = catno_s;
+             }
+         }
+     } else {
+         if(estObs==='estimated'){
+             if(catchHarvest==='harvest'){
+                 what = hvsne1;
+             } else {
+                 what = catne1;
+             }
+         } else {
+             if(catchHarvest==='harvest'){
+                 what = hvsno1_s;
+             } else {
+                 what = catno1_s;
+             }
+         }
+     }
+     return what;
+ }
+
+ var randomColorGenerator = function (n) {
+     // a simple little function that will create an array of n random colours.
+     var colours = [];
+
+     for (i = 1; i < n; i++) {
+         col = '#' + (Math.random().toString(16) + '0000000').slice(2, 8);
+         colours.push(col)
+     }
+
+     return colours
+ };
+
+
+ var makeplot = function (species, xvals, colours, title = "Estimated Catch", type=chartType) {
+
+     var ctx = document.getElementById("myChart");
+     var options;
+
+     if(type==='bar'){
+         options = {
+             scales: {
+                 yAxes: [{
+                     ticks: {
+                         beginAtZero:true
+                     }
+                 }]
+             },
+
+             legend: {
+                 display: false,
+             },
+
+             title: {
+                 fontSize: 20,
+                 display: true,
+                 text: title,
+                 position: 'top'
+             },
+
+         }
+     } else {
+         options = {
+             title: {
+                 fontSize: 20,
+                 display: true,
+                 text: title,
+                 position: 'top'
+             },
+             legend: {
+                 display: true,
+                 position: 'right'
+             }
+
+         }}
+
+
+     myChart = new Chart(ctx, {
+         type: chartType,
+         data: {
+             labels: species,
+             datasets: [{
+                 //label: title,
+                 data: xvals,
+                 backgroundColor: colours,
+                 //borderWidth: 1
+             }]
+         },
+         options: options
+     });
+ }
+
+ $(document).ready(function() {
 
      drawMap();
 
-    </script>
+     populate_arrays();
+     chartTitle = makeTitle();
+     colours = randomColorGenerator(catne.length);
+     x = get_xvars();
+     makeplot(species, catne, colours, chartTitle, chartType)
+
+ }
+ );
+
+</script>
 
 
-    {% endblock content %}
+{% endblock javascript %}
