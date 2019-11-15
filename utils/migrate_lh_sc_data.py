@@ -329,7 +329,7 @@ for record in rs:
         x['daycode'] = daytype.dtp
 
     area_code = x['area']
-    area = FN026.objects.get(creel=creel, area_lst=area_code)
+    area = FN026.objects.get(creel=creel, space=area_code)
     x['area'] = area
 
     mode_code = x['mode']
