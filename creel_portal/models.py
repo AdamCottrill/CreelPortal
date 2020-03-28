@@ -87,7 +87,7 @@ class FN011(models.Model):
     v0 = models.TextField(blank=True, null=True)
 
     class Meta:
-        verbose_name = "Creel List"
+        verbose_name = "FN011 - Creel"
         ordering = ["-prj_date1"]
 
     def get_absolute_url(self):
@@ -248,7 +248,7 @@ class FN022(models.Model):
     v0 = models.CharField(max_length=4, blank=False)
 
     class Meta:
-        verbose_name = "Seasons"
+        verbose_name = "FN022 - Season"
         ordering = ["ssn"]
         unique_together = ["creel", "ssn"]
 
@@ -332,7 +332,7 @@ class FN023(models.Model):
     dow_lst = models.CharField(help_text="Day Of Week List", max_length=7, blank=False)
 
     class Meta:
-        verbose_name = "Day Types"
+        verbose_name = "FN023 - Day Type"
         ordering = ["dtp"]
         unique_together = ["season", "dtp"]
 
@@ -376,7 +376,7 @@ class FN024(models.Model):
     prd_dur = models.FloatField(help_text="Period Duration (hrs)", blank=False)
 
     class Meta:
-        verbose_name = "Periods"
+        verbose_name = "FN024 - Period"
         ordering = ["prd"]
         unique_together = ["daytype", "prd"]
 
@@ -434,7 +434,7 @@ class FN025(models.Model):
     )
 
     class Meta:
-        verbose_name = "Exception Dates"
+        verbose_name = "FN025 - Exception Date"
         ordering = ["date"]
 
     #    def get_dtp_nm(self):
@@ -479,7 +479,8 @@ class FN026(models.Model):
     ddlon = models.FloatField(blank=True, null=True)
 
     class Meta:
-        verbose_name = "Spatial Strata"
+        verbose_name = "FN026 - Spatial Strata"
+        verbose_name_plural = "FN026 - Spatial Strata"
         ordering = ["space"]
         unique_together = ["creel", "space"]
 
@@ -552,7 +553,7 @@ class FN028(models.Model):
     )
 
     class Meta:
-        verbose_name = "Fishing Mode"
+        verbose_name = "FN028 - Fishing Mode"
         ordering = ["mode"]
         unique_together = ["creel", "mode"]
 
@@ -616,7 +617,7 @@ class FR711(models.Model):
     strat_comb = models.CharField(max_length=11, default="++_++_++_++")
 
     class Meta:
-        verbose_name = "EffortEstimate"
+        verbose_name = "FR711 - Effort Estimate"
         ordering = ["creel", "run"]
         unique_together = ["creel", "run"]
 
@@ -663,6 +664,7 @@ class Strata(models.Model):
     )
 
     class Meta:
+
         unique_together = ["creel_run", "stratum_label"]
         ordering = ["creel_run__creel__prj_cd", "creel_run__run", "stratum_label"]
 
@@ -747,7 +749,7 @@ class FN111(models.Model):
     daycode = models.CharField(max_length=1, blank=False, db_index=True)
 
     class Meta:
-        verbose_name = "Inveriew Log"
+        verbose_name = "FN111 - Inveriew Log"
         ordering = ["creel__prj_cd", "sama"]
         unique_together = ["creel", "sama"]
 
@@ -869,7 +871,7 @@ class FN112(models.Model):
     atydur = models.FloatField(help_text="Period Duration", default=0)
 
     class Meta:
-        verbose_name = "Activity Count"
+        verbose_name = "FN112 - Activity Count"
         ordering = ["sama", "atytm0", "atytm1"]
         unique_together = ["sama", "atytm0", "atytm1"]
 
@@ -933,7 +935,7 @@ class FN121(models.Model):
     comment1 = models.TextField(blank=False, null=True)
 
     class Meta:
-        verbose_name = "Inveriew"
+        verbose_name = "FN121 - Inveriew"
         ordering = ["sama__creel__prj_cd", "sam"]
         # unique_together = ['sama__creel_id', 'sam']
 
@@ -964,7 +966,7 @@ class FN123(models.Model):
     meswt = models.FloatField(blank=True, null=True)
 
     class Meta:
-        verbose_name = "Catch"
+        verbose_name = "FN123 - Catch Count"
         ordering = ["interview", "species"]
         unique_together = ["interview", "species"]
 
@@ -1014,7 +1016,7 @@ class FN125(models.Model):
     fate = models.CharField(max_length=2, blank=True, null=True)
 
     class Meta:
-        verbose_name = "Fish"
+        verbose_name = "FN125 - Bio Sample"
         ordering = ["catch", "fish"]
         unique_together = ["catch", "grp", "fish"]
 
@@ -1051,7 +1053,7 @@ class FN127(models.Model):
     nca = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        verbose_name = "AgeEstimate"
+        verbose_name = "FN127 - AgeEstimate"
         ordering = ["fish", "ageid"]
         unique_together = ["fish", "ageid"]
 
