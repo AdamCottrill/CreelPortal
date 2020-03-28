@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -87,6 +88,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
+DATE_FORMAT = "%b-%d-%Y"
+
 LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "UTC"
@@ -107,10 +110,13 @@ STATIC_URL = "/static/"
 # STATIC_ROOT = os.path.join(BASE_DIR, "../static/")
 # print('STATIC_ROOT={}'.format(STATIC_ROOT))
 
+print("BASE_DIR={}".format(BASE_DIR))
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-    os.path.join(BASE_DIR, "../static/"),
+    os.path.abspath(os.path.join(BASE_DIR, "../static")),
+    # os.path.join(BASE_DIR, "static"),
 ]
+print("STATICFILES_DIRS={}".format(STATICFILES_DIRS))
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/

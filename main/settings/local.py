@@ -12,6 +12,17 @@ from main.settings.base import *
 # }
 #
 
+INSTALLED_APPS = INSTALLED_APPS + [
+    "debug_toolbar",
+]
+
+
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]
+
 DATABASES = {
     "default": {
         #        'ENGINE': 'django.contrib.gis.db.backends.postgis',
