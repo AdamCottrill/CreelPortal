@@ -71,4 +71,8 @@ urlpatterns = [
         api_views.CreelSpaces.as_view(),
         name="creel_spaces",
     ),
+    # The real api:
+    path(
+        "api/", include(("creel_portal.api.urls", "creel-api"), namespace="creel-api")
+    ),
 ]
