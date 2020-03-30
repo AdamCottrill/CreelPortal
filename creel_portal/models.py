@@ -370,7 +370,7 @@ class FN024(models.Model):
     """
 
     daytype = models.ForeignKey(FN023, related_name="periods", on_delete=models.CASCADE)
-    prd = models.CharField(help_text="Day Type Code", max_length=2, blank=False)
+    prd = models.CharField(help_text="Period Code", max_length=2, blank=False)
     prdtm0 = models.TimeField(help_text="Period Start Time", blank=False)
     prdtm1 = models.TimeField(help_text="Period End Time", blank=False)
     prd_dur = models.FloatField(help_text="Period Duration (hrs)", blank=False)

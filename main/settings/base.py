@@ -29,16 +29,24 @@ ALLOWED_HOSTS = ["142.143.160.56", "142.143.160.42", "127.0.0.1"]
 
 # Application definition
 
-INSTALLED_APPS = [
+DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "rest_framework",
+]
+
+THIRD_PARY_APPS = ["rest_framework", "django_filters"]
+
+
+LOCAL_APPS = [
     "creel_portal",
 ]
+
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARY_APPS + LOCAL_APPS
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -110,12 +118,10 @@ STATIC_URL = "/static/"
 # STATIC_ROOT = os.path.join(BASE_DIR, "../static/")
 # print('STATIC_ROOT={}'.format(STATIC_ROOT))
 
-print("BASE_DIR={}".format(BASE_DIR))
 STATICFILES_DIRS = [
     os.path.abspath(os.path.join(BASE_DIR, "../static")),
     # os.path.join(BASE_DIR, "static"),
 ]
-print("STATICFILES_DIRS={}".format(STATICFILES_DIRS))
 
 
 # Static files (CSS, JavaScript, Images)
@@ -125,11 +131,11 @@ print("STATICFILES_DIRS={}".format(STATICFILES_DIRS))
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.abspath(os.path.join(BASE_DIR, "../media"))
 
-
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticatedOrReadOnly"
     ],
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
-    "PAGE_SIZE": 5000,
+    "PAGE_SIZE": 100,
 }
