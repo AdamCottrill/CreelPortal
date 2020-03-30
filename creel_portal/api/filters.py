@@ -15,8 +15,8 @@
 import django_filters
 from django_filters import rest_framework as filters
 
-
-from ..models import FN011, FN111, FN121
+from ..models.fishnet2 import FN011, FN121
+from ..models.creel_tables import FN111
 
 
 class ValueInFilter(django_filters.BaseInFilter, django_filters.CharFilter):

@@ -38,7 +38,7 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 
-THIRD_PARY_APPS = ["rest_framework", "django_filters"]
+THIRD_PARY_APPS = ["rest_framework", "django_filters", "myusers", "common"]
 
 
 LOCAL_APPS = [
@@ -123,6 +123,16 @@ STATICFILES_DIRS = [
     # os.path.join(BASE_DIR, "static"),
 ]
 
+
+# custom user settings
+AUTH_USER_MODEL = "myusers.CustomUser"
+
+LOGIN_URL = "login"
+# LOGIN_REDIRECT_URL = 'home'
+# LOGOUT_REDIRECT_URL = 'home'
+
+EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_mails")
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/

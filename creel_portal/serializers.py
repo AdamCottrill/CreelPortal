@@ -1,7 +1,9 @@
 from rest_framework import serializers
 
-from creel_portal.models import Lake, Species
-from creel_portal.models import *
+from common.models import Lake, Species
+from .models.fishnet2 import FN011, FN121, FN123, FN125, FN127
+from .models.creel_tables import FN022, FN023, FN024, FN025, FN026, FN028, FN111, FN112
+from .models.fishnet_results import Strata, FR711, FR713, FR714
 
 
 class LakeSerializer(serializers.ModelSerializer):

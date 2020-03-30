@@ -29,6 +29,8 @@ router = routers.DefaultRouter()
 from creel_portal import urls as creel_portal_urls
 
 urlpatterns = [
+    path("users/", include("myusers.urls")),
+    # path('users/', include('django.contrib.auth.urls')),
     path("admin/", admin.site.urls),
     path("creel_portal/", include(creel_portal_urls)),
     path("api/", include(router.urls)),

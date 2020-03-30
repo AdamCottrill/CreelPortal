@@ -21,22 +21,12 @@
 
 from rest_framework import serializers
 
-from ..models import (
-    Species,
-    Lake,
-    FN011,
-    FN022,
-    FN023,
-    FN024,
-    FN025,
-    FN026,
-    FN028,
-    FN111,
-    FN112,
-    FN121,
-    FN123,
-    FN125,
-)
+from common.models import Species, Lake
+
+from ..models.fishnet2 import FN011, FN121, FN123, FN125
+
+from ..models.creel_tables import FN022, FN023, FN024, FN025, FN026, FN028, FN111, FN112
+
 
 # we will need a user serializer here...
 
@@ -259,14 +249,7 @@ class FN123Serializer(serializers.ModelSerializer):
 
     class Meta:
         model = FN123
-        fields = (
-            "species",
-            "sek",
-            "hvscnt",
-            "rlscnt",
-            "mescnt",
-            "meswt",
-        )
+        fields = ("species", "sek", "hvscnt", "rlscnt", "mescnt", "meswt")
 
 
 class FN121Serializer(serializers.ModelSerializer):

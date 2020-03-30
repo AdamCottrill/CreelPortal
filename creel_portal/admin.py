@@ -1,20 +1,8 @@
 from django.contrib import admin
 
+from .models.fishnet2 import FN011, FN121, FN123, FN125
 
-from .models import (
-    FN011,
-    FN022,
-    FN023,
-    FN024,
-    FN025,
-    FN026,
-    FN028,
-    FN111,
-    FN112,
-    FN121,
-    FN123,
-    FN125,
-)
+from .models.creel_tables import FN022, FN023, FN024, FN025, FN026, FN028, FN111, FN112
 
 # Register your models here.
 
@@ -116,11 +104,7 @@ class FN023Admin(admin.ModelAdmin):
 
     ordering = ["season__creel__prj_cd", "season__ssn", "dtp"]
 
-    list_select_related = [
-        "season",
-        "season__creel",
-        "season__creel__lake",
-    ]
+    list_select_related = ["season", "season__creel", "season__creel__lake"]
 
     def get_daytype(self, object):
         return "{} ({})".format(object.dtp_nm.title(), object.dtp)
