@@ -11,8 +11,7 @@
 + FR712
 + FR713
 + FR714
-
-
++ FR715
 
  A. Cottrill
 =============================================================
@@ -26,7 +25,7 @@ from common.models import Species
 from .fishnet2 import FN011
 from .creel_tables import FN022, FN023, FN024, FN026, FN028
 
-from .choices import CONTMETH_CHOICES
+from .choices import CONTMETH_CHOICES, REC_TP_CHOICES, ANG_FN_CHOICES
 
 
 class Strata(models.Model):
@@ -172,13 +171,11 @@ class FR712(models.Model):
 
     """
 
-    REC_TP_CHOICES = ((1, "creel log (daily)"), (2, "stratum"), (3, "multi-stratum"))
-
     ATYUNIT_CHOICES = ((1, "Person"), (2, "Party"))
 
     CHKFLAG_CHOICES = ((0, "No"), (1, "Yes"))
 
-    stratum = models.OneToOneField(
+    stratum = models.ForeignKey(
         Strata, on_delete=models.CASCADE, related_name="strata_values"
     )
     rec_tp = models.IntegerField(default=2, choices=REC_TP_CHOICES)
@@ -186,7 +183,7 @@ class FR712(models.Model):
     strat_hours = models.FloatField()
     sam_days = models.IntegerField(default=0, blank=True, null=True)
     sam_hours = models.FloatField(default=0, blank=True, null=True)
-    fpc = models.FloatField(default=0)
+    fpc = models.FloatField(default=0, blank=True, null=True)
     prd_dur = models.FloatField()
     atyunit = models.IntegerField(
         default=2, choices=ATYUNIT_CHOICES, blank=True, null=True
@@ -198,15 +195,16 @@ class FR712(models.Model):
     strat_nn = models.IntegerField(default=1)
 
     def __str__(self):
-        """return the object type (stratum values), the stratum lable, the
-        creel project code and run number
+        """return the object type (stratum values), the stratum label, record
+        type, the creel project code and run number
 
         """
-        repr = "<Stratum Values: {} ({}, run:{}))>"
+        repr = "<Stratum Attributes: {}[{}] ({}, run:{}))>"
         return repr.format(
             self.stratum.stratum_label,
-            self.stratum.creel_run__creel__prj_cd,
-            self.stratum.creel_run__run,
+            self.rec_tp,
+            self.stratum.creel_run.creel.prj_cd,
+            self.stratum.creel_run.run,
         )
 
 
@@ -220,8 +218,8 @@ class FR713(models.Model):
 
     """
 
-    stratum = models.ForeignKey(
-        Strata, related_name="effort_estimates", on_delete=models.CASCADE
+    fr712 = models.ForeignKey(
+        FR712, related_name="effort_estimates", on_delete=models.CASCADE
     )
 
     #    creel = models.ForeignKey(FN011, related_name='effort_estimates')
@@ -238,8 +236,8 @@ class FR713(models.Model):
     #                             blank=True, null=True)
     #
     # TODO: run should be a fk to FR111 table
-    run = models.CharField(max_length=2, db_index=True)
-    rec_tp = models.IntegerField(default=1)
+    # run = models.CharField(max_length=2, db_index=True)
+    # rec_tp = models.IntegerField(default=2, choices=REC_TP_CHOICES)
     # strat = models.CharField(max_length=11)
     date = models.DateField(blank=True, null=True)
 
@@ -300,24 +298,32 @@ class FR713(models.Model):
 
     class Meta:
         verbose_name = "EffortEstimate"
-        ordering = [
-            "stratum__creel_run__creel__prj_cd",
-            "run",
-            "stratum__stratum_label",
-            "date",
-            "rec_tp",
-        ]
-        unique_together = ["stratum", "date", "rec_tp", "run"]
+        unique_together = ["fr712", "date"]
 
     def __str__(self):
         """return the object type (EffortEstimate), and the prj_cd.
         """
-        repr = "<EffortEstimate: {} (run:{} strat:{})>"
-        return repr.format(
-            self.stratum.creel_run.creel.prj_cd,
-            self.stratum.creel_run.run,
-            self.stratum.stratum_label,
-        )
+
+        if self.date:
+
+            repr = "<EffortEstimate: {} (run:{} strat:{} date:{})>"
+            repr = repr.format(
+                self.fr712.stratum.creel_run.creel.prj_cd,
+                self.fr712.stratum.creel_run.run,
+                self.fr712.stratum.stratum_label,
+                self.date.strftime("%b-%d-%y"),
+            )
+
+        else:
+
+            repr = "<EffortEstimate: {} (run:{} strat:{})>"
+            repr = repr.format(
+                self.fr712.stratum.creel_run.creel.prj_cd,
+                self.fr712.stratum.creel_run.run,
+                self.fr712.stratum.stratum_label,
+            )
+
+        return repr
 
 
 class FR714(models.Model):
@@ -330,9 +336,14 @@ class FR714(models.Model):
 
     """
 
-    stratum = models.ForeignKey(
-        Strata, related_name="catch_estimates", on_delete=models.CASCADE
+    # stratum = models.ForeignKey(
+    #    Strata, related_name="catch_estimates", on_delete=models.CASCADE
+    # )
+
+    fr712 = models.ForeignKey(
+        FR712, related_name="catch_estimates", on_delete=models.CASCADE
     )
+
     species = models.ForeignKey(
         Species, related_name="catch_estimates", on_delete=models.CASCADE
     )
@@ -352,8 +363,8 @@ class FR714(models.Model):
 
     # NEW
     # run should be a fk to FR111 table
-    run = models.CharField(max_length=2, db_index=True)
-    rec_tp = models.IntegerField()
+    # run = models.CharField(max_length=2, db_index=True)
+    # rec_tp = models.IntegerField(default=2, choices=REC_TP_CHOICES)
     # strat = models.CharField(max_length=11)
     date = models.DateField(blank=False, null=True)
     sek = models.BooleanField()
@@ -436,27 +447,75 @@ class FR714(models.Model):
 
     class Meta:
         verbose_name = "HarvestEstimate"
-        ordering = [
-            "stratum__creel_run__creel__prj_cd",
-            "stratum__creel_run__run",
-            "stratum__stratum_label",
-            "species",
-            "date",
-            "rec_tp",
-            "sek",
-        ]
-        unique_together = ["stratum", "species", "date", "rec_tp", "sek", "run"]
+        ##ordering = [
+        #    "stratum__creel_run__creel__prj_cd",
+        #    "stratum__creel_run__run",
+        #    "stratum__stratum_label",
+        #    "species",
+        #    "date",
+        #    "rec_tp",
+        #    "sek",
+        # ]
+        unique_together = ["fr712", "species", "date", "sek"]
 
     def __str__(self):
-        """return the object type (EffortEstimate), and the prj_cd."""
+        """return the object type (HarvestEstimate), and the prj_cd."""
 
-        repr = "<HarvestEstimate: {} ({} run:{} strat:{} sek:{})>"
+        if self.date:
+            repr = "<HarvestEstimate: {} (run:{} strat:{} rec_tp:{} date:{} spc:{} sek:{})>"
+            repr = repr.format(
+                self.fr712.stratum.creel_run.creel.prj_cd,
+                self.fr712.stratum.creel_run.run,
+                self.fr712.stratum.stratum_label,
+                self.fr712.rec_tp,
+                self.date.strftime("%b-%d-%y"),
+                self.species.spc,
+                self.sek,
+            )
+        else:
+            repr = "<HarvestEstimate: {} (run:{} strat:{} rec_tp:{} spc:{} sek:{})>"
+            repr = repr.format(
+                self.fr712.stratum.creel_run.creel.prj_cd,
+                self.fr712.stratum.creel_run.run,
+                self.fr712.stratum.stratum_label,
+                self.fr712.rec_tp,
+                self.species.spc,
+                self.sek,
+            )
 
-        targetted = "Targetted" if self.sek else "NonTargetted"
-        return repr.format(
-            self.species.species_code,
-            self.stratum.creel_run.creel.prj_cd,
-            self.stratum.creel_run.run,
-            self.stratum.stratum_label,
-            targetted,
+        return repr
+
+
+class FR715(models.Model):
+    """Class to hold angler options.
+
+    """
+
+    fr712 = models.ForeignKey(
+        FR712, related_name="angler_options", on_delete=models.CASCADE
+    )
+
+    ang_fn = models.CharField(max_length=2, choices=ANG_FN_CHOICES)
+    ang_val = models.CharField(max_length=4, blank=True, null=True)
+    ang_freq = models.IntegerField()
+    ang_prop = models.FloatField()
+    pty_freq = models.IntegerField()
+    pty_prop = models.FloatField()
+
+    class Meta:
+        verbose_name = "Angler Options"
+
+    def __str__(self):
+        """return the object type (AnglerOption), and the prj_cd."""
+
+        repr = "<AnglerOption: {}={} ({} run:{} strat:{} rec_tp:{})>"
+        repr = repr.format(
+            self.ang_fn,
+            self.ang_val,
+            self.fr712.stratum.creel_run.creel.prj_cd,
+            self.fr712.stratum.creel_run.run,
+            self.fr712.stratum.stratum_label,
+            self.fr712.rec_tp,
         )
+
+        return repr

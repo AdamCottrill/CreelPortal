@@ -1,4 +1,4 @@
-'''=============================================================
+"""=============================================================
  /home/adam/Documents/djcode/creel_portal/utils/helper_fcts.py
  Created: 12 Feb 2017 13:52:24
 
@@ -11,8 +11,244 @@
  A. Cottrill
 =============================================================
 
-'''
+"""
 
+
+from common.models import Lake, Species
+
+from creel_portal.models.fishnet2 import FN011, FN121, FN123, FN125
+from creel_portal.models.creel_tables import FN022, FN023, FN024, FN026, FN028, FN111
+from creel_portal.models.fishnet_results import FR712
+
+
+def get_Lake_cache():
+    """Return a dictionary of django Lake objects keyed off of their
+    abbreviations.
+
+    """
+    return {x.abbrev: x for x in Lake.objects.all()}
+
+
+def get_Species_cache():
+    """Return a dictionary of django Lake objects keyed off of their
+    species code.
+
+    """
+    return {x.spc: x for x in Species.objects.all()}
+
+
+def get_FN011_cache():
+    """Return a dictionary of django FN011 objects keyed off of their
+    project code.  saves calls to teh database each time we need a reference to a project.
+
+    """
+    return {x.prj_cd: x for x in FN011.objects.all()}
+
+
+def get_FN022_cache():
+    """our FN022 cache will be a two level dictionary - first level will be
+     the prj_cd, the second witll be season.
+    """
+    FN022_cache = {}
+    seasons = FN022.objects.all().select_related("creel")
+    for ssn in seasons:
+        prj_cd = ssn.creel.prj_cd
+        x = FN022_cache.get(prj_cd)
+        if x:
+            x[ssn.ssn] = ssn
+        else:
+            x = {ssn.ssn: ssn}
+        FN022_cache[prj_cd] = x
+    return FN022_cache
+
+
+def get_FN023_cache():
+    """
+    """
+    cache = {}
+    items = FN023.objects.all().select_related("season", "season__creel")
+    for item in items:
+        key = "{}-{}-{}".format(item.season.creel.prj_cd, item.season.ssn, item.dtp)
+        cache[key] = item
+    return cache
+
+
+def get_FN024_cache():
+    """
+    """
+    cache = {}
+    items = FN024.objects.all().select_related(
+        "daytype", "daytype__season", "daytype__season__creel"
+    )
+    for item in items:
+        key = "{}-{}-{}-{}".format(
+            item.daytype.season.creel.prj_cd,
+            item.daytype.season.ssn,
+            item.daytype.dtp,
+            item.prd,
+        )
+        cache[key] = item
+    return cache
+
+
+def get_FN026_cache():
+    """Return a dictionary of dictionaries that reference the spaces
+    available for each creel.
+
+    useage:
+
+    fn026 = FN026_cache[prj_cd][space_code]
+
+    """
+
+    FN026_cache = {}
+    spaces = FN026.objects.all().select_related("creel")
+    for space in spaces:
+        prj_cd = space.creel.prj_cd
+        x = FN026_cache.get(prj_cd)
+        if x:
+            x[space.space] = space
+        else:
+            x = {space.space: space}
+        FN026_cache[prj_cd] = x
+    return FN026_cache
+
+
+def get_FN028_cache():
+    """Return a dictionary of dictionaries that reference the modes
+    available for each creel.
+
+    useage:
+
+    fn028 = FN028_cache[prj_cd][mode_code]
+
+    """
+
+    FN028_cache = {}
+    modes = FN028.objects.all().select_related("creel")
+    for mode in modes:
+        prj_cd = mode.creel.prj_cd
+        x = FN028_cache.get(prj_cd)
+        if x:
+            x[mode.mode] = mode
+        else:
+            x = {mode.mode: mode}
+        FN028_cache[prj_cd] = x
+    return FN028_cache
+
+
+def get_FN111_cache():
+    """Return a dictionary of dictionaries that reference the creel logs
+    available for each creel.
+
+    useage:
+
+    fn111 = FN111_cache[prj_cd][sama]
+    """
+    cache = {}
+    samas = FN111.objects.all().select_related("creel")
+    for sama in samas:
+        prj_cd = sama.creel.prj_cd
+        x = cache.get(prj_cd)
+        if x:
+            x[sama.sama] = sama
+        else:
+            x = {sama.sama: sama}
+        cache[prj_cd] = x
+    return cache
+
+
+def get_FN121_cache():
+    """Return a dictionary of dictionaries that reference the interviews
+    available for each creel.
+
+    useage:
+
+    fn121 = FN121_cache[prj_cd][sam]
+    """
+
+    cache = {}
+    sams = FN121.objects.all().select_related("sama__creel")
+    for sam in sams:
+        prj_cd = sam.sama.creel.prj_cd
+        x = cache.get(prj_cd)
+        if x:
+            x[sam.sam] = sam
+        else:
+            x = {sam.sam: sam}
+        cache[prj_cd] = x
+    return cache
+
+
+def get_FN123_cache():
+    """Return a dictionary of available catch counts that is keyed by a
+    string made up of the project code, sam number, species code and
+    group
+
+    useage:
+
+    fn123 = FN123_cache["prj_cd-sam-spc-grp"]
+
+    """
+    cache = {}
+    items = FN123.objects.all().select_related(
+        "interview", "interview__sama__creel", "species"
+    )
+    for item in items:
+        key = "{}-{}-{}-{}".format(
+            item.interview.sama.creel.prj_cd,
+            item.interview.sam,
+            item.grp,
+            item.species.spc,
+        )
+        cache[key] = item
+    return cache
+
+
+def get_FN125_cache():
+    """Return a dictionary of sampled fish that is keyed by a string made
+    up of the project code, sam number, species code, group and fish
+    number
+
+    useage:
+
+    fn125 = FN125_cache["prj_cd-sam-spc-grp-fish"]
+
+    """
+    cache = {}
+    items = FN125.objects.all().select_related(
+        "catch", "catch__interview", "catch__interview__sama__creel", "catch__species"
+    )
+    for item in items:
+        key = "{}-{}-{}-{}-{}".format(
+            item.catch.interview.sama.creel.prj_cd,
+            item.catch.interview.sam,
+            item.catch.species.spc,
+            item.catch.grp,
+            item.fish,
+        )
+        cache[key] = item
+    return cache
+
+
+def get_FR712_cache():
+    """Return a dictionary of available of known strata that is keyed by a
+    string made up of the project code, run number, strata, and record type
+    """
+    # FR712 records our unique by: prj_cd, run, rec_tp, strat
+    cache = {}
+    objects = FR712.objects.all().select_related(
+        "stratum", "stratum__creel_run", "stratum__creel_run__creel"
+    )
+    for item in objects:
+        key = "{}-{}-{}-{}".format(
+            item.stratum.creel_run.creel.prj_cd,
+            item.stratum.creel_run.run,
+            item.rec_tp,
+            item.stratum.stratum_label,
+        )
+        cache[key] = item
+    return cache
 
 
 def prj_cd_shouldbe(prj_cd):
@@ -26,13 +262,13 @@ def prj_cd_shouldbe(prj_cd):
 
     """
 
-    if prj_cd == 'NPW_SC03_NIR':
-        return 'LSM_SC03_NIP'
+    if prj_cd == "NPW_SC03_NIR":
+        return "LSM_SC03_NIP"
 
-    if prj_cd[-3:] in ['BSR','NIR']:
-        prj_cd = 'NPW' + prj_cd[3:]
+    if prj_cd[-3:] in ["BSR", "NIR"]:
+        prj_cd = "NPW" + prj_cd[3:]
     else:
-        prj_cd = 'LSM' + prj_cd[3:]
+        prj_cd = "LSM" + prj_cd[3:]
     return prj_cd
 
 
@@ -63,12 +299,13 @@ def time_or_none(val):
     - `x`:
     """
     from datetime import datetime
+
     if val is None:
         return None
-    elif val=="" or val.replace(' ','')==':':
+    elif val == "" or val.replace(" ", "") == ":":
         return None
     else:
-        return datetime.strptime(val,'%H:%M')
+        return datetime.strptime(val, "%H:%M")
 
 
 def float_or_none(val):
@@ -96,10 +333,29 @@ def bool_or_none(val):
 
     if val is None:
         return None
-    elif val == '':
+    elif val == "":
         return None
     else:
         return bool(strtobool(val))
+
+
+def get_user_attrs(prj_ldr):
+    """take a username from a fishnet project and return the first and
+    last name, a user address and an ontario email address."""
+    attrs = {}
+
+    names = prj_ldr.title().split()
+    firstName = names[0]
+    if len(names) > 1:
+        lastName = names[1]
+    else:
+        lastName = ""
+    attrs["first_name"] = firstName
+    attrs["last_name"] = lastName
+    attrs["email"] = "{}.{}@ontario.ca".format(firstName.lower(), lastName.lower())
+    attrs["username"] = lastName.lower() + firstName.lower()[:2]
+
+    return attrs
 
 
 def get_combined_strata(creel_run):
@@ -120,36 +376,35 @@ def get_combined_strata(creel_run):
     strat_comb = creel_run.strat_comb
 
     if strat_comb[:2] == "??":
-        season_strata =  creel_run.creel.seasons.values_list('ssn', 'id')
+        season_strata = creel_run.creel.seasons.values_list("ssn", "id")
     else:
-        season_strata = [('++',None),]
+        season_strata = [("++", None)]
 
     if strat_comb[3] == "?":
-        #daytype is within season, so we can't have separate daytype
-        #strata unless we have separate season strata too
+        # daytype is within season, so we can't have separate daytype
+        # strata unless we have separate season strata too
         print("warning - grouping by daytype is not currently implemented")
-        daytype_strata = [('+', None),]
+        daytype_strata = [("+", None)]
     else:
-        daytype_strata = [('+', None),]
+        daytype_strata = [("+", None)]
 
     if strat_comb[4] == "?":
-        #period is within daytype, so we can't have separate periods
-        #strata unless we have separate season and daytype strata
+        # period is within daytype, so we can't have separate periods
+        # strata unless we have separate season and daytype strata
         print("warning - grouping by period is not currently implemented")
-        period_strata = [('+', None),]
+        period_strata = [("+", None)]
     else:
-        period_strata = [('+', None),]
+        period_strata = [("+", None)]
 
     if strat_comb[6:8] == "??":
-        space_strata =  creel_run.creel.spatial_strata.\
-                        values_list('space', 'id')
+        space_strata = creel_run.creel.spatial_strata.values_list("space", "id")
     else:
-        space_strata = [('++', None),]
+        space_strata = [("++", None)]
 
     if strat_comb[9:11] == "??":
-        mode_strata =  creel_run.creel.modes.values_list('mode', 'id')
+        mode_strata = creel_run.creel.modes.values_list("mode", "id")
     else:
-        mode_strata = [('++', None),]
+        mode_strata = [("++", None)]
 
     all_strata = []
 
@@ -158,12 +413,20 @@ def get_combined_strata(creel_run):
             for period in period_strata:
                 for space in space_strata:
                     for mode in mode_strata:
-                        strata = '{}_{}{}_{}_{}'.format(
-                            season[0],  daytype[0], period[0],
-                            space[0], mode[0])
-                        all_strata.append((creel_run.id, strata, season[1],
-                                           space[1], daytype[1], period[1],
-                                           mode[1]))
+                        strata = "{}_{}{}_{}_{}".format(
+                            season[0], daytype[0], period[0], space[0], mode[0]
+                        )
+                        all_strata.append(
+                            (
+                                creel_run.id,
+                                strata,
+                                season[1],
+                                space[1],
+                                daytype[1],
+                                period[1],
+                                mode[1],
+                            )
+                        )
     return all_strata
 
 
@@ -190,10 +453,18 @@ def get_strata(creel_run):
                 periods = daytype.periods.all()
                 for period in periods:
                     for mode in modes:
-                        strata = '{}_{}{}_{}_{}'.format(
-                            season.ssn, daytype.dtp, period.prd,
-                            spot.space, mode.mode)
-                        all_strata.append((creel_run.id, strata, season.id,
-                                           spot.id, daytype.id, period.id,
-                                           mode.id))
+                        strata = "{}_{}{}_{}_{}".format(
+                            season.ssn, daytype.dtp, period.prd, spot.space, mode.mode
+                        )
+                        all_strata.append(
+                            (
+                                creel_run.id,
+                                strata,
+                                season.id,
+                                spot.id,
+                                daytype.id,
+                                period.id,
+                                mode.id,
+                            )
+                        )
     return all_strata

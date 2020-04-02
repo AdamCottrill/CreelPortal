@@ -255,6 +255,8 @@ class FN121(models.Model):
         "FN111", related_name="interviews", on_delete=models.CASCADE
     )
 
+    slug = models.SlugField(blank=True, unique=True, editable=False)
+
     # area = models.ForeignKey(FN026, related_name='interviews')
     # mode = models.ForeignKey(FN028, related_name='interviews')
 
@@ -283,6 +285,15 @@ class FN121(models.Model):
         ordering = ["sama__creel__prj_cd", "sam"]
         # unique_together = ['sama__creel_id', 'sam']
 
+    def save(self, *args, **kwargs):
+        """
+        """
+
+        raw_slug = "-".join([self.sama.creel.prj_cd, self.sam])
+
+        self.slug = slugify(raw_slug)
+        super(FN121, self).save(*args, **kwargs)
+
     def __str__(self):
         """return the object type, the interview log number (sama), the stratum,
         and project code of the creel this record is assoicated
@@ -303,16 +314,36 @@ class FN123(models.Model):
     species = models.ForeignKey(
         Species, related_name="catch_counts", on_delete=models.CASCADE
     )
+
+    grp = models.CharField(max_length=3, default="00", db_index=True)
     sek = models.BooleanField(default=True)
     hvscnt = models.IntegerField(default=0)
     rlscnt = models.IntegerField(default=0)
     mescnt = models.IntegerField(default=0)
     meswt = models.FloatField(blank=True, null=True)
 
+    slug = models.SlugField(blank=True, unique=True, editable=False)
+
     class Meta:
         verbose_name = "FN123 - Catch Count"
         ordering = ["interview", "species"]
-        unique_together = ["interview", "species"]
+        unique_together = ["interview", "grp", "species"]
+
+    def save(self, *args, **kwargs):
+        """
+        """
+
+        raw_slug = "-".join(
+            [
+                self.interview.sama.creel.prj_cd,
+                self.interview.sam,
+                self.grp,
+                self.species.spc,
+            ]
+        )
+
+        self.slug = slugify(raw_slug)
+        super(FN123, self).save(*args, **kwargs)
 
     def __str__(self):
         """return the object type, the interview log number (sama), the stratum,
@@ -320,11 +351,12 @@ class FN123(models.Model):
        with.
 
         """
-        repr = "<Catch: {}-{}-{}>"
+        repr = "<Catch: {}-{}-{}-{}>"
         return repr.format(
-            self.interview.stratum.creel.prj_cd,
+            self.interview.sama.creel.prj_cd,
             self.interview.sam,
-            self.species.species_code,
+            self.grp,
+            self.species.spc,
         )
 
 
@@ -345,7 +377,6 @@ class FN125(models.Model):
     )
     # species = models.ForeignKey(Species)
 
-    grp = models.CharField(max_length=2)
     fish = models.IntegerField()
     flen = models.IntegerField(blank=True, null=True)
     tlen = models.IntegerField(blank=True, null=True)
@@ -359,10 +390,29 @@ class FN125(models.Model):
     clipc = models.CharField(max_length=6, blank=True, null=True)
     fate = models.CharField(max_length=2, blank=True, null=True)
 
+    slug = models.SlugField(blank=True, unique=True, editable=False)
+
     class Meta:
         verbose_name = "FN125 - Bio Sample"
         ordering = ["catch", "fish"]
-        unique_together = ["catch", "grp", "fish"]
+        unique_together = ["catch", "fish"]
+
+    def save(self, *args, **kwargs):
+        """
+        """
+
+        raw_slug = "-".join(
+            [
+                self.catch.interview.sama.creel.prj_cd,
+                self.catch.interview.sam,
+                self.catch.species.spc,
+                self.catch.grp,
+                self.fish,
+            ]
+        )
+
+        self.slug = slugify(raw_slug)
+        super(FN125, self).save(*args, **kwargs)
 
     def __str__(self):
         """return the object type (fish), and the fishnet key fields prj_cd,
@@ -371,10 +421,10 @@ class FN125(models.Model):
         """
         repr = "<Fish: {}-{}-{}-{}-{}>"
         return repr.format(
-            self.catch.interview.stratum.creel.prj_cd,
+            self.catch.interview.sama.creel.prj_cd,
             self.catch.interview.sam,
-            self.catch.species.species_code,
-            self.grp,
+            self.catch.species.spc,
+            self.catch.grp,
             self.fish,
         )
 
@@ -455,7 +505,7 @@ class FN125_Tag(models.Model):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.fishnet_keys())
-        super(FN125Tag, self).save(*args, **kwargs)
+        super(FN125_Tag, self).save(*args, **kwargs)
 
     def fishnet_keys(self):
         """return the fish-net II key fields for this record"""
@@ -520,9 +570,9 @@ class FN127(models.Model):
         repr = "<AgeEstimate: {}-{}-{}-{}-{}-{}>"
 
         return repr.format(
-            self.fish.catch.interview.stratum.creel.prj_cd,
+            self.fish.catch.interview.sama.creel.prj_cd,
             self.fish.catch.interview.sam,
-            self.fish.catch.species.species_code,
+            self.fish.catch.species.spc,
             self.fish.grp,
             self.fish.fish,
             self.ageid,

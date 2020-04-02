@@ -18,21 +18,16 @@ class FN011Admin(admin.ModelAdmin):
         "get_prj_nm",
         "get_prj_ldr",
         "get_lake_name",
-        # "creel_type",
+        "contmeth",
         "year",
     ]
 
-    list_filter = [
-        "lake__lake_name",
-        # "creel_type",
-        "year",
-        "prj_ldr",
-    ]
+    list_filter = ["lake__lake_name", "contmeth", "year", "prj_ldr"]
 
     search_fields = ["prj_cd", "prj_nm"]
     ordering = ["-year"]
 
-    list_select_related = ["lake"]
+    list_select_related = ["lake", "prj_ldr"]
 
     def get_lake_name(self, object):
         return object.lake.lake_name
@@ -45,7 +40,7 @@ class FN011Admin(admin.ModelAdmin):
     get_prj_nm.short_description = "PRJ_NM"
 
     def get_prj_ldr(self, object):
-        return object.prj_ldr.title()
+        return "{} {}".format(object.prj_ldr.first_name, object.prj_ldr.first_name)
 
     get_prj_nm.short_description = "PRJ_LDR"
 
@@ -126,6 +121,20 @@ class FN023Admin(admin.ModelAdmin):
 
     get_prj_cd.short_description = "PRJ_CD"
 
+    def get_form(self, request, obj=None, **kwargs):
+        form = super(FN023Admin, self).get_form(request, obj, **kwargs)
+        form.base_fields["season"].queryset = FN022.objects.filter(
+            creel=obj.season.creel
+        )
+        return form
+
+
+#    def render_change_form(self, request, context, *args, **kwargs):
+#        context["adminform"].form.fields["season"].queryset = FN022.objects.all()[:10]
+#        return super(FN023Admin, self).render_change_form(
+#            request, context, *args, **kwargs
+#        )
+
 
 admin.site.register(FN023, FN023Admin)
 
@@ -179,6 +188,13 @@ class FN024Admin(admin.ModelAdmin):
 
     get_prj_cd.short_description = "PRJ_CD"
 
+    def get_form(self, request, obj=None, **kwargs):
+        form = super(FN024Admin, self).get_form(request, obj, **kwargs)
+        form.base_fields["daytype"].queryset = FN023.objects.filter(
+            season=obj.daytype.season
+        )
+        return form
+
 
 admin.site.register(FN024, FN024Admin)
 
@@ -225,6 +241,13 @@ class FN025Admin(admin.ModelAdmin):
         return object.season.creel.prj_cd
 
     get_prj_cd.short_description = "PRJ_CD"
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super(FN025Admin, self).get_form(request, obj, **kwargs)
+        form.base_fields["season"].queryset = FN022.objects.filter(
+            creel=obj.season.creel
+        )
+        return form
 
 
 admin.site.register(FN025, FN025Admin)
@@ -501,6 +524,14 @@ class FN121Admin(admin.ModelAdmin):
         "sama__daytype",
         "sama__mode",
     ]
+
+    # limit the choice of creel log to those in the same creel:
+    def get_form(self, request, obj=None, **kwargs):
+        form = super(FN121Admin, self).get_form(request, obj, **kwargs)
+        form.base_fields["sama"].queryset = FN111.objects.filter(
+            creel=obj.sama.creel
+        ).select_related("creel")
+        return form
 
     def get_prj_cd(self, object):
         return object.sama.creel.prj_cd

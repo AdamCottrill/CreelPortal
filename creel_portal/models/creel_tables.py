@@ -23,9 +23,10 @@
 
 """
 
-from django.db import models
-
 from datetime import datetime, timedelta
+from django.db import models
+from django.template.defaultfilters import slugify
+
 
 from .fishnet2 import FN011
 
@@ -46,10 +47,21 @@ class FN022(models.Model):
 
     v0 = models.CharField(max_length=4, blank=False)
 
+    slug = models.SlugField(blank=True, unique=True, editable=False)
+
     class Meta:
         verbose_name = "FN022 - Season"
         ordering = ["ssn"]
         unique_together = ["creel", "ssn"]
+
+    def save(self, *args, **kwargs):
+        """
+        """
+
+        raw_slug = "-".join([self.creel.prj_cd, self.ssn])
+
+        self.slug = slugify(raw_slug)
+        super(FN022, self).save(*args, **kwargs)
 
     def __str__(self):
         """return the season name, code and project code associated with this
@@ -132,10 +144,21 @@ class FN023(models.Model):
     dtp_nm = models.CharField(help_text="Day Type Name", max_length=10, blank=False)
     dow_lst = models.CharField(help_text="Day Of Week List", max_length=7, blank=False)
 
+    slug = models.SlugField(blank=True, unique=True, editable=False)
+
     class Meta:
         verbose_name = "FN023 - Day Type"
         ordering = ["dtp"]
         unique_together = ["season", "dtp"]
+
+    def save(self, *args, **kwargs):
+        """
+        """
+
+        raw_slug = "-".join([self.season.creel.prj_cd, self.season.ssn, self.dtp])
+
+        self.slug = slugify(raw_slug)
+        super(FN023, self).save(*args, **kwargs)
 
     def __str__(self):
         """return the object type, the daytype name, day type code, and the
@@ -178,6 +201,8 @@ class FN024(models.Model):
     prdtm1 = models.TimeField(help_text="Period End Time", blank=False)
     prd_dur = models.FloatField(help_text="Period Duration (hrs)", blank=False)
 
+    slug = models.SlugField(blank=True, unique=True, editable=False)
+
     class Meta:
         verbose_name = "FN024 - Period"
         ordering = ["prd"]
@@ -204,12 +229,21 @@ class FN024(models.Model):
         )
 
     def save(self, *args, **kwargs):
-        """from:http://stackoverflow.com/questions/7971689/
-             generate-slug-field-in-existing-table
-
+        """
         Create a space label as a combination of the space description
         and space code.
         """
+
+        raw_slug = "-".join(
+            [
+                self.daytype.season.creel.prj_cd,
+                self.daytpe.season.ssn,
+                self.daytype.dtp,
+                self.prd,
+            ]
+        )
+
+        self.slug = slugify(raw_slug)
 
         # to calculate the difference between times, we need to convert
         # them to date.  Use the current date, it won't affect the results
@@ -280,6 +314,8 @@ class FN026(models.Model):
 
     label = models.CharField(max_length=110, blank=False, help_text="Space Label")
 
+    slug = models.SlugField(blank=True, unique=True, editable=False)
+
     ddlat = models.FloatField(blank=True, null=True)
     ddlon = models.FloatField(blank=True, null=True)
 
@@ -299,12 +335,14 @@ class FN026(models.Model):
         return repr.format(self.space_des, self.space, self.creel.prj_cd)
 
     def save(self, *args, **kwargs):
-        """from:http://stackoverflow.com/questions/7971689/
-             generate-slug-field-in-existing-table
-
+        """
         Create a space label as a combination of the space description
         and space code.
         """
+
+        raw_slug = "-".join([self.creel.prj_cd, self.space])
+
+        self.slug = slugify(raw_slug)
 
         if self.space_des:
             self.label = "{}-{}".format(self.space, self.space_des.title())
@@ -359,6 +397,8 @@ class FN028(models.Model):
         help_text="Check Flag", default=0, choices=CHKFLAG_CHOICES
     )
 
+    slug = models.SlugField(blank=True, unique=True, editable=False)
+
     class Meta:
         verbose_name = "FN028 - Fishing Mode"
         ordering = ["mode"]
@@ -389,10 +429,21 @@ class FN028(models.Model):
             label = "{}".format(self.mode)
         return label
 
+    def save(self, *args, **kwargs):
+        """Create a unique slug for each fishing mode in this creel.
+        """
+
+        raw_slug = "-".join([self.creel.prj_cd, self.mode])
+        self.slug = slugify(raw_slug)
+        super(FN028, self).save(*args, **kwargs)
+
 
 class FN111(models.Model):
     """Class to represent the creel logs.
     """
+
+    # from FN-2 data dictionary
+    WEATHER_CHOICES = [(0, "No effect"), (1, "Possible effect"), (2, "Definite effect")]
 
     # stratum = models.ForeignKey(Strata, related_name='interview_logs')
     creel = models.ForeignKey(
@@ -417,12 +468,15 @@ class FN111(models.Model):
     sama = models.CharField(max_length=6, blank=False)
     date = models.DateField(blank=False, db_index=True)
     samtm0 = models.TimeField(blank=False, help_text="Interview Period Start")
-    weather = models.CharField(max_length=200, blank=False)
+    weather = models.IntegerField(choices=WEATHER_CHOICES, blank=True, null=True)
+
     help_str = "Comments about current interview period."
     comment1 = models.CharField(
         max_length=200, blank=True, null=True, help_text=help_str
     )
     daycode = models.CharField(max_length=1, blank=False, db_index=True)
+
+    slug = models.SlugField(blank=True, unique=True, editable=False)
 
     class Meta:
         verbose_name = "FN111 - Inveriew Log"
@@ -438,6 +492,14 @@ class FN111(models.Model):
 
         repr = "<InterviewLog: {} ({})>"
         return repr.format(self.sama, self.creel.prj_cd)
+
+    def save(self, *args, **kwargs):
+        """Create a unique slug for each fishing mode in this creel.
+        """
+
+        raw_slug = "-".join([self.creel.prj_cd, self.sama])
+        self.slug = slugify(raw_slug)
+        super(FN111, self).save(*args, **kwargs)
 
     @property
     def dow(self):
@@ -546,6 +608,8 @@ class FN112(models.Model):
 
     atydur = models.FloatField(help_text="Period Duration", default=0)
 
+    slug = models.SlugField(blank=True, unique=True, editable=False)
+
     class Meta:
         verbose_name = "FN112 - Activity Count"
         ordering = ["sama", "atytm0", "atytm1"]
@@ -562,11 +626,7 @@ class FN112(models.Model):
         )
 
     def save(self, *args, **kwargs):
-        """from:http://stackoverflow.com/questions/7971689/
-             generate-slug-field-in-existing-table
-
-        Create a space label as a combination of the space description
-        and space code.
+        """
         """
 
         # to calculate the difference between times, we need to convert
@@ -575,6 +635,9 @@ class FN112(models.Model):
         delta = datetime.combine(anydate, self.atytm1) - datetime.combine(
             anydate, self.atytm0
         )
-
         self.atydur = delta.total_seconds() / (60 * 60)
+
+        raw_slug = "-".join([self.sama.creel.prj_cd, self.sama.sama, self.aty0])
+        self.slug = slugify(raw_slug)
+
         super(FN112, self).save(*args, **kwargs)
