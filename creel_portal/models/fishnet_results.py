@@ -23,7 +23,7 @@ from django.db import models
 from common.models import Species
 
 from .fishnet2 import FN011
-from .creel_tables import FN022, FN023, FN024, FN026, FN028
+from .creel import FN022, FN023, FN024, FN026, FN028
 
 from .choices import CONTMETH_CHOICES, REC_TP_CHOICES, ANG_FN_CHOICES
 
@@ -305,24 +305,22 @@ class FR713(models.Model):
         """
 
         if self.date:
-
-            repr = "<EffortEstimate: {} (run:{} strat:{} date:{})>"
+            repr = "<Effort Estimate: {} (run:{} strat:{} rec_tp: {} date:{})>"
             repr = repr.format(
                 self.fr712.stratum.creel_run.creel.prj_cd,
                 self.fr712.stratum.creel_run.run,
                 self.fr712.stratum.stratum_label,
+                self.fr712.rec_tp,
                 self.date.strftime("%b-%d-%y"),
             )
-
         else:
-
-            repr = "<EffortEstimate: {} (run:{} strat:{})>"
+            repr = "<Effort Estimate: {} (run:{} strat:{} rec_tp: {})>"
             repr = repr.format(
                 self.fr712.stratum.creel_run.creel.prj_cd,
                 self.fr712.stratum.creel_run.run,
                 self.fr712.stratum.stratum_label,
+                self.fr712.rec_tp,
             )
-
         return repr
 
 
@@ -462,25 +460,27 @@ class FR714(models.Model):
         """return the object type (HarvestEstimate), and the prj_cd."""
 
         if self.date:
-            repr = "<HarvestEstimate: {} (run:{} strat:{} rec_tp:{} date:{} spc:{} sek:{})>"
+            repr = (
+                "<HarvestEstimate: {}-{} sek:{} (prj_cd:{} run:{} rec_tp:{} date:{})>"
+            )
             repr = repr.format(
+                self.fr712.stratum.stratum_label,
+                self.species.spc,
+                self.sek,
                 self.fr712.stratum.creel_run.creel.prj_cd,
                 self.fr712.stratum.creel_run.run,
-                self.fr712.stratum.stratum_label,
                 self.fr712.rec_tp,
                 self.date.strftime("%b-%d-%y"),
-                self.species.spc,
-                self.sek,
             )
         else:
-            repr = "<HarvestEstimate: {} (run:{} strat:{} rec_tp:{} spc:{} sek:{})>"
+            repr = "<HarvestEstimate: {}-{} sek:{} (prj_cd:{} run:{} rec_tp:{})>"
             repr = repr.format(
-                self.fr712.stratum.creel_run.creel.prj_cd,
-                self.fr712.stratum.creel_run.run,
                 self.fr712.stratum.stratum_label,
-                self.fr712.rec_tp,
                 self.species.spc,
                 self.sek,
+                self.fr712.stratum.creel_run.creel.prj_cd,
+                self.fr712.stratum.creel_run.run,
+                self.fr712.rec_tp,
             )
 
         return repr

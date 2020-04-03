@@ -4,7 +4,7 @@ from common.models import Lake, Species
 
 from creel_portal.models.fishnet2 import FN011, FN121, FN123, FN125, FN127
 
-from creel_portal.models.creel_tables import (
+from creel_portal.models.creel import (
     FN022,
     FN023,
     FN024,

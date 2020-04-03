@@ -38,14 +38,14 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 
-THIRD_PARY_APPS = ["rest_framework", "django_filters", "myusers", "common"]
+THIRD_PARTY_APPS = ["rest_framework", "django_filters", "myusers", "common"]
 
 
 LOCAL_APPS = [
     "creel_portal",
 ]
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARY_APPS + LOCAL_APPS
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 
 MIDDLEWARE = [

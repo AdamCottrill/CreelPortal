@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 
-from creel_portal.models.creel_tables import FN026
+from creel_portal.models.creel import FN026
 
 
 class FN026Form(ModelForm):

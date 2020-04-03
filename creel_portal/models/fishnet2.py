@@ -36,10 +36,6 @@ import json
 
 from common.models import Lake, Species
 
-# from .creel_tables import FN111
-
-# from .result_tables import FR714
-
 from .choices import CONTMETH_CHOICES
 
 
@@ -407,7 +403,7 @@ class FN125(models.Model):
                 self.catch.interview.sam,
                 self.catch.species.spc,
                 self.catch.grp,
-                self.fish,
+                str(self.fish),
             ]
         )
 
@@ -476,7 +472,16 @@ class FN125_Lamprey(models.Model):
 
     def fishnet_keys(self):
         """return the fish-net II key fields for this record"""
-        return "{}-{}".format(self.fish, self.lamid)
+        repr = "{}-{}-{}-{}-{}-{}"
+
+        return repr.format(
+            self.fish.catch.interview.sama.creel.prj_cd,
+            self.fish.catch.interview.sam,
+            self.fish.catch.species.spc,
+            self.fish.catch.grp,
+            self.fish.fish,
+            self.lamid,
+        )
 
 
 class FN125_Tag(models.Model):
@@ -509,7 +514,17 @@ class FN125_Tag(models.Model):
 
     def fishnet_keys(self):
         """return the fish-net II key fields for this record"""
-        return "{}-{}".format(self.fish, self.fish_tag_id)
+
+        repr = "{}-{}-{}-{}-{}-{}"
+
+        return repr.format(
+            self.fish.catch.interview.sama.creel.prj_cd,
+            self.fish.catch.interview.sam,
+            self.fish.catch.species.spc,
+            self.fish.catch.grp,
+            self.fish.fish,
+            self.fish_tag_id,
+        )
 
 
 class FN126(models.Model):
@@ -573,7 +588,7 @@ class FN127(models.Model):
             self.fish.catch.interview.sama.creel.prj_cd,
             self.fish.catch.interview.sam,
             self.fish.catch.species.spc,
-            self.fish.grp,
+            self.fish.catch.grp,
             self.fish.fish,
             self.ageid,
         )

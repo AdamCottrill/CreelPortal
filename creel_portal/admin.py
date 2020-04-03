@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from .models.fishnet2 import FN011, FN121, FN123, FN125
 
-from .models.creel_tables import FN022, FN023, FN024, FN025, FN026, FN028, FN111, FN112
+from .models.creel import FN022, FN023, FN024, FN025, FN026, FN028, FN111, FN112
 
 # Register your models here.
 
