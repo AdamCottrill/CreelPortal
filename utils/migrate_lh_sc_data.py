@@ -39,7 +39,7 @@ from creel_portal.models.fishnet2 import (
     FN125_Lamprey,
     FN125_Tag,
 )
-from creel_portal.models.creel_tables import (
+from creel_portal.models.creel import (
     FN022,
     FN023,
     FN024,

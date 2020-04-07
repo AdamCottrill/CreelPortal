@@ -19,6 +19,47 @@ available in your browser.
 | api/creel/<prj_cd>/effort       | creel effort estimates api |
 | api/creel/<prj_cd>/catch        | creel catch estimates api  |
 
+** api-2
+
+- All of these api endpoints will consist of a pair of generic API
+  views:
+  + ListCreateAPIView()
+  + RetreiveUpdateDestroyAPIView()
+
+
+| url                                               | view name                     |
+|---------------------------------------------------+-------------------------------|
+| api/creel/<prj_cd>/fn022                          | creel season list             |
+| api/creel/<prj_cd>/fn022/<ssn>                    | creel season detail           |
+| api/creel/<prj_cd>/fn023/<ssn>                    | creel day type list           |
+| api/creel/<prj_cd>/fn023/<ssn>/<dtp>              | creel day type detail         |
+| api/creel/<prj_cd>/fn024/<ssn>/<dtp>              | creel period list             |
+| api/creel/<prj_cd>/fn024/<ssn>/<dtp>/<prj>        | creel period detail           |
+| api/creel/<prj_cd>/fn025/                         | creel exception dates         |
+| api/creel/<prj_cd>/fn026/                         | space list                    |
+| api/creel/<prj_cd>/fn026/<space>                  | space detail                  |
+| api/creel/<prj_cd>/fn028/                         | fishing mode list             |
+| api/creel/<prj_cd>/fn028/<mode>                   | fishing mode detail           |
+| api/creel/<prj_cd>/fn111/                         | sampling strata list*         |
+| api/creel/<prj_cd>/fn111/<sama>                   | sampling strata detail        |
+| api/creel/<prj_cd>/fn112/                         | activity count list           |
+| api/creel/<prj_cd>/fn112/<sama>                   | strata activity count list(?) |
+| api/creel/<prj_cd>/fn121/                         | creel interview list*         |
+| api/creel/<prj_cd>/fn121/<sam>                    | creel interview detail        |
+| api/creel/<prj_cd>/fn123/                         | creel catch count  list**     |
+| api/creel/<prj_cd>/fn123/<sam>                    | creel catch count detail      |
+| api/creel/<prj_cd>/fn125/                         | creel bio-sample  list**      |
+| api/creel/<prj_cd>/fn125/<sam>                    | creel bio-sample interview ** |
+| api/creel/<prj_cd>/fn125/<sam>/<spc>/<grp>/<fish> | creel bio-sample detail       |
+|                                                   |                               |
+
+- * views need to accept filters for space, mode, date, dow(?)
+- ** filter by species
+
+
+
+
+
 * views
 
 ** creel list

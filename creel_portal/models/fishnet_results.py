@@ -23,6 +23,7 @@ from django.db import models
 from common.models import Species
 
 from .fishnet2 import FN011
+
 from .creel import FN022, FN023, FN024, FN026, FN028
 
 from .choices import CONTMETH_CHOICES, REC_TP_CHOICES, ANG_FN_CHOICES
@@ -176,7 +177,7 @@ class FR712(models.Model):
     CHKFLAG_CHOICES = ((0, "No"), (1, "Yes"))
 
     stratum = models.ForeignKey(
-        Strata, on_delete=models.CASCADE, related_name="strata_values"
+        Strata, on_delete=models.CASCADE, related_name="strata_attributes"
     )
     rec_tp = models.IntegerField(default=2, choices=REC_TP_CHOICES)
     strat_days = models.IntegerField()

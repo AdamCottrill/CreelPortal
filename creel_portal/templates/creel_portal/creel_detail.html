@@ -35,6 +35,16 @@
 
 <div  class="row" >
     <div class="col-md-4" >
+
+        {% if not object.final_run %}
+
+            <div class="alert alert-danger" role="alert">
+                This creel does not appear to have been completed.                
+            </div>
+            
+         {% endif %}
+
+        
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">Project Details</h3>
@@ -125,7 +135,7 @@
     <div>
 
 
-
+        
 
         <!-- Nav tabs -->
         <ul class="nav nav-tabs" role="tablist">
@@ -134,7 +144,7 @@
             <li role="presentation"><a href="#effort" aria-controls="effort" role="tab" data-toggle="tab">Effort</a></li>
             <li role="presentation"><a href="#catch" aria-controls="catch" role="tab" data-toggle="tab">Catch</a></li>
         </ul>
-
+        
         <!-- Tab panes -->
         <div class="tab-content">
 
@@ -307,15 +317,29 @@
 
             <div role="tabpanel" class="tab-pane" id="effort">
 
-                {% with object.get_global_effort as effort_estimates %}
+                {% if effort_estimates %}
+                
 
-                {% for effort in effort_estimates %}
+                {% for strata in effort_estimates %}
+                    {% for fr713 in effort_estimates %}
 
-                {% include 'creel_portal/_details_effort_panel.html' with strata=effort.strata estimates=effort.estimates %}
+                        {% include 'creel_portal/_details_effort_panel.html' %}
 
+                    {% endfor %}
                 {% endfor %}
 
-                {% endwith %}
+
+                
+                        {% else %}
+
+                <div class="alert alert-warning" role="alert">
+                    <h4>Oops - It doesn't look like there are any Effort Estimates for this creel</h4>
+                    
+                </div>
+
+                        {% endif %}
+
+
 
             </div>
             <div role="tabpanel" class="tab-pane" id="catch">
@@ -380,12 +404,39 @@
                             </div>
                         </div>
 
-                        {% with object.get_global_catch as catch_estimates %}
-                        {% for catch in catch_estimates %}
-                        {% include 'creel_portal/_detail_catch_panel.html' with strata=catch.strata catch=catch.estimates %}
-                        {% endfor %}
-                        {% endwith %}
 
+                        {% if catch_estimates %}
+                        
+                        {% regroup catch_estimates by fr712.stratum.stratum_label as stratum_list %}
+                        
+                        {% for fr714 in stratum_list %}
+                            {% include 'creel_portal/_detail_catch_panel.html' %}
+                        {% endfor %}
+
+                        {% else %}
+
+                        <div class="alert alert-warning" role="alert">
+                            <h4>Oops - It doesn't look like there are any Catch Estimates for this creel</h4>
+                            
+                        </div>
+
+                        {% endif %}
+                        
+                        <!--
+
+
+                             {% comment %}
+                             {% for fr714 in catch_estimates %}
+
+                             {% endfor %}
+                             {% endcomment %}
+
+
+
+                        -->
+
+                        
+                        
                     </div>
                 </div>
             </div>
@@ -410,11 +461,16 @@
 
 
  // intiailize map based on the lake this creel occurs in
- var lat = {{ creel.lake.ddlat }}
-     var lon =  {{ creel.lake.ddlon }}
-         var zoom =  {{ creel.lake.zoom }}
+ //var lat = {{ creel.lake.ddlat }}
+ //    var lon =  {{ creel.lake.ddlon }}
+ //        var zoom =  {{ creel.lake.zoom }}
 
-             var  map = new L.map('map').setView([lat,lon], zoom);
+ let lat=45.0;
+ let lon = -81.0;
+ let zoom = 7;
+ 
+
+ var  map = new L.map('map').setView([lat,lon], zoom);
 
  function drawMap(){
 
@@ -445,8 +501,12 @@
  //============================================================
  // catch plots
 
- var catch_data = {{ object.get_catch_totals|safe }};
-
+ {% if catch_data %}
+ var catch_data = {{ catch_totals|safe }};
+ {% else %}
+ var catch_data = {};
+ {% endif %}
+ 
  // data arrays for plots:
  let species = [];
  let catne = [];
@@ -471,7 +531,7 @@
 
 
  const populate_arrays = function(){
-   
+     
      // load the catch data into the proper arrays
      $.each(catch_data, function(i,d){
          if(d.xcatne>0){
@@ -630,7 +690,7 @@
                  position: 'right'
              }
 
-         }}
+     }}
 
 
      myChart = new Chart(ctx, {

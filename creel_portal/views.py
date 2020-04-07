@@ -7,9 +7,14 @@ from django.db.models import Q
 import json
 from django.core.serializers.json import DjangoJSONEncoder
 
-
 from creel_portal.models import FN011, FN026
 from creel_portal.forms import FN026Form
+
+from .utils import (
+    get_aggregate_catch_estimates,
+    get_aggregate_effort_estimates,
+    get_catch_totals,
+)
 
 
 class CreelListView(ListView):
@@ -39,19 +44,53 @@ class CreelListView(ListView):
 
 
 class CreelDetailView(DetailView):
+    """A class based view to provide all of the details assocaited with a
+    creel.  In addition to the basic FN011 information, it also
+    includes effort and catch estiamtes from the last creel run (if
+    one is available.)
+
+    """
+
     model = FN011
     template_name = "creel_portal/creel_detail.html"
     context_object_name = "creel"
 
+    def get_queryset(self):
+        queryset = super(CreelDetailView, self).get_queryset()
+
+        queryset = queryset.select_related("prj_ldr").prefetch_related(
+            "seasons",
+            "seasons__daytypes",
+            "seasons__daytypes__periods",
+            "seasons__exception_dates",
+            "modes",
+            "spatial_strata",
+            "creel_run",
+        )
+
+        return queryset
+
     def get_context_data(self, **kwargs):
+        """The creel detail page requires a number additional pieces of
+        information that are used to populate the map, the tables, and the
+        charts."""
         context = super(CreelDetailView, self).get_context_data(**kwargs)
 
-        # get our creel and add the space label lat and lon to the context
-        # as a json string.
-
         creel = kwargs.get("object")
+
         spots = creel.spatial_strata.values("label", "ddlon", "ddlat")
         context["spaces"] = json.dumps(list(spots), cls=DjangoJSONEncoder)
+
+        catch_estimates = get_aggregate_catch_estimates(creel)
+        context["catch_estimates"] = catch_estimates
+
+        effort_estimates = get_aggregate_effort_estimates(creel)
+        context["effort_estimates"] = effort_estimates
+
+        # these are used by the chart - we might want to move them to
+        # the api and load this data via ajax when the page loads.
+        catch_totals = get_catch_totals(creel)
+        context["catch_totals"] = catch_totals
 
         return context
 
