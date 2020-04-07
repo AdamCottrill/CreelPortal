@@ -1,3 +1,4 @@
+from django.db.models import F
 from rest_framework import viewsets, generics
 
 from common.models import Lake, Species
@@ -226,13 +227,56 @@ class EffortEstimates(generics.ListAPIView):
         """
         slug = self.kwargs["slug"]
 
-        final_run = FN011.objects.get(slug=slug).final_run.run
+        # final_run = FN011.objects.get(slug=slug).final_run.run
+        # qs = (
+        #     FR713.objects.filter(fr712__stratum__creel_run__creel__slug=slug)
+        #     .filter(date__isnull=True, fr712__rec_tp=2)
+        #     .filter(fr712__stratum__creel_run__run=final_run)
+        # )
+
+        # need to add mode, season, dtp, period, area, ddlat, ddlon
+
+        creel = FN011.objects.get(slug=slug)
+        final_run = creel.final_run.run
+
         qs = (
-            FR713.objects.filter(stratum__creel_run__creel__slug=slug)
-            .filter(date__isnull=True)
-            .filter(stratum__creel_run__run=final_run)
-            .exclude(stratum__stratum_label__contains="+")
+            FR713.objects.filter(
+                date__isnull=True,
+                fr712__rec_tp=2,
+                fr712__stratum__creel_run__creel=creel,
+                fr712__stratum__creel_run__run=final_run,
+            )
+            .select_related(
+                "fr712__stratum__season",
+                "fr712__stratum__season__datetype",
+                "fr712__stratum__season__datetype__period",
+                "fr712__stratum__mode",
+                "fr712__stratum__spatial_strata",
+            )
+            .annotate(
+                season=F("fr712__stratum__season__ssn"),
+                dtp=F("fr712__stratum__daytype__dtp"),
+                period=F("fr712__stratum__period__prd"),
+                mode=F("fr712__stratum__mode__mode"),
+                area=F("fr712__stratum__area__space"),
+                ddlat=F("fr712__stratum__area__ddlat"),
+                ddlon=F("fr712__stratum__area__ddlon"),
+            )
+            .values(
+                "id",
+                "effre",
+                "effae",
+                "effao_s",
+                "effro_s",
+                "mode",
+                "season",
+                "period",
+                "area",
+                "ddlat",
+                "ddlon",
+            )
         )
+
         return qs
 
 

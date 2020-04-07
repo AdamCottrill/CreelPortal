@@ -58,12 +58,14 @@ urlpatterns = [
     path("api/v1/", include(router.urls)),
     path(
         ("api/v1/effort_estimates/<slug:slug>/"),
-        api_views.EffortEstimates.as_view(),
+        # api_views.EffortEstimates.as_view(),
+        views.effort_estimates_json,
         name="effort_estimates",
     ),
     path(
         ("api/v1/catch_estimates/<slug:slug>/"),
-        api_views.CatchEstimates.as_view(),
+        # api_views.CatchEstimates.as_view(),
+        views.catch_estimates_json,
         name="catch_estimates",
     ),
     path(

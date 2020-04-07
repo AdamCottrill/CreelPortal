@@ -1,13 +1,14 @@
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.views.generic import ListView, DetailView
 from django.template import RequestContext
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
+from django.db.models import Q, F
 
 import json
 from django.core.serializers.json import DjangoJSONEncoder
 
-from creel_portal.models import FN011, FN026
+from creel_portal.models import FN011, FN026, FR713, FR714
 from creel_portal.forms import FN026Form
 
 from .utils import (
@@ -154,3 +155,114 @@ def catch_estimates(request, slug):
         "creel_portal/creel_catch_plots.html",
         {"creel": creel, "spaces": spots_json},
     )
+
+
+def effort_estimates_json(request, slug):
+    """This is just a temporary function to get the effort estimates for a
+    single creel and dump them as json for cross filter to consume. This
+    should be reaplaced by a real api endpoint.
+
+    Arguments:
+    - `request`:
+
+    """
+
+    creel = FN011.objects.get(slug=slug)
+    final_run = creel.final_run.run
+
+    qs = (
+        FR713.objects.filter(
+            date__isnull=True,
+            fr712__rec_tp=2,
+            fr712__stratum__creel_run__creel=creel,
+            fr712__stratum__creel_run__run=final_run,
+        )
+        .select_related(
+            "fr712__stratum__season",
+            "fr712__stratum__season__datetype",
+            "fr712__stratum__season__datetype__period",
+            "fr712__stratum__mode",
+            "fr712__stratum__spatial_strata",
+        )
+        .annotate(
+            season=F("fr712__stratum__season__ssn_des"),
+            dtp=F("fr712__stratum__daytype__dtp_nm"),
+            period=F("fr712__stratum__period__prd"),
+            mode=F("fr712__stratum__mode__mode_des"),
+            area=F("fr712__stratum__area__space_des"),
+            ddlat=F("fr712__stratum__area__ddlat"),
+            ddlon=F("fr712__stratum__area__ddlon"),
+        )
+        .values(
+            "id",
+            "effre",
+            "effae",
+            "effao_s",
+            "effro_s",
+            "mode",
+            "season",
+            "dtp",
+            "period",
+            "area",
+            "ddlat",
+            "ddlon",
+        )
+    )
+
+    return JsonResponse(list(qs), safe=False)
+
+
+def catch_estimates_json(request, slug):
+    """This is just a temporary function to get the catch estimates for a
+    single creel and dump them as json for cross filter to consume. This
+    should be reaplaced by a real api endpoint.
+
+    Arguments:
+    - `request`:
+
+    """
+
+    creel = FN011.objects.get(slug=slug)
+    final_run = creel.final_run.run
+
+    qs = (
+        FR714.objects.filter(
+            date__isnull=True,
+            fr712__rec_tp=2,
+            fr712__stratum__creel_run__creel=creel,
+            fr712__stratum__creel_run__run=final_run,
+        )
+        .select_related(
+            "species",
+            "fr712__stratum__season",
+            "fr712__stratum__season__datetype",
+            "fr712__stratum__season__datetype__period",
+            "fr712__stratum__mode",
+            "fr712__stratum__spatial_strata",
+        )
+        .annotate(
+            species_name=F("species__spc_nmco"),
+            season=F("fr712__stratum__season__ssn_des"),
+            dtp=F("fr712__stratum__daytype__dtp_nm"),
+            period=F("fr712__stratum__period__prd"),
+            mode=F("fr712__stratum__mode__mode_des"),
+            area=F("fr712__stratum__area__space_des"),
+            ddlat=F("fr712__stratum__area__ddlat"),
+            ddlon=F("fr712__stratum__area__ddlon"),
+        )
+        .values(
+            "id",
+            "species_name",
+            "sek",
+            "catne",
+            "mode",
+            "season",
+            "dtp",
+            "period",
+            "area",
+            "ddlat",
+            "ddlon",
+        )
+    )
+
+    return JsonResponse(list(qs), safe=False)

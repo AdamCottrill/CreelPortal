@@ -293,7 +293,7 @@
                  "Space": d.area,
                  "Total Catch": d.catne.toFixed(1),
                  'species':spc_list
-             }});
+         }});
      });
 
      var geojson =  {"type": "FeatureCollection",
@@ -321,19 +321,13 @@
 
  d3.json("{% url 'catch_estimates' creel.slug %}", function (error, data) {
 
-     data = data.results
-
-     var mydateformat = d3.time.format('%B %d, %Y');
-     var isodateformat = d3.time.format.iso;
-
      data.forEach(function(d){
          d.mode = d.mode;
          d.season = d.season;
          d.dtp = d.dtp;
          d.period = d.period;
-         d.species = d.species;
+         d.species = d.species_name;
          d.area = d.area;
-         d.date = isodateformat.parse(d.date);
          d.sek = d.sek;
          d.catne = +d.catne;
          d.ddlat = +d.ddlat;
@@ -342,7 +336,6 @@
      });
 
      var estimates = crossfilter(data);
-
 
      var all = estimates.groupAll();
      var all_catne = all.reduceSum(function(d){return d.catne;});
@@ -566,11 +559,17 @@
 
 
      // intiailize map based on the lake this creel occurs in
-     var lat = {{ creel.lake.ddlat }}
-     var lon =  {{ creel.lake.ddlon }}
-     var zoom =  {{ creel.lake.zoom }}
+     //var lat = {{ creel.lake.ddlat }}
+     //var lon =  {{ creel.lake.ddlon }}
+     //var zoom =  {{ creel.lake.zoom }}
 
-     var  map = new L.map('map').setView([lat,lon], zoom);
+     // intiailize map based on the lake this creel occurs in
+     var lat = 45;
+     var lon =  -81.0
+     var zoom =  7
+
+                
+                 var  map = new L.map('map').setView([lat,lon], zoom);
 
 
      function drawMap(){
@@ -654,6 +653,6 @@
 
 
 
-        </script>
+</script>
 
 {% endblock %}

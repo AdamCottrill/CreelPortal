@@ -183,6 +183,7 @@
 
  var spaces = {{ spaces|safe }};
 
+
  function get_map_points(x, pts){
      // give a list/array, extract format the elements
      // for use with leaflet.
@@ -258,11 +259,9 @@
  var effortTable = dc.dataTable('#dc-data-table');//); //, chartGroup);
 
  d3.json("{% url 'effort_estimates' creel.slug %}", function (error, data) {
-
-     data = data.results
-
-     var mydateformat = d3.time.format('%B %d, %Y');
-     var isodateformat = d3.time.format.iso;
+    
+     //var mydateformat = d3.time.format('%B %d, %Y');
+     //var isodateformat = d3.time.format.iso;
 
      data.forEach(function(d,i){
          d.mode = d.mode;
@@ -270,7 +269,7 @@
          d.dtp = d.dtp;
          d.period = d.period;
          d.area = d.area;
-         d.date = isodateformat.parse(d.date);
+         //d.date = isodateformat.parse(d.date);
          d.effre = +d.effre;
          d.effae = +d.effae;
          d.effao_s = d.effao_s;
@@ -468,10 +467,14 @@
 
 
      // intiailize map based on the lake this creel occurs in
-     var lat = {{ creel.lake.ddlat }}
-     var lon =  {{ creel.lake.ddlon }}
-     var zoom =  {{ creel.lake.zoom }}
+     //var lat = {{ creel.lake.ddlat }}
+     //var lon =  {{ creel.lake.ddlon }}
+     //var zoom =  {{ creel.lake.zoom }}
 
+     var lat = 45
+     var lon = -81
+     var zoom = 7
+     
      var  map = new L.map('map').setView([lat,lon], zoom);
 
      function drawMap(){
