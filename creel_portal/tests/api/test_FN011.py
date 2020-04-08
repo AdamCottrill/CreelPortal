@@ -25,9 +25,47 @@ field crew (who cannot edit or create projects)
 """
 
 import pytest
+import json
 
 
-def test_fn011_list():
+from django.urls import reverse
+
+from rest_framework import status
+
+from creel_portal.models import FN011
+
+from fixtures import api_client, user, user2, creels
+from creel_portal.tests.pytest_fixtures import creel
+
+
+@pytest.mark.django_db
+def test_fn011_list(api_client, creels):
     """
     """
+    url = reverse("creel-api:creel-list")
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK
+
+    data = [x.get("prj_nm") for x in response.data["results"]]
+    assert len(data) == 3
+
+    expected = ["First Creel", "Second Creel", "Third Creel"]
+    for x in expected:
+        assert x in data
+
+
+@pytest.mark.django_db
+def test_fn011_detail(api_client, creel):
+    """The creel detail endpoint should return all of the relavent details for a creel:
+
+    + lake
+    + prj_cd
+    + prj_nm
+    + prj_ldr
+    + prj_date0
+    + prj_date1
+    + cont_meth
+
+    """
+
     assert 0 == 1

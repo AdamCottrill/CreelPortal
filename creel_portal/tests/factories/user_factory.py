@@ -23,7 +23,7 @@ User = get_user_model()
 class UserFactory(factory.DjangoModelFactory):
     class Meta:
         model = User
-        django_get_or_create = ("username",)
+        django_get_or_create = ("email",)
 
     email = "homer@simpsons.com"
     first_name = "Homer"
