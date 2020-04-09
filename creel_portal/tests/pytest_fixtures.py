@@ -35,19 +35,56 @@ SCOPE = "function"
 
 
 @pytest.fixture(scope=SCOPE)
+def api_client():
+    from rest_framework.test import APIClient
+
+    return APIClient()
+
+
+@pytest.fixture(scope=SCOPE)
 def user(db):
     """return a normal user named homer
     """
     password = "Abcd1234"
     homer = UserFactory.create(
-        username="hsimpson", first_name="Homer", last_name="Simpson", password=password
+        username="hsimpson",
+        first_name="Homer",
+        last_name="Simpson",
+        password=password,
+        email="homer@simpsons.com",
     )
+    homer.set_password(password)
     homer.save()
     return homer
 
 
 @pytest.fixture(scope=SCOPE)
-def creel(db):
+def user2(db):
+    password = "Abcd1234"
+    user2 = UserFactory(
+        username="gcostanza",
+        first_name="George",
+        last_name="Costanza",
+        email="george@nbc.com",
+        password=password,
+    )
+    user2.set_password(password)
+    user2.save()
+    return user2
+
+
+@pytest.fixture(scope=SCOPE)
+def creels(user, user2):
+
+    creel1 = FN011Factory(prj_ldr=user, prj_cd="LHA_SC19_001", prj_nm="First Creel")
+    creel2 = FN011Factory(prj_ldr=user, prj_cd="LHA_SC19_002", prj_nm="Second Creel")
+    creel3 = FN011Factory(prj_ldr=user2, prj_cd="LHA_SC19_003", prj_nm="Third Creel")
+
+    return [creel1, creel2, creel3]
+
+
+@pytest.fixture(scope=SCOPE)
+def creel(db, user, user2):
     """a fixture to setup to relatively complicated state of a single
     creel - this fixture returns a creel object with two seasons, two
     daytypes and two periods (one per datetype).  It has a single
@@ -55,11 +92,11 @@ def creel(db):
 
     """
 
-    prj_cd = "LHA_SC11_123"
+    prj_cd = "LHA_SC17_123"
 
     ssn = "12"
     ssn_des = "February"
-    creel = FN011Factory(prj_cd=prj_cd)
+    creel = FN011Factory(prj_cd=prj_cd, prj_ldr=user, field_crew=[user2,])
     ssn_date0 = datetime.strptime("2017-02-01", "%Y-%m-%d")
     ssn_date1 = datetime.strptime("2017-02-28", "%Y-%m-%d")
     season = FN022Factory(
@@ -87,12 +124,12 @@ def creel(db):
     weekday = FN023Factory(season=season, dtp=dtp2, dtp_nm=dtp2_nm, dow_lst=dow_lst)
     weekday2 = FN023Factory(season=season2, dtp=dtp2, dtp_nm=dtp2_nm, dow_lst=dow_lst)
 
-    prd_am = "AM"
+    prd_am = 1
     prdtm0_am = time(6, 0)
     prdtm1_am = time(12, 0)
     prd_dur_am = 6
 
-    prd_pm = "PM"
+    prd_pm = 2
     prdtm0_pm = time(12, 0)
     prdtm1_pm = time(20, 0)
     prd_dur_pm = 8

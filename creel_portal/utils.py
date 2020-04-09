@@ -19,6 +19,14 @@ from common.models import Species
 from .models.fishnet_results import FR713, FR714
 
 
+def is_admin(user):
+    """return true if the user belongs to the admin group, false otherwise"""
+    if user.groups.filter(name="admin").exists() or user.is_superuser:
+        return True
+    else:
+        return False
+
+
 def get_aggregate_effort_estimates(creel, run=None):
     """Given a creel object and optionally a creel run, return the catch
     estimate objects from the top-most, aggregate strata.  If the

@@ -14,6 +14,13 @@
   + the exception date detail endpoint will return the exception date,
   the daytype code (dtp1), and description.
 
++ creations rules:
+
+  + date must occur after season start and before season endpoint
+  + cannot already exist in the season
+  + should not be a weekend (they are already exceptional)
+
+
  A. Cottrill
 =============================================================
 
@@ -29,8 +36,8 @@ from rest_framework import status
 
 from creel_portal.models import FN025
 
-from fixtures import api_client
-from creel_portal.tests.pytest_fixtures import creel
+
+from creel_portal.tests.pytest_fixtures import creel, api_client, user, user2
 
 
 @pytest.mark.django_db
@@ -63,4 +70,17 @@ def test_fn025_detail(api_client, creel):
     """
     """
 
-    assert 0 == 1
+    prj_cd = creel.prj_cd
+    ssn = "12"
+
+    url = reverse(
+        "creel-api:exception-date-detail",
+        kwargs={"prj_cd": prj_cd, "ssn": ssn, "date": "2017-02-16"},
+    )
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK
+
+    expected = {"date": "2017-02-16", "dtp1": "1", "description": "Family Day"}
+
+    for k, v in expected.items():
+        assert response.data[k] == expected[k]

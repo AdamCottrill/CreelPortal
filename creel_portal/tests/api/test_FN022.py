@@ -14,6 +14,11 @@
   + the season detail endpoint will return the ssn, ssn_des, start and
   end date
 
++ creation rules:
+
+    + must occur before project start and before project endpoint
+    + season must not overlap - each date can only belong to on season
+    + there should not be any gaps - days that do not belong to a season.
 
  A. Cottrill
 =============================================================
@@ -30,8 +35,7 @@ from rest_framework import status
 
 from creel_portal.models import FN022
 
-from fixtures import api_client
-from creel_portal.tests.pytest_fixtures import creel
+from creel_portal.tests.pytest_fixtures import creel, user, user2, api_client
 
 
 @pytest.mark.django_db
@@ -54,7 +58,25 @@ def test_fn022_list(api_client, creel):
 
 @pytest.mark.django_db
 def test_fn022_detail(api_client, creel):
-    """
+    """The season detail object should return 5 basic elements - the
+    project code, season code, season description, start date and end
+    date.
     """
 
-    assert 0 == 1
+    prj_cd = creel.prj_cd
+    ssn = "12"
+
+    url = reverse("creel-api:season-detail", kwargs={"prj_cd": prj_cd, "ssn": ssn})
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK
+
+    expected = {
+        "creel": prj_cd.lower(),
+        "ssn": ssn,
+        "ssn_des": "February",
+        "ssn_date0": "2017-02-01",
+        "ssn_date1": "2017-02-28",
+    }
+
+    for k, v in expected.items():
+        assert response.data[k] == expected[k]

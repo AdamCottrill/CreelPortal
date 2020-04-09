@@ -28,8 +28,8 @@ from rest_framework import status
 
 from creel_portal.models import FN026
 
-from fixtures import api_client
-from creel_portal.tests.pytest_fixtures import creel
+
+from creel_portal.tests.pytest_fixtures import creel, api_client, user, user2
 
 
 @pytest.mark.django_db
@@ -58,4 +58,19 @@ def test_fn026_detail(api_client, creel):
     """
     """
 
-    assert 0 == 1
+    prj_cd = creel.prj_cd
+    space = "S1"
+
+    url = reverse("creel-api:space-detail", kwargs={"prj_cd": prj_cd, "space": space})
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK
+
+    expected = {
+        "space": "S1",
+        "space_des": "Space 1",
+        "ddlat": 45.1,
+        "ddlon": -81.1,
+    }
+
+    for k, v in expected.items():
+        assert response.data[k] == expected[k]

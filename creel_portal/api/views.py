@@ -59,6 +59,8 @@ from .serializers import (
     FN123Serializer,
 )
 
+from .permissions import IsPrjLeadOrAdminOrReadOnly, IsAdminUserOrReadOnly, ReadOnly
+
 
 class CreelList(generics.ListAPIView):
     """an api end point to list all of our creels."""
@@ -69,6 +71,16 @@ class CreelList(generics.ListAPIView):
     queryset = FN011.objects.select_related("lake").all()
 
     filterset_class = FN011Filter
+
+
+class CreelDetail(generics.RetrieveUpdateDestroyAPIView):
+    """An api endpoint for get, put and delete endpoints for creel objects.
+    """
+
+    queryset = FN011.objects.all()
+    lookup_field = "slug"
+    serializer_class = FN011Serializer
+    permission_classes = [IsPrjLeadOrAdminOrReadOnly]
 
 
 class SeasonList(generics.ListAPIView):
@@ -85,6 +97,22 @@ class SeasonList(generics.ListAPIView):
         return FN022.objects.filter(creel__slug=prj_cd.lower()).select_related("creel")
 
 
+class SeasonDetail(generics.RetrieveUpdateDestroyAPIView):
+    """An api endpoint for get, put and delete endpoints for season
+    objects associated with a specfic creel """
+
+    lookup_field = "ssn"
+    serializer_class = FN022Serializer
+    permission_classes = [IsPrjLeadOrAdminOrReadOnly]
+
+    def get_queryset(self):
+        """return only those season objects associate with this creel.
+        """
+
+        prj_cd = self.kwargs.get("prj_cd")
+        return FN022.objects.filter(creel__slug=prj_cd.lower()).select_related("creel")
+
+
 class DayTypeList(generics.ListAPIView):
     """an api end point to list all of the daytypes (FN023) associated with a
     creel."""
@@ -95,6 +123,24 @@ class DayTypeList(generics.ListAPIView):
         """
         """
 
+        prj_cd = self.kwargs.get("prj_cd")
+        ssn = self.kwargs.get("ssn")
+        return FN023.objects.filter(season__creel__slug=prj_cd.lower()).filter(
+            season__ssn=ssn
+        )
+
+
+class DayTypeDetail(generics.RetrieveUpdateDestroyAPIView):
+    """An api endpoint for get, put and delete endpoints for daytype objects
+    objects associated with a season within a specfic creel """
+
+    lookup_field = "dtp"
+    serializer_class = FN023Serializer
+    permission_classes = [IsPrjLeadOrAdminOrReadOnly]
+
+    def get_queryset(self):
+        """return only those season objects associate with this creel.
+        """
         prj_cd = self.kwargs.get("prj_cd")
         ssn = self.kwargs.get("ssn")
         return FN023.objects.filter(season__creel__slug=prj_cd.lower()).filter(
@@ -124,11 +170,58 @@ class PeriodList(generics.ListAPIView):
         )
 
 
+class PeriodDetail(generics.RetrieveUpdateDestroyAPIView):
+    """An api endpoint for get, put and delete endpoints for period objects
+    objects associated with a daytpye, within a season within a specfic creel """
+
+    lookup_field = "prd"
+    serializer_class = FN024Serializer
+    permission_classes = [IsPrjLeadOrAdminOrReadOnly]
+
+    def get_queryset(self):
+        """return only those season objects associate with this daytype,
+        season and creel.
+
+        """
+        prj_cd = self.kwargs.get("prj_cd")
+        ssn = self.kwargs.get("ssn")
+        dtp = self.kwargs.get("dtp")
+
+        return (
+            FN024.objects.filter(daytype__season__creel__slug=prj_cd.lower())
+            .filter(daytype__season__ssn=ssn)
+            .filter(daytype__dtp=dtp)
+        )
+
+
 class ExceptionDateList(generics.ListAPIView):
     """an api end point to list all the exception dates (FN025) in a creel (FN011).
     """
 
     serializer_class = FN025Serializer
+
+    def get_queryset(self):
+        """
+        """
+
+        prj_cd = self.kwargs.get("prj_cd")
+        ssn = self.kwargs.get("ssn")
+
+        return FN025.objects.filter(season__creel__slug=prj_cd.lower()).filter(
+            season__ssn=ssn
+        )
+
+
+class ExceptionDateDetail(generics.RetrieveUpdateDestroyAPIView):
+    """An api endpoint for get, put and delete endpoints for exception
+    date objects objects associated with a season within a specfic
+    creel
+
+    """
+
+    lookup_field = "date"
+    serializer_class = FN025Serializer
+    permission_classes = [IsPrjLeadOrAdminOrReadOnly]
 
     def get_queryset(self):
         """
@@ -175,6 +268,23 @@ class SpaceList(generics.ListAPIView):
         return FN026.objects.filter(creel__slug=prj_cd.lower())
 
 
+class SpaceDetail(generics.RetrieveUpdateDestroyAPIView):
+    """An api endpoint for get, put and delete endpoints for
+    space/area objects associated with a specfic creel
+
+    """
+
+    lookup_field = "space"
+    serializer_class = FN026Serializer
+    permission_classes = [IsPrjLeadOrAdminOrReadOnly]
+
+    def get_queryset(self):
+        """
+        """
+        prj_cd = self.kwargs.get("prj_cd")
+        return FN026.objects.filter(creel__slug=prj_cd.lower())
+
+
 class FishingModeList(generics.ListAPIView):
     """an api end point to list all of the fishing modes (FN022) associated with a
     creel."""
@@ -185,6 +295,23 @@ class FishingModeList(generics.ListAPIView):
         """
         """
 
+        prj_cd = self.kwargs.get("prj_cd")
+        return FN028.objects.filter(creel__slug=prj_cd.lower())
+
+
+class FishingModeDetail(generics.RetrieveUpdateDestroyAPIView):
+    """An api endpoint for get, put and delete endpoints for fishing mode
+    objects associated with a specfic creel.
+
+    """
+
+    lookup_field = "mode"
+    serializer_class = FN028Serializer
+    permission_classes = [IsPrjLeadOrAdminOrReadOnly]
+
+    def get_queryset(self):
+        """
+        """
         prj_cd = self.kwargs.get("prj_cd")
         return FN028.objects.filter(creel__slug=prj_cd.lower())
 

@@ -15,13 +15,20 @@ from django.urls import include, path
 
 from .views import (
     CreelList,
+    CreelDetail,
     SeasonList,
+    SeasonDetail,
     DayTypeList,
+    DayTypeDetail,
     PeriodList,
+    PeriodDetail,
     ExceptionDateList,
+    ExceptionDateDetail,
     TemporalStrataList,
     FishingModeList,
+    FishingModeDetail,
     SpaceList,
+    SpaceDetail,
     ActivityCountList,
     InterviewLogList,
     InterviewList,
@@ -29,21 +36,42 @@ from .views import (
 
 urlpatterns = [
     path("creels/", CreelList.as_view(), name="creel-list"),
+    path("creel/<slug:slug>/", CreelDetail.as_view(), name="creel-detail"),
     path("creel/<str:prj_cd>/seasons", SeasonList.as_view(), name="season-list"),
     path(
-        "creel/<str:prj_cd>/day_types/<str:ssn>",
+        "creel/<str:prj_cd>/season/<str:ssn>",
+        SeasonDetail.as_view(),
+        name="season-detail",
+    ),
+    path(
+        "creel/<str:prj_cd>/<str:ssn>/day_types/",
         DayTypeList.as_view(),
         name="day-type-list",
     ),
     path(
-        "creel/<str:prj_cd>/periods/<str:ssn>/<str:dtp>",
+        "creel/<str:prj_cd>/<str:ssn>/day_type/<str:dtp>",
+        DayTypeDetail.as_view(),
+        name="day-type-detail",
+    ),
+    path(
+        "creel/<str:prj_cd>/<str:ssn>/<str:dtp>/periods",
         PeriodList.as_view(),
         name="period-list",
     ),
     path(
-        "creel/<str:prj_cd>/exception_dates/<str:ssn>/",
+        "creel/<str:prj_cd>/<str:ssn>/<str:dtp>/period/<str:prd>",
+        PeriodDetail.as_view(),
+        name="period-detail",
+    ),
+    path(
+        "creel/<str:prj_cd>/<str:ssn>/exception_dates",
         ExceptionDateList.as_view(),
         name="exception-date-list",
+    ),
+    path(
+        "creel/<str:prj_cd>/<str:ssn>/exception_date/<str:date>",
+        ExceptionDateDetail.as_view(),
+        name="exception-date-detail",
     ),
     path(
         "creel/<str:prj_cd>/temporal_strata",
@@ -52,9 +80,19 @@ urlpatterns = [
     ),
     path("creel/<str:prj_cd>/spatial_strata", SpaceList.as_view(), name="space-list"),
     path(
+        "creel/<str:prj_cd>/space/<str:space>",
+        SpaceDetail.as_view(),
+        name="space-detail",
+    ),
+    path(
         "creel/<str:prj_cd>/fishing_modes",
         FishingModeList.as_view(),
         name="fishing-mode-list",
+    ),
+    path(
+        "creel/<str:prj_cd>/fishing_mode/<str:mode>",
+        FishingModeDetail.as_view(),
+        name="fishing-mode-detail",
     ),
     path(
         "creel/<str:prj_cd>/interview_logs",

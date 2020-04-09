@@ -10,7 +10,7 @@
   + the fn028 list returns all of the fishing modes associated with a
   specific creel
 
-  + the space detail endpoint will return the space code, space
+  + the mode detail endpoint will return the mode code, mode
   description, ddlat, ddlon.
 
  A. Cottrill
@@ -28,8 +28,8 @@ from rest_framework import status
 
 from creel_portal.models import FN028
 
-from fixtures import api_client
-from creel_portal.tests.pytest_fixtures import creel
+
+from creel_portal.tests.pytest_fixtures import creel, api_client, user, user2
 
 
 @pytest.mark.django_db
@@ -56,4 +56,19 @@ def test_fn028_detail(api_client, creel):
     """
     """
 
-    assert 0 == 1
+    prj_cd = creel.prj_cd
+    mode = "m1"
+
+    url = reverse(
+        "creel-api:fishing-mode-detail", kwargs={"prj_cd": prj_cd, "mode": mode}
+    )
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK
+
+    expected = {
+        "mode": "m1",
+        "mode_des": "Mode 1",
+    }
+
+    for k, v in expected.items():
+        assert response.data[k] == expected[k]

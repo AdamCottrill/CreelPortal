@@ -29,8 +29,8 @@ from rest_framework import status
 
 from creel_portal.models import FN024
 
-from fixtures import api_client
-from creel_portal.tests.pytest_fixtures import creel
+
+from creel_portal.tests.pytest_fixtures import creel, api_client, user, user2
 
 
 @pytest.mark.django_db
@@ -55,13 +55,29 @@ def test_fn024_list(api_client, creel):
     ]
     assert len(data) == 2
 
-    expected = [("AM", "06:00:00", "12:00:00"), ("PM", "12:00:00", "20:00:00")]
+    expected = [("1", "06:00:00", "12:00:00"), ("2", "12:00:00", "20:00:00")]
     assert data == expected
 
 
 @pytest.mark.django_db
 def test_fn024_detail(api_client, creel):
-    """
+    """the period detail endpoint will return the period label, the start
+    time, end time, and period duration
     """
 
-    assert 0 == 1
+    prj_cd = creel.prj_cd
+    ssn = "12"
+    dtp = 1
+    prd = 1
+
+    url = reverse(
+        "creel-api:period-detail",
+        kwargs={"prj_cd": prj_cd, "ssn": ssn, "dtp": dtp, "prd": prd},
+    )
+    response = api_client.get(url)
+    assert response.status_code == status.HTTP_200_OK
+
+    expected = {"prd": "1", "prdtm0": "06:00:00", "prdtm1": "12:00:00", "prd_dur": 6.0}
+
+    for k, v in expected.items():
+        assert response.data[k] == expected[k]

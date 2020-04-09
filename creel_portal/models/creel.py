@@ -136,10 +136,16 @@ class FN023(models.Model):
     """Class  to represent the daytypes used in each season of creel
     """
 
+    DAYTYPE_CHOICES = ((1, "weekday"), (2, "weekend"))
+
     # creel = models.ForeignKey(FN011)
     season = models.ForeignKey(FN022, related_name="daytypes", on_delete=models.CASCADE)
     dtp = models.CharField(
-        help_text="Day Type Code", max_length=2, blank=False, db_index=True
+        help_text="Day Type Code",
+        max_length=2,
+        blank=False,
+        db_index=True,
+        choices=DAYTYPE_CHOICES,
     )
     dtp_nm = models.CharField(help_text="Day Type Name", max_length=10, blank=False)
     dow_lst = models.CharField(help_text="Day Of Week List", max_length=7, blank=False)
@@ -150,6 +156,13 @@ class FN023(models.Model):
         verbose_name = "FN023 - Day Type"
         ordering = ["dtp"]
         unique_together = ["season", "dtp"]
+
+    @property
+    def creel(self):
+        """A shortcut method to directly access the creel object - allows use
+        of same permission class on different api endpoints.
+        """
+        return self.season.creel
 
     def save(self, *args, **kwargs):
         """
@@ -255,6 +268,13 @@ class FN024(models.Model):
         self.prd_dur = delta.total_seconds() / (60 * 60)
         super(FN024, self).save(*args, **kwargs)
 
+    @property
+    def creel(self):
+        """A shortcut method to directly access the creel object - allows use
+        of same permission class on different api endpoints.
+        """
+        return self.daytype.season.creel
+
 
 class FN025(models.Model):
     """Class to represent the day type exceptions so that holidays can be
@@ -270,17 +290,26 @@ class FN025(models.Model):
         help_text="Description", max_length=50, default="Holiday"
     )
 
+    slug = models.SlugField(blank=True, unique=True, editable=False,)
+
     class Meta:
         verbose_name = "FN025 - Exception Date"
         ordering = ["date"]
+        unique_together = ["season", "date"]
 
-    #    def get_dtp_nm(self):
-    #        """the day types are stored in the FN023 table.  We want to return
-    #        dpt_nm from FN023 where the season and dpt match."""
-    #
-    #        dtp_nm = FN023.objects.filter(season=self.season,
-    #                                      dtp=self.dpt1).values('dpt_name')[0]
-    #        return dpt_nm
+    def save(self, *args, **kwargs):
+        """
+        Create a slug as a combination of the prject code, the season code and the date.
+
+        """
+
+        raw_slug = "-".join(
+            [self.season.creel.prj_cd, self.season.ssn, self.date.strftime("%Y-%m-%d"),]
+        )
+
+        self.slug = slugify(raw_slug)
+
+        super(FN025, self).save(*args, **kwargs)
 
     def __str__(self):
         """return the object type, the date, the season name, and
@@ -290,6 +319,13 @@ class FN025(models.Model):
         fdate = datetime.strftime(self.date, "%Y-%m-%d")
         repr = "<ExceptionDate: {} ({}-{})>"
         return repr.format(fdate, self.season.ssn_des, self.season.creel.prj_cd)
+
+    @property
+    def creel(self):
+        """A shortcut method to directly access the creel object - allows use
+        of same permission class on different api endpoints.
+        """
+        return self.season.creel
 
 
 class FN026(models.Model):
