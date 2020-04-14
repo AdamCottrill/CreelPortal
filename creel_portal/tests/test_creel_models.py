@@ -1,6 +1,9 @@
 import pytest
+from django.core.exceptions import ValidationError
 
 from datetime import datetime
+
+from creel_portal.models.creel import FN025
 
 from .factories.fishnet2_factories import FN011Factory
 from .factories.creel_factories import (
@@ -97,6 +100,39 @@ def test_exception_dates_repr():
     shouldbe = "<ExceptionDate: {} ({}-{})>".format(datestring, ssn_des, prj_cd)
 
     assert str(exceptiondate) == shouldbe
+
+
+fn025_dates = [
+    ["2017-10-15", "Date occurs before the associated season."],
+    ["2017-12-15", "Date occurs after the associated season."],
+]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("datestring,expected", fn025_dates)
+def test_exception_date_clean(datestring, expected):
+    """The FN025 model has a clean method that verifies that the exception
+    date falls within the bounds of its associated season.  Verify
+    that it works.
+
+    """
+    prj_cd = "LHA_SC11_123"
+    ssn_date0 = datetime(2017, 11, 1)
+    ssn_date1 = datetime(2017, 11, 30)
+    # FN025_date = datetime(2017, 12, 10)
+    FN025_date = datetime.strptime(datestring, "%Y-%m-%d")
+
+    creel = FN011Factory(prj_cd=prj_cd)
+    season = FN022Factory(creel=creel, ssn_date0=ssn_date0, ssn_date1=ssn_date1)
+    fn025 = FN025(season=season, dtp1="1", date=FN025_date)
+
+    with pytest.raises(ValidationError) as excinfo:
+        fn025.save()
+
+    # expected = "Date is not in the associated season."
+    observed = excinfo.value.messages[0]
+
+    assert expected == observed
 
 
 def test_space_repr():
@@ -355,7 +391,7 @@ def test_sama_check_exception_date():
     # A thursday between season start and end dates
     mydate = datetime.strptime("2017-02-09", "%Y-%m-%d")
 
-    # make my date an exceptino
+    # make my date an exception
     FN025Factory(season=season, dtp1=dtp, date=mydate)
 
     sama1 = FN111Factory(

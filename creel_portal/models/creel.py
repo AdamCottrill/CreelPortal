@@ -26,7 +26,8 @@
 from datetime import datetime, timedelta
 from django.db import models
 from django.template.defaultfilters import slugify
-
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 from .fishnet2 import FN011
 
@@ -290,12 +291,25 @@ class FN025(models.Model):
         help_text="Description", max_length=50, default="Holiday"
     )
 
-    slug = models.SlugField(blank=True, unique=True, editable=False,)
+    slug = models.SlugField(blank=True, unique=True, editable=False)
 
     class Meta:
         verbose_name = "FN025 - Exception Date"
         ordering = ["date"]
         unique_together = ["season", "date"]
+
+    def clean(self):
+        """The exception date must fall within the dates of the assoicated season."""
+
+        if self.date < self.season.ssn_date0.date():
+            raise ValidationError(
+                {"date": _("Date occurs before the associated season.")}
+            )
+
+        if self.date > self.season.ssn_date1.date():
+            raise ValidationError(
+                {"date": _("Date occurs after the associated season.")}
+            )
 
     def save(self, *args, **kwargs):
         """
@@ -304,11 +318,11 @@ class FN025(models.Model):
         """
 
         raw_slug = "-".join(
-            [self.season.creel.prj_cd, self.season.ssn, self.date.strftime("%Y-%m-%d"),]
+            [self.season.creel.prj_cd, self.season.ssn, self.date.strftime("%Y-%m-%d")]
         )
 
         self.slug = slugify(raw_slug)
-
+        self.full_clean()
         super(FN025, self).save(*args, **kwargs)
 
     def __str__(self):
