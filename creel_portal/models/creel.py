@@ -521,7 +521,7 @@ class FN111(models.Model):
     weather = models.IntegerField(choices=WEATHER_CHOICES, blank=True, null=True)
 
     help_str = "Comments about current interview period."
-    comment1 = models.CharField(
+    comment1 = models.TextField(
         max_length=200, blank=True, null=True, help_text=help_str
     )
     daycode = models.CharField(max_length=1, blank=False, db_index=True)

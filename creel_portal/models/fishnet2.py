@@ -59,7 +59,7 @@ class FN011(models.Model):
         blank=False,
         on_delete=models.CASCADE,
     )
-    field_crew = models.ManyToManyField(User)
+    field_crew = models.ManyToManyField(User, related_name="creel_crew")
 
     prj_date0 = models.DateField(help_text="Start Date", blank=False)
     prj_date1 = models.DateField(help_text="End Date", blank=False)
@@ -326,9 +326,7 @@ class FN123(models.Model):
     interview = models.ForeignKey(
         FN121, related_name="catch_counts", on_delete=models.CASCADE
     )
-    species = models.ForeignKey(
-        Species, related_name="catch_counts", on_delete=models.CASCADE
-    )
+    species = models.ForeignKey(Species, on_delete=models.CASCADE)
 
     grp = models.CharField(max_length=3, default="00", db_index=True)
     sek = models.BooleanField(default=True)

@@ -496,7 +496,7 @@ class FR715(models.Model):
         FR712, related_name="angler_options", on_delete=models.CASCADE
     )
 
-    ang_fn = models.CharField(max_length=2, choices=ANG_FN_CHOICES)
+    ang_fn = models.CharField(max_length=8, choices=ANG_FN_CHOICES)
     ang_val = models.CharField(max_length=4, blank=True, null=True)
     ang_freq = models.IntegerField()
     ang_prop = models.FloatField()

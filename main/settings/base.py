@@ -11,6 +11,18 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+from django.core.exceptions import ImproperlyConfigured
+
+
+def get_env_variable(var_name):
+    """Get the environment variable or return exception (from page 39 of
+    2-scoops"""
+    try:
+        return os.environ[var_name]
+    except KeyError:
+        error_msg = "Set the %s environment variable" % var_name
+        raise ImproperlyConfigured(error_msg)
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -36,14 +48,13 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.gis",
 ]
 
 THIRD_PARTY_APPS = ["rest_framework", "django_filters", "myusers", "common"]
 
 
-LOCAL_APPS = [
-    "creel_portal",
-]
+LOCAL_APPS = ["creel_portal"]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -64,7 +75,7 @@ ROOT_URLCONF = "main.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.abspath(os.path.join(BASE_DIR, "../creel_portal/templates")),],
+        "DIRS": [os.path.abspath(os.path.join(BASE_DIR, "../creel_portal/templates"))],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -123,6 +134,11 @@ STATICFILES_DIRS = [
     # os.path.join(BASE_DIR, "static"),
 ]
 
+VIRTUAL_ENV = os.environ["VIRTUAL_ENV"]
+OSGEO_VENV = os.path.join(VIRTUAL_ENV, "Lib/site-packages/osgeo")
+GEOS_LIBRARY_PATH = os.path.join(OSGEO_VENV, "geos_c.dll")
+GDAL_LIBRARY_PATH = os.path.join(OSGEO_VENV, "gdal300.dll")
+os.environ["PATH"] += os.pathsep + str(OSGEO_VENV)
 
 # custom user settings
 AUTH_USER_MODEL = "myusers.CustomUser"

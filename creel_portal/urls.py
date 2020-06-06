@@ -31,9 +31,9 @@ router.register(r"age_estimates", api_views.AgeEstimateViewSet)
 
 
 urlpatterns = [
-    path("", views.CreelListView.as_view(), name="creel_list",),
-    path("", views.CreelListView.as_view(), name="home",),
-    path("<str:lake>/", views.CreelListView.as_view(), name="creels_by_lake",),
+    path("", views.CreelListView.as_view(), name="creel_list"),
+    path("", views.CreelListView.as_view(), name="home"),
+    path("<str:lake>/", views.CreelListView.as_view(), name="creels_by_lake"),
     path(
         ("creel_detail/<slug:slug>/"),
         views.CreelDetailView.as_view(),

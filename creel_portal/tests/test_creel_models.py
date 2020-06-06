@@ -424,7 +424,7 @@ def test_sama_check_period():
     prdtm1 = datetime.strptime("12:00", "%H:%M").time()
     period = FN024Factory(daytype=daytype, prd=prd, prdtm0=prdtm0, prdtm1=prdtm1)
 
-    prd = "noon"
+    prd = "no"
     prdtm0 = datetime.strptime("12:00", "%H:%M").time()
     prdtm1 = datetime.strptime("16:00", "%H:%M").time()
     period2 = FN024Factory(daytype=daytype, prd=prd, prdtm0=prdtm0, prdtm1=prdtm1)

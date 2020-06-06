@@ -11,8 +11,9 @@
 =============================================================
 """
 
+import django_settings
 
-import django
+# import django
 import sqlite3
 import os
 
@@ -20,9 +21,8 @@ from datetime import datetime
 
 os.chdir("./..")
 
-import django_settings
 
-django.setup()
+# django.setup()
 
 
 from django.contrib.auth import get_user_model
@@ -281,7 +281,7 @@ FN024_cache = get_FN024_cache()
 # ==================================
 #     FN025 - Exception Dates
 
-sql = """SELECT PRJ_CD, [DATE], DTP1 from FN025;"""
+sql = """SELECT distinct PRJ_CD, [DATE], DTP1 from FN025;"""
 
 cursor.execute(sql)
 rs = cursor.fetchall()
@@ -301,6 +301,10 @@ for record in rs:
     )
     x["season"] = season
     x["date"] = my_date
+
+    slug = "-".join([prj_cd, season.ssn, my_date.strftime("%Y-%m-%d")])
+    x["slug"] = slugify(slug)
+
     item = FN025(**x)
     # item.save()
     objects.append(item)
@@ -991,6 +995,9 @@ FR712.objects.bulk_create(objects)
 print("Done adding FR712 records.")
 
 
+FR712_cache = get_FR712_cache()
+
+
 # ==================================
 #    FR713  - Effort Estimates
 
@@ -1385,5 +1392,5 @@ print("Done adding FR715 records.")
 conn.commit()
 
 # clean up
-cur.close()
+cursor.close()
 conn.close()

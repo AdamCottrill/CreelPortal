@@ -1,0 +1,5 @@
+include LICENSE
+include README.rst
+recursive-include creel_portal/docs *
+recursive-include creel_portal/static *
+recursive-include creel_portal/templates *

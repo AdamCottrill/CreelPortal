@@ -4,10 +4,18 @@
 
 from main.settings.base import *
 
+
 SECRET_KEY = "testing"
 
-DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3"}}
-
+DATABASES = {
+    "default": {
+        "ENGINE": "django.contrib.gis.db.backends.postgis",
+        "NAME": "creel_portal",
+        "USER": get_env_variable("PGUSER"),
+        "PASSWORD": get_env_variable("PGPASSWORD"),
+        "HOST": "localhost",
+    }
+}
 
 PASSWORD_HASHERS = ("django.contrib.auth.hashers.MD5PasswordHasher",)
 
