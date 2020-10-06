@@ -1,29 +1,31 @@
+
 {% extends "creel_portal_base.html" %}
 
 {% block extrahead %}
 
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
-
-<script src='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.js'></script>
-<link href='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.css' rel='stylesheet' />
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.js"></script>
 
 
-<style type="text/css" media="screen">
- .tab-content {
-     padding: 5px;
- }
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.6.0/leaflet.js" integrity="sha256-fNoRrwkP2GuYPbNSJmMJOCyfRB2DhPQe0rGTgzRsyso=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.6.0/leaflet.css" integrity="sha256-SHMGCYmST46SoyGgo4YR/9AlK1vf3ff84Aq9yK4hdqM=" crossorigin="anonymous" />
 
- .nav-tabs {
-     margin-bottom: 5px;
-     margin-top: 20px;
- }
 
- .btn-default:active, {
-     background-color: #8064A2;
-     border-color: #8064A2;
- }
+    <style type="text/css" media="screen">
+     .tab-content {
+         padding: 5px;
+     }
 
-</style>
+     .nav-tabs {
+         margin-bottom: 5px;
+         margin-top: 20px;
+     }
+
+     .btn-default:active, {
+         background-color: #8064A2;
+         border-color: #8064A2;
+     }
+
+    </style>
 
 
 
@@ -33,696 +35,692 @@
 
 {% block content %}
 
-<div  class="row" >
-    <div class="col-md-4" >
+    <div  class="row" >
+        <div class="col-md-4" >
 
-        {% if not object.final_run %}
+            {% if not object.final_run %}
 
-            <div class="alert alert-danger" role="alert">
-                This creel does not appear to have been completed.                
-            </div>
+                <div class="alert alert-danger" role="alert">
+                    This creel does not appear to have been completed.                
+                </div>
+                
+            {% endif %}
+
             
-         {% endif %}
-
-        
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Project Details</h3>
-            </div>
-            <div class="panel-body">
-                <table class="table">
-                    <tbody>
-                        <tr>
-                            <td>Project Name:</td>
-                            <td>{{ object.prj_nm|title }}</td>
-                        </tr>
-                        <tr>
-                            <td>Project Code:</td>
-                            <td>{{ object.prj_cd }}</td>
-                        </tr>
-                        <tr>
-                            <td>Project Lead:</td>
-                            <td>{{ object.prj_ldr|title }}</td>
-                        </tr>
-                        <tr>
-                            <td>Project Start:</td>
-                            <td>{{ object.prj_date0 }}</td>
-                        </tr>
-                        <tr>
-                            <td>Project End:</td>
-                            <td>{{ object.prj_date1 }}</td>
-                        </tr>
-
-                        <tr>
-                            <td>Contact Method:</td>
-                            <td>{{ object.final_run.get_contmeth_display }} ({{ object.final_run.contmeth }})</td>
-                        </tr>
-                        <tr>
-                            <td>Strata Combine Mask:</td>
-                            <td>{{ object.final_run.strat_comb }}</td>
-                        </tr>
-
-                        <tr>
-                            <td>Estimation Method:</td>
-                            <td>{{ object.final_run.get_fr71_est_display }}</td>
-                        </tr>
-
-                        <tr>
-                            <td>Estimation Unit:</td>
-                            <td>{{ object.final_run.get_fr71_unit_display }}</td>
-                        </tr>
-
-
-                        <tr>
-                            <td>Final Run:</td>
-                            <td>{{ object.final_run.run }}</td>
-                        </tr>
-
-
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Explore:</h3>
-            </div>
-            <div class="panel-body">
-
-                <div  class="row" >
-                    <div  class="col-md-4" >
-                        <a class="btn btn-primary btn-block" href="{% url 'effort_estimates_plots' object.slug %}" role="button">Effort</a>
-                    </div>
-                    <div  class="col-md-4" >
-                        <a class="btn btn-primary btn-block" href="{% url 'catch_estimates_plots' object.slug %}" role="button">Catch/Harvest</a>
-                    </div>
-                    <div  class="col-md-4" >
-                        <a class="btn btn-primary btn-block" href="#" role="button" disabled="disabled">Option Questions</a>
-                    </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Project Details</h3>
                 </div>
+                <div class="panel-body">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td>Project Name:</td>
+                                <td>{{ object.prj_nm|title }}</td>
+                            </tr>
+                            <tr>
+                                <td>Project Code:</td>
+                                <td>{{ object.prj_cd }}</td>
+                            </tr>
+                            <tr>
+                                <td>Project Lead:</td>
+                                <td>{{ object.prj_ldr|title }}</td>
+                            </tr>
+                            <tr>
+                                <td>Project Start:</td>
+                                <td>{{ object.prj_date0 }}</td>
+                            </tr>
+                            <tr>
+                                <td>Project End:</td>
+                                <td>{{ object.prj_date1 }}</td>
+                            </tr>
+
+                            <tr>
+                                <td>Contact Method:</td>
+                                <td>{{ object.final_run.get_contmeth_display }} ({{ object.final_run.contmeth }})</td>
+                            </tr>
+                            <tr>
+                                <td>Strata Combine Mask:</td>
+                                <td>{{ object.final_run.strat_comb }}</td>
+                            </tr>
+
+                            <tr>
+                                <td>Estimation Method:</td>
+                                <td>{{ object.final_run.get_fr71_est_display }}</td>
+                            </tr>
+
+                            <tr>
+                                <td>Estimation Unit:</td>
+                                <td>{{ object.final_run.get_fr71_unit_display }}</td>
+                            </tr>
 
 
-            </div>
-        </div>
+                            <tr>
+                                <td>Final Run:</td>
+                                <td>{{ object.final_run.run }}</td>
+                            </tr>
 
 
-    </div
-    <div class="col-md-8" >
-        <div id="map" style="width: 700px; height: 700px;"></div>
-    </div>
-
-    <div>
-
-
-        
-
-        <!-- Nav tabs -->
-        <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active"><a href="#summary" aria-controls="summary" role="tab" data-toggle="tab">Project Summary</a></li>
-            <li role="presentation"><a href="#strata" aria-controls="strata" role="tab" data-toggle="tab">Strata</a></li>
-            <li role="presentation"><a href="#effort" aria-controls="effort" role="tab" data-toggle="tab">Effort</a></li>
-            <li role="presentation"><a href="#catch" aria-controls="catch" role="tab" data-toggle="tab">Catch</a></li>
-        </ul>
-        
-        <!-- Tab panes -->
-        <div class="tab-content">
-
-            <div role="tabpanel" class="tab-pane active" id="summary">
-
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Project Summary</h3>
-                    </div>
-                    <div class="panel-body">
-                        {{ object.comment0 }}
-                    </div>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            <div role="tabpanel" class="tab-pane" id="strata">
-                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingOne">
-                            <h4 class="panel-title">
-                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                    Seasons
-                                </a>
-                            </h4>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Explore:</h3>
+                </div>
+                <div class="panel-body">
+
+                    <div  class="row" >
+                        <div  class="col-md-4" >
+                            <a class="btn btn-primary btn-block" href="{% url 'effort_estimates_plots' object.slug %}" role="button">Effort</a>
                         </div>
-                        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
-                            <div class="panel-body">
+                        <div  class="col-md-4" >
+                            <a class="btn btn-primary btn-block" href="{% url 'catch_estimates_plots' object.slug %}" role="button">Catch/Harvest</a>
+                        </div>
+                        <div  class="col-md-4" >
+                            <a class="btn btn-primary btn-block" href="#" role="button" disabled="disabled">Option Questions</a>
+                        </div>
+                    </div>
 
-                                {% for ssn in object.seasons.all %}
 
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <h3 class="panel-title"> {{ ssn.ssn_des|title }} ({{ssn.ssn}}) </h3>
-                                    </div>
-                                    <div class="panel-body">
+                </div>
+            </div>
 
-                                        <div class="row">
-                                            <div class="col-md-4"><strong>Season Start:</strong> {{ ssn.ssn_date0 }}</div>
-                                            <div class="col-md-4"><strong>Season End:</strong> {{ ssn.ssn_date1 }}</div>
-                                        </div>
+
+        </div
+        <div class="col-md-8" >
+            <div id="map" style="width: 700px; height: 700px;"></div>
+        </div>
+
+        <div>
+
+
+            
+
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#summary" aria-controls="summary" role="tab" data-toggle="tab">Project Summary</a></li>
+                <li role="presentation"><a href="#strata" aria-controls="strata" role="tab" data-toggle="tab">Strata</a></li>
+                <li role="presentation"><a href="#effort" aria-controls="effort" role="tab" data-toggle="tab">Effort</a></li>
+                <li role="presentation"><a href="#catch" aria-controls="catch" role="tab" data-toggle="tab">Catch</a></li>
+            </ul>
+            
+            <!-- Tab panes -->
+            <div class="tab-content">
+
+                <div role="tabpanel" class="tab-pane active" id="summary">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Project Summary</h3>
+                        </div>
+                        <div class="panel-body">
+                            {{ object.comment0 }}
+                        </div>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="strata">
+                    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="headingOne">
+                                <h4 class="panel-title">
+                                    <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                        Seasons
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                                <div class="panel-body">
+
+                                    {% for ssn in object.seasons.all %}
 
                                         <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <h3 class="panel-title"> {{ ssn.ssn_des|title }} ({{ssn.ssn}}) </h3>
+                                            </div>
                                             <div class="panel-body">
-                                                <strong>DayTypes</strong>
-                                                <ul>
-                                                    {% for dt in ssn.daytypes.all %}
-                                                    <li>{{ dt.dtp_nm | title }} ({{ dt.dtp }})</li>
+
+                                                <div class="row">
+                                                    <div class="col-md-4"><strong>Season Start:</strong> {{ ssn.ssn_date0 }}</div>
+                                                    <div class="col-md-4"><strong>Season End:</strong> {{ ssn.ssn_date1 }}</div>
+                                                </div>
+
+                                                <div class="panel panel-default">
+                                                    <div class="panel-body">
+                                                        <strong>DayTypes</strong>
+                                                        <ul>
+                                                            {% for dt in ssn.daytypes.all %}
+                                                                <li>{{ dt.dtp_nm | title }} ({{ dt.dtp }})</li>
+                                                                <ul>
+                                                                    {% for period in dt.periods.all %}
+                                                                        <li> Period {{ period.prd }}: {{period.prdtm0}} - {{ period.prdtm1}}</li>
+                                                                    {% endfor %}
+                                                                </ul>
+                                                            {% endfor %}
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                {% if ssn.exception_dates.all %}
+                                                    <strong>Exception Dates:</strong>
                                                     <ul>
-                                                        {% for period in dt.periods.all %}
-                                                        <li> Period {{ period.prd }}: {{period.prdtm0}} - {{ period.prdtm1}}</li>
+                                                        {% for x in ssn.exception_dates.all %}
+                                                            <li>{{ x.date }}</li>
                                                         {% endfor %}
+                                                {% endif %}
                                                     </ul>
-                                                    {% endfor %}
-                                                </ul>
                                             </div>
                                         </div>
-                                        {% if ssn.exception_dates.all %}
-                                        <strong>Exception Dates:</strong>
-                                        <ul>
-                                            {% for x in ssn.exception_dates.all %}
-                                            <li>{{ x.date }}</li>
-                                            {% endfor %}
-                                            {% endif %}
-                                        </ul>
-                                    </div>
+                                    {% endfor %}
                                 </div>
-                                {% endfor %}
                             </div>
                         </div>
-                    </div>
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingTwo">
-                            <h4 class="panel-title">
-                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                    Spatial Strata
-                                </a>
-                            </h4>
-                        </div>
-                        <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-                            <div class="panel-body">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Space</th>
-                                            <th>Descrption</th>
-                                            <th>Area Size</th>
-                                            <th>Area Count</th>
-                                            <th>Area List</th>
-                                            <th>Area Weight</th>
-                                            <th></th>
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="headingTwo">
+                                <h4 class="panel-title">
+                                    <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                        Spatial Strata
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Space</th>
+                                                <th>Descrption</th>
+                                                <th>Area Size</th>
+                                                <th>Area Count</th>
+                                                <th>Area List</th>
+                                                <th>Area Weight</th>
+                                                <th></th>
 
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for item in object.spatial_strata.all %}
-                                        <tr>
-                                            <td>{{ item.space }}</td>
-                                            <td>{{ item.space_des|title }}</td>
-                                            <td>{{ item.space_siz }}</td>
-                                            <td>{{ item.area_count }}</td>
-                                            <td>{{ item.area_lst }}</td>
-                                            <td>{{ item.area_wt }}</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in object.spatial_strata.all %}
+                                                <tr>
+                                                    <td>{{ item.space }}</td>
+                                                    <td>{{ item.space_des|title }}</td>
+                                                    <td>{{ item.space_siz }}</td>
+                                                    <td>{{ item.area_count }}</td>
+                                                    <td>{{ item.area_lst }}</td>
+                                                    <td>{{ item.area_wt }}</td>
 
-                                            <td>
+                                                    <td>
 
-                                                {% url 'edit_creel_space' item.creel.slug item.space as the_url %}
+                                                        {% url 'edit_creel_space' item.creel.slug item.space as the_url %}
 
-                                                {% if item.ddlat and item.ddlon %}
+                                                        {% if item.ddlat and item.ddlon %}
 
-                                                <a class="btn btn-xs btn-primary" href="{{ the_url }}" role="button">
-                                                    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Edit
-                                                </a>
+                                                            <a class="btn btn-xs btn-primary" href="{{ the_url }}" role="button">
+                                                                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Edit
+                                                            </a>
 
                                             </button>
-                                            {% else %}
+                                                        {% else %}
 
                                             <a class="btn btn-xs btn-danger" href="{{ the_url }}" role="button">
                                                 <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Add
                                             </a>
 
 
-                                            {% endif %}
+                                                        {% endif %}
 
-                                            </td>
+                                                    </td>
 
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingThree">
-                            <h4 class="panel-title">
-                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                    Fishing Modes
-                                </a>
-                            </h4>
-                        </div>
-                        <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-                            <div class="panel-body">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Mode</th>
-                                            <th>Descrption</th>
-                                            <th>ATY Unit</th>
-                                            <th>Interview Unit</th>
-                                            <th>Check Flag</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for item in object.modes.all %}
-                                        <tr>
-                                            <td>{{ item.mode }}</td>
-                                            <td>{{ item.mode_des|title }}</td>
-                                            <td>{{ item.atyunit }}</td>
-                                            <td>{{ item.itvunit }}</td>
-                                            <td>{{ item.chkflag }}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>  <!-- tab pabel -->
-
-            <div role="tabpanel" class="tab-pane" id="effort">
-
-                {% if effort_estimates %}
-                
-
-                {% for strata in effort_estimates %}
-                    {% for fr713 in effort_estimates %}
-
-                        {% include 'creel_portal/_details_effort_panel.html' %}
-
-                    {% endfor %}
-                {% endfor %}
-
-
-                
-                        {% else %}
-
-                <div class="alert alert-warning" role="alert">
-                    <h4>Oops - It doesn't look like there are any Effort Estimates for this creel</h4>
-                    
-                </div>
-
-                        {% endif %}
-
-
-
-            </div>
-            <div role="tabpanel" class="tab-pane" id="catch">
-
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Catch, Harvest and CPUE</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="panel panel-default">
-                            <div class="panel-body">
-                                <div class="row" >
-                                    <div class="col-md-3" >
-                                        <div id="estObsButtons" class="btn-group" data-toggle="buttons">
-                                            <label class="btn btn-default btn-xs active">
-                                                <input type="radio" name="estObs" data-value="estimated" checked> Estimated
-                                            </label>
-                                            <label class="btn btn-default btn-xs">
-                                                <input type="radio" name="estObs" data-value="observed"> Observed
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3" >
-                                        <div id="catchHarvestButtons" class="btn-group" data-toggle="buttons">
-                                            <label class="btn btn-default btn-xs active">
-                                                <input type="radio" name="catchHarvest" data-value="catch" checked> Catch
-                                            </label>
-                                            <label class="btn btn-default btn-xs">
-                                                <input type="radio" name="catchHarvest" data-value="harvest"> Harvest
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3" >
-                                        <div id="targetButtons" class="btn-group" data-toggle="buttons">
-                                            <label class="btn btn-default btn-xs active">
-                                                <input type="radio" name="targeted" data-value="all" checked> All
-                                            </label>
-
-                                            <label class="btn btn-default btn-xs">
-                                                <input type="radio" name="targeted" data-value="targeted"> Targeted
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3" >
-                                        <div id="chartTypeButtons" class="btn-group" data-toggle="buttons">
-                                            <label class="btn btn-default btn-xs active">
-                                                <input type="radio" name="chartType" data-value="bar" checked> Bar
-                                            </label>
-                                            <label class="btn btn-default btn-xs">
-                                                <input type="radio" name="chartType" data-value="pie"> Pie
-                                            </label>
-                                        </div>
-                                    </div>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
                         <div class="panel panel-default">
-                            <div class="panel-body">
-                                <div>
-                                    <canvas id="myChart" style="width: 500px; height: 200px"></canvas>
+                            <div class="panel-heading" role="tab" id="headingThree">
+                                <h4 class="panel-title">
+                                    <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                        Fishing Modes
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Mode</th>
+                                                <th>Descrption</th>
+                                                <th>ATY Unit</th>
+                                                <th>Interview Unit</th>
+                                                <th>Check Flag</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in object.modes.all %}
+                                                <tr>
+                                                    <td>{{ item.mode }}</td>
+                                                    <td>{{ item.mode_des|title }}</td>
+                                                    <td>{{ item.atyunit }}</td>
+                                                    <td>{{ item.itvunit }}</td>
+                                                    <td>{{ item.chkflag }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>  <!-- tab pabel -->
 
+                <div role="tabpanel" class="tab-pane" id="effort">
 
-                        {% if catch_estimates %}
+                    {% if effort_estimates %}
                         
-                        {% regroup catch_estimates by fr712.stratum.stratum_label as stratum_list %}
-                        
-                        {% for fr714 in stratum_list %}
-                            {% include 'creel_portal/_detail_catch_panel.html' %}
+
+                        {% for strata in effort_estimates %}
+                            {% for fr713 in effort_estimates %}
+
+                                {% include 'creel_portal/_details_effort_panel.html' %}
+
+                            {% endfor %}
                         {% endfor %}
 
-                        {% else %}
+
+                        
+                    {% else %}
 
                         <div class="alert alert-warning" role="alert">
-                            <h4>Oops - It doesn't look like there are any Catch Estimates for this creel</h4>
+                            <h4>Oops - It doesn't look like there are any Effort Estimates for this creel</h4>
                             
                         </div>
 
-                        {% endif %}
-                        
-                        <!--
-
-
-                             {% comment %}
-                             {% for fr714 in catch_estimates %}
-
-                             {% endfor %}
-                             {% endcomment %}
+                    {% endif %}
 
 
 
-                        -->
+                </div>
+                <div role="tabpanel" class="tab-pane" id="catch">
 
-                        
-                        
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Catch, Harvest and CPUE</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    <div class="row" >
+                                        <div class="col-md-3" >
+                                            <div id="estObsButtons" class="btn-group" data-toggle="buttons">
+                                                <label class="btn btn-default btn-xs active">
+                                                    <input type="radio" name="estObs" data-value="estimated" checked> Estimated
+                                                </label>
+                                                <label class="btn btn-default btn-xs">
+                                                    <input type="radio" name="estObs" data-value="observed"> Observed
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3" >
+                                            <div id="catchHarvestButtons" class="btn-group" data-toggle="buttons">
+                                                <label class="btn btn-default btn-xs active">
+                                                    <input type="radio" name="catchHarvest" data-value="catch" checked> Catch
+                                                </label>
+                                                <label class="btn btn-default btn-xs">
+                                                    <input type="radio" name="catchHarvest" data-value="harvest"> Harvest
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3" >
+                                            <div id="targetButtons" class="btn-group" data-toggle="buttons">
+                                                <label class="btn btn-default btn-xs active">
+                                                    <input type="radio" name="targeted" data-value="all" checked> All
+                                                </label>
+
+                                                <label class="btn btn-default btn-xs">
+                                                    <input type="radio" name="targeted" data-value="targeted"> Targeted
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3" >
+                                            <div id="chartTypeButtons" class="btn-group" data-toggle="buttons">
+                                                <label class="btn btn-default btn-xs active">
+                                                    <input type="radio" name="chartType" data-value="bar" checked> Bar
+                                                </label>
+                                                <label class="btn btn-default btn-xs">
+                                                    <input type="radio" name="chartType" data-value="pie"> Pie
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    <div>
+                                        <canvas id="myChart" style="width: 500px; height: 200px"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            {% if catch_estimates %}
+                                
+                                {% regroup catch_estimates by fr712.stratum.stratum_label as stratum_list %}
+                                
+                                {% for fr714 in stratum_list %}
+                                    {% include 'creel_portal/_detail_catch_panel.html' %}
+                                {% endfor %}
+
+                            {% else %}
+
+                                <div class="alert alert-warning" role="alert">
+                                    <h4>Oops - It doesn't look like there are any Catch Estimates for this creel</h4>
+                                    
+                                </div>
+
+                            {% endif %}
+                            
+                            <!--
+
+
+                                 {% comment %}
+                                 {% for fr714 in catch_estimates %}
+
+                                 {% endfor %}
+                                 {% endcomment %}
+
+
+
+                            -->
+
+                            
+                            
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 {% endblock content %}
 
 {% block javascript %}
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 
 
+    <script type="text/javascript">
+
+     // add the creel locations here as a json string.
+     var spaces = {{ spaces|safe }};
 
 
+     // intiailize map based on the lake this creel occurs in
+     //var lat = {{ creel.lake.ddlat }}
+     //    var lon =  {{ creel.lake.ddlon }}
+     //        var zoom =  {{ creel.lake.zoom }}
 
-<script type="text/javascript">
-
- // add the creel locations here as a json string.
- var spaces = {{ spaces|safe }};
-
-
- // intiailize map based on the lake this creel occurs in
- //var lat = {{ creel.lake.ddlat }}
- //    var lon =  {{ creel.lake.ddlon }}
- //        var zoom =  {{ creel.lake.zoom }}
-
- let lat=45.0;
- let lon = -81.0;
- let zoom = 7;
- 
-
- var  map = new L.map('map').setView([lat,lon], zoom);
-
- function drawMap(){
-
-     var spaceMarkers = new L.FeatureGroup();
-     spaceMarkers.clearLayers();
-
-     $.each( spaces, function(i, x) {
-         if(x.ddlat & x.ddlon){
-             var marker = L.marker([x.ddlat, x.ddlon]);
-             popup = "<p>Space: " + x.label + "</p>"
-             marker.bindPopup(popup);
-
-             spaceMarkers.addLayer(marker);
-         }
-     });
-
-     map.addLayer(spaceMarkers);
-
-     L.mapbox.accessToken = 'pk.eyJ1IjoiYWNvdHRyaWxsIiwiYSI6ImNpazVmb3Q2eDAwMWZpZm0yZTQ1cjF3NTkifQ.Pb1wCYs0lKgjnTGz43DjVQ';
-     // Replace 'mapbox.streets' with your map id.
-     var mapboxTiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=' + L.mapbox.accessToken, {
-         attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
-     }).addTo(map);
-
- }
-
-
- //============================================================
- // catch plots
-
-
- {% if catch_totals %}
- var catch_data = {{ catch_totals|safe }};
- {% else %}
- var catch_data = {};
- {% endif %}
- 
- // data arrays for plots:
- let species = [];
- let catne = [];
- let catne1 = [];
- let catno_s = [];
- let catno1_s = [];
- let hvsno_s = [];
- let hvsno1_s = [];
- let hvsne = [];
- let hvsne1 = [];
-
- //=====================================
- // plot for catch counts by species:
- let estObs = "estimated";
- let catchHarvest = "catch";
- let targeted = false;
- let chartType = 'bar'
- let colours = [];
- let myChart;
- let x = [];
- let chart_title = estObs + ' ' + catchHarvest;
-
-
- const populate_arrays = function(){
+     let lat=45.0;
+     let lon = -81.0;
+     let zoom = 7;
      
-     // load the catch data into the proper arrays
-     $.each(catch_data, function(i,d){
-         if(d.xcatne>0){
-             species.push(d.common_name);
-             catne.push(d.xcatne);
-             catne1.push(d.xcatne1);
-             catno_s.push(d.xcatno_s);
-             catno1_s.push(d.xcatno1_s);
-             hvsno_s.push(d.xhvsno_s);
-             hvsno1_s.push(d.xhvsno1_s);
-             hvsne.push(d.xhvsne);
-             hvsne1.push(d.xhvsne1);
-         }
-     });
- }
 
- $("#targetButtons :input").change(function() {
-     var what =  $(this).data("value");
-     if (what==='targeted'){
-         targeted = true;
-     } else {
-         targeted = false;
+     var  map = new L.map('map').setView([lat,lon], zoom);
+
+     function drawMap(){
+
+         var spaceMarkers = new L.FeatureGroup();
+         spaceMarkers.clearLayers();
+
+         $.each( spaces, function(i, x) {
+             if(x.ddlat & x.ddlon){
+                 var marker = L.marker([x.ddlat, x.ddlon]);
+                 popup = "<p>Space: " + x.label + "</p>"
+                 marker.bindPopup(popup);
+
+                 spaceMarkers.addLayer(marker);
+             }
+         });
+
+         map.addLayer(spaceMarkers);
+
+         // add the OpenStreetMap tiles
+         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+             attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+         }).addTo(map);
+
      }
-     myChart.destroy();
-     x = get_xvars();
-     chartTitle = makeTitle();
-     makeplot(species, x, colours, chartTitle, chartType)
-
- });
-
- $("#chartTypeButtons :input").change(function() {
-     chartType = $(this).data("value");
-     myChart.destroy();
-     x = get_xvars();
-     chartTitle = makeTitle();
-     makeplot(species, x, colours, chartTitle, chartType)
-
- });
 
 
- $("#catchHarvestButtons :input").change(function() {
-     catchHarvest = $(this).data("value");
-     myChart.destroy();
-     x = get_xvars();
-     chartTitle = makeTitle();
-     makeplot(species, x, colours, chartTitle, chartType)
-
- });
+     //============================================================
+     // catch plots
 
 
- $("#estObsButtons :input").change(function() {
-     estObs = $(this).data("value");
-     myChart.destroy();
-     x = get_xvars();
-     chartTitle = makeTitle();
-     makeplot(species, x, colours, chartTitle, chartType)
+     {% if catch_totals %}
+     var catch_data = {{ catch_totals|safe }};
+     {% else %}
+     var catch_data = {};
+     {% endif %}
+     
+     // data arrays for plots:
+     let species = [];
+     let catne = [];
+     let catne1 = [];
+     let catno_s = [];
+     let catno1_s = [];
+     let hvsno_s = [];
+     let hvsno1_s = [];
+     let hvsne = [];
+     let hvsne1 = [];
 
- });
+     //=====================================
+     // plot for catch counts by species:
+     let estObs = "estimated";
+     let catchHarvest = "catch";
+     let targeted = false;
+     let chartType = 'bar'
+     let colours = [];
+     let myChart;
+     let x = [];
+     let chart_title = estObs + ' ' + catchHarvest;
 
- var makeTitle = function(){
 
-     String.prototype.toProperCase = function () {
-         return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+     const populate_arrays = function(){
+         
+         // load the catch data into the proper arrays
+         $.each(catch_data, function(i,d){
+             if(d.xcatne>0){
+                 species.push(d.common_name);
+                 catne.push(d.xcatne);
+                 catne1.push(d.xcatne1);
+                 catno_s.push(d.xcatno_s);
+                 catno1_s.push(d.xcatno1_s);
+                 hvsno_s.push(d.xhvsno_s);
+                 hvsno1_s.push(d.xhvsno1_s);
+                 hvsne.push(d.xhvsne);
+                 hvsne1.push(d.xhvsne1);
+             }
+         });
+     }
+
+     $("#targetButtons :input").change(function() {
+         var what =  $(this).data("value");
+         if (what==='targeted'){
+             targeted = true;
+         } else {
+             targeted = false;
+         }
+         myChart.destroy();
+         x = get_xvars();
+         chartTitle = makeTitle();
+         makeplot(species, x, colours, chartTitle, chartType)
+
+     });
+
+     $("#chartTypeButtons :input").change(function() {
+         chartType = $(this).data("value");
+         myChart.destroy();
+         x = get_xvars();
+         chartTitle = makeTitle();
+         makeplot(species, x, colours, chartTitle, chartType)
+
+     });
+
+
+     $("#catchHarvestButtons :input").change(function() {
+         catchHarvest = $(this).data("value");
+         myChart.destroy();
+         x = get_xvars();
+         chartTitle = makeTitle();
+         makeplot(species, x, colours, chartTitle, chartType)
+
+     });
+
+
+     $("#estObsButtons :input").change(function() {
+         estObs = $(this).data("value");
+         myChart.destroy();
+         x = get_xvars();
+         chartTitle = makeTitle();
+         makeplot(species, x, colours, chartTitle, chartType)
+
+     });
+
+     var makeTitle = function(){
+
+         String.prototype.toProperCase = function () {
+             return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+         };
+
+         let targ = targeted ? " in targeted effort" : "";
+         let mytitle = estObs + ' ' + catchHarvest + targ;
+         return mytitle.toProperCase();
+
+     }
+
+     var get_xvars = function(){
+         let what;
+         if(!targeted){
+             if(estObs==='estimated'){
+                 if(catchHarvest==='harvest'){
+                     what = hvsne;
+                 } else {
+                     what = catne;
+                 }
+             } else {
+                 if(catchHarvest==='harvest'){
+                     what = hvsno_s;
+                 } else {
+                     what = catno_s;
+                 }
+             }
+         } else {
+             if(estObs==='estimated'){
+                 if(catchHarvest==='harvest'){
+                     what = hvsne1;
+                 } else {
+                     what = catne1;
+                 }
+             } else {
+                 if(catchHarvest==='harvest'){
+                     what = hvsno1_s;
+                 } else {
+                     what = catno1_s;
+                 }
+             }
+         }
+         return what;
+     }
+
+     var randomColorGenerator = function (n) {
+         // a simple little function that will create an array of n random colours.
+         var colours = [];
+
+         for (i = 1; i < n; i++) {
+             col = '#' + (Math.random().toString(16) + '0000000').slice(2, 8);
+             colours.push(col)
+         }
+
+         return colours
      };
 
-     let targ = targeted ? " in targeted effort" : "";
-     let mytitle = estObs + ' ' + catchHarvest + targ;
-     return mytitle.toProperCase();
 
- }
+     var makeplot = function (species, xvals, colours, title = "Estimated Catch", type=chartType) {
 
- var get_xvars = function(){
-     let what;
-     if(!targeted){
-         if(estObs==='estimated'){
-             if(catchHarvest==='harvest'){
-                 what = hvsne;
-             } else {
-                 what = catne;
+         var ctx = document.getElementById("myChart");
+         var options;
+
+         if(type==='bar'){
+             options = {
+                 scales: {
+                     yAxes: [{
+                         ticks: {
+                             beginAtZero:true
+                         }
+                     }]
+                 },
+
+                 legend: {
+                     display: false,
+                 },
+
+                 title: {
+                     fontSize: 20,
+                     display: true,
+                     text: title,
+                     position: 'top'
+                 },
+
              }
          } else {
-             if(catchHarvest==='harvest'){
-                 what = hvsno_s;
-             } else {
-                 what = catno_s;
-             }
-         }
-     } else {
-         if(estObs==='estimated'){
-             if(catchHarvest==='harvest'){
-                 what = hvsne1;
-             } else {
-                 what = catne1;
-             }
-         } else {
-             if(catchHarvest==='harvest'){
-                 what = hvsno1_s;
-             } else {
-                 what = catno1_s;
-             }
-         }
-     }
-     return what;
- }
+             options = {
+                 title: {
+                     fontSize: 20,
+                     display: true,
+                     text: title,
+                     position: 'top'
+                 },
+                 legend: {
+                     display: true,
+                     position: 'right'
+                 }
 
- var randomColorGenerator = function (n) {
-     // a simple little function that will create an array of n random colours.
-     var colours = [];
-
-     for (i = 1; i < n; i++) {
-         col = '#' + (Math.random().toString(16) + '0000000').slice(2, 8);
-         colours.push(col)
-     }
-
-     return colours
- };
+         }}
 
 
- var makeplot = function (species, xvals, colours, title = "Estimated Catch", type=chartType) {
-
-     var ctx = document.getElementById("myChart");
-     var options;
-
-     if(type==='bar'){
-         options = {
-             scales: {
-                 yAxes: [{
-                     ticks: {
-                         beginAtZero:true
-                     }
+         myChart = new Chart(ctx, {
+             type: chartType,
+             data: {
+                 labels: species,
+                 datasets: [{
+                     //label: title,
+                     data: xvals,
+                     backgroundColor: colours,
+                     //borderWidth: 1
                  }]
              },
+             options: options
+         });
+     }
 
-             legend: {
-                 display: false,
-             },
+     $(document).ready(function() {
 
-             title: {
-                 fontSize: 20,
-                 display: true,
-                 text: title,
-                 position: 'top'
-             },
+         drawMap();
 
-         }
-     } else {
-         options = {
-             title: {
-                 fontSize: 20,
-                 display: true,
-                 text: title,
-                 position: 'top'
-             },
-             legend: {
-                 display: true,
-                 position: 'right'
-             }
+         populate_arrays();
+         chartTitle = makeTitle();
+         colours = randomColorGenerator(catne.length);
+         x = get_xvars();
+         makeplot(species, catne, colours, chartTitle, chartType)
 
-     }}
+     }
+     );
 
-
-     myChart = new Chart(ctx, {
-         type: chartType,
-         data: {
-             labels: species,
-             datasets: [{
-                 //label: title,
-                 data: xvals,
-                 backgroundColor: colours,
-                 //borderWidth: 1
-             }]
-         },
-         options: options
-     });
- }
-
- $(document).ready(function() {
-
-     drawMap();
-
-     populate_arrays();
-     chartTitle = makeTitle();
-     colours = randomColorGenerator(catne.length);
-     x = get_xvars();
-     makeplot(species, catne, colours, chartTitle, chartType)
-
- }
- );
-
-</script>
+    </script>
 
 
 {% endblock javascript %}

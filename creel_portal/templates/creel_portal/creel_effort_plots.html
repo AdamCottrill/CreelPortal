@@ -15,8 +15,10 @@
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
 
-<script src='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.js'></script>
-<link href='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.css' rel='stylesheet' />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.6.0/leaflet.js" integrity="sha256-fNoRrwkP2GuYPbNSJmMJOCyfRB2DhPQe0rGTgzRsyso=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.6.0/leaflet.css" integrity="sha256-SHMGCYmST46SoyGgo4YR/9AlK1vf3ff84Aq9yK4hdqM=" crossorigin="anonymous" />
+
 
 <script src="{% static 'leaflet-bubble.js' %}"></script>
 
@@ -174,386 +176,385 @@
 
 {% block javascript %}
 
-<script type="text/javascript">
+    <script type="text/javascript">
 
 
- //function get_spaces() {
- //    return $.getJSON("{%  url 'creel_spaces' creel.slug %}");
- //}
+     //function get_spaces() {
+     //    return $.getJSON("{%  url 'creel_spaces' creel.slug %}");
+     //}
 
- var spaces = {{ spaces|safe }};
+     var spaces = {{ spaces|safe }};
 
 
- function get_map_points(x, pts){
-     // give a list/array, extract format the elements
-     // for use with leaflet.
-     var len = x.length
-     var points={};
+     function get_map_points(x, pts){
+         // give a list/array, extract format the elements
+         // for use with leaflet.
+         var len = x.length
+         var points={};
 
-     // create an list of objects that will use the area string as their key
+         // create an list of objects that will use the area string as their key
 
-     for (var i = 0; i < len; i++) {
-         var tmp = x[i];
-         // if it exists, add the values from this iteration
-         if (points[tmp.area] !=undefined){
-             points[tmp.area].effae += tmp.effae;
-             points[tmp.area].effao_s += tmp.effao_s;
-             points[tmp.area].effre += tmp.effre;
-             points[tmp.area].effro_s += tmp.effro_s;
-         } else {
-             // if not, create on
-             points[tmp.area] = {
-                 area: tmp.area,
-                 ddlat: tmp.ddlat,
-                 ddlon: tmp.ddlon,
-                 effae: tmp.effae,
-                 effao_s: tmp.effao_s,
-                 effre: tmp.effre,
-                 effro_s: tmp.effro_s,
-             };
+         for (var i = 0; i < len; i++) {
+             var tmp = x[i];
+             // if it exists, add the values from this iteration
+             if (points[tmp.area] !=undefined){
+                 points[tmp.area].effae += tmp.effae;
+                 points[tmp.area].effao_s += tmp.effao_s;
+                 points[tmp.area].effre += tmp.effre;
+                 points[tmp.area].effro_s += tmp.effro_s;
+             } else {
+                 // if not, create on
+                 points[tmp.area] = {
+                     area: tmp.area,
+                     ddlat: tmp.ddlat,
+                     ddlon: tmp.ddlon,
+                     effae: tmp.effae,
+                     effao_s: tmp.effao_s,
+                     effre: tmp.effre,
+                     effro_s: tmp.effro_s,
+                 };
+             }
          }
+         return points
      }
-     return points
- }
 
 
- function points_to_geojson(points){
-     // this function takes a list of points and converts it to geoJson format
-     // required by leaflet-bubble.js
-     var features = []
-     _.each(points, function (d){
+     function points_to_geojson(points){
+         // this function takes a list of points and converts it to geoJson format
+         // required by leaflet-bubble.js
+         var features = []
+         _.each(points, function (d){
 
-         features.push({
-             "type": "Feature",
-             "geometry":{
-                 "type": "Point",
-                 "coordinates": [d.ddlon, d.ddlat]},
-             "properties":{
-                 "Space": d.area,
-                 "est_effort_angler": d.effae.toFixed(1),
-                 "obs_effort_agler": d.effao_s.toFixed(1),
-                 "est_effort_rods": d.effre.toFixed(1),
-                 'obs_effort_rods': d.effro_s.toFixed(1)
+             features.push({
+                 "type": "Feature",
+                 "geometry":{
+                     "type": "Point",
+                     "coordinates": [d.ddlon, d.ddlat]},
+                 "properties":{
+                     "Space": d.area,
+                     "est_effort_angler": d.effae.toFixed(1),
+                     "obs_effort_agler": d.effao_s.toFixed(1),
+                     "est_effort_rods": d.effre.toFixed(1),
+                     'obs_effort_rods': d.effro_s.toFixed(1)
              }});
-     });
-
-     var geojson =  {"type": "FeatureCollection",
-                     "features": features };
-
-     return geojson
- }
-
-
-
- // var effSeasonChart = dc.barChart('#eff-season-chart');
- // var effSpaceChart = dc.barChart('#eff-space-chart');
-
- // var chartGroup = "myCharts";
- var effSeasonChart = dc.rowChart('#eff-season-chart'); //, chartGroup);
- var effSpaceChart = dc.rowChart('#eff-space-chart'); //, chartGroup);
-
- var effModeChart = dc.pieChart('#eff-mode-chart'); //, chartGroup);
- var effPeriodChart = dc.pieChart('#eff-period-chart'); //, chartGroup);
- var effDaytypeChart = dc.pieChart('#eff-daytype-chart'); //, chartGroup);
-
- var effortTable = dc.dataTable('#dc-data-table');//); //, chartGroup);
-
- d3.json("{% url 'effort_estimates' creel.slug %}", function (error, data) {
-    
-     //var mydateformat = d3.time.format('%B %d, %Y');
-     //var isodateformat = d3.time.format.iso;
-
-     data.forEach(function(d,i){
-         d.mode = d.mode;
-         d.season = d.season;
-         d.dtp = d.dtp;
-         d.period = d.period;
-         d.area = d.area;
-         //d.date = isodateformat.parse(d.date);
-         d.effre = +d.effre;
-         d.effae = +d.effae;
-         d.effao_s = d.effao_s;
-         d.effro_s = d.effro_s;
-         d.ddlat = +d.ddlat;
-         d.ddlon = +d.ddlon;
-
-     });
-
-     var estimates = crossfilter(data);
-
-     var all = estimates.groupAll();
-     var all_effre = all.reduceSum(function(d){return d.effre;});
-     //var all_effae = all.reduceSum(function(d){return d.effae;});
-
-     var n = all.reduceCount().value();
-
-     //create a dimension for each strata
-     var modeDim = estimates.dimension(function(d) { return d.mode; });
-     var ssnDim = estimates.dimension(function(d) { return d.season; });
-     var daytypeDim = estimates.dimension(function(d) { return d.dtp; });
-     var periodDim = estimates.dimension(function(d) { return d.period; });
-     var areaDim = estimates.dimension(function(d) { return d.area; });
-
-     // create goups from each of our dimensions
-     var modeGroup = modeDim.group();
-     var ssnGroup = ssnDim.group();
-     var daytypeGroup = daytypeDim.group();
-     var periodGroup = periodDim.group();
-     var areaGroup = areaDim.group();
-
-     // reducer functions for each group:
-     // sum for now, but could be more complicated later
-
-     var modeGroupeffre = modeDim.group().reduceSum(function(d) {return d.effre;});
-     var ssnGroupeffre = ssnDim.group().reduceSum(function(d) {return d.effre;});
-     var daytypeGroupeffre = daytypeDim.group().reduceSum(function(d) {return d.effre;});
-     var periodGroupeffre = periodDim.group().reduceSum(function(d) {return d.effre;});
-     var areaGroupeffre = areaDim.group().reduceSum(function(d) {return d.effre;});
-
-     // =================
-     //     CHARTS
-
-     var width = 500;
-     var height = 500;
-
-     var sm_width = width * 0.6;
-     var sm_height = width * 0.6;
-     var radius = (sm_width * 0.8)/2;
-
-     effSeasonChart.width(width)
-                   .height(height)
-                   .dimension(ssnDim)
-                   .group(ssnGroupeffre)
-                   .x(d3.scale.linear().domain([0,100]))
-                   .elasticX(true)
-                   .render();
-
-     effSeasonChart.on("renderlet", function(chart) {
-         dc.events.trigger(function() {
-             myfilters=effSeasonChart.filters();
-             if (!myfilters || !myfilters.length){
-                 d3.select("#season-filter").text('None');
-             } else {
-                 d3.select("#season-filter").text(myfilters);
-                 //d3.select("#season-count").text(myfilters.length);
-             }
-         });
-     });
-
-
-     effSpaceChart.width(width)
-                  .height(height)
-                  .dimension(areaDim)
-                  .group(areaGroupeffre)
-                  .x(d3.scale.linear().domain([0,100]))
-                  .elasticX(true)
-                  .render();
-
-     effSpaceChart.on("renderlet", function(chart) {
-         dc.events.trigger(function() {
-             myfilters=effSpaceChart.filters();
-             if (!myfilters || !myfilters.length){
-                 d3.select("#space-filter").text('None');
-             } else {
-                 d3.select("#space-filter").text(myfilters);
-                 //d3.select("#space-count").text(myfilters.length);
-             }
-         });
-     });
-
-     effModeChart.width(sm_width)
-                 .height(sm_height)
-                 .radius(radius)
-                 .dimension(modeDim)
-                 .group(modeGroupeffre)
-                 .render();
-
-     effModeChart.on("renderlet", function(chart) {
-         dc.events.trigger(function() {
-             myfilters=effModeChart.filters();
-             if (!myfilters || !myfilters.length){
-                 d3.select("#mode-filter").text('None');
-             } else {
-                 d3.select("#mode-filter").text(myfilters);
-                 //d3.select("#mode-count").text(myfilters.length);
-             }
-         });
-     });
-
-
-
-     effPeriodChart.width(sm_width)
-                   .height(sm_height)
-                   .dimension(periodDim)
-                   .group(periodGroupeffre)
-                   .radius(radius)
-     //.x(d3.scale.linear().domain([0,100]))
-     //.elasticX(true)
-                   .render();
-
-
-     effPeriodChart.on("renderlet", function(chart) {
-         dc.events.trigger(function() {
-             myfilters=effPeriodChart.filters();
-             if (!myfilters || !myfilters.length){
-                 d3.select("#period-filter").text('None');
-             } else {
-                 d3.select("#period-filter").text(myfilters);
-                 //d3.select("#period-count").text(myfilters.length);
-             }
-         });
-     });
-
-
-
-
-     effDaytypeChart.width(sm_width)
-                    .height(sm_height)
-                    .dimension(daytypeDim)
-                    .group(daytypeGroupeffre)
-                    .radius(radius)
-     //.x(d3.scale.linear().domain([0,100]))
-     //.elasticX(true)
-                    .render();
-
-     effDaytypeChart.on("renderlet", function(chart) {
-         dc.events.trigger(function() {
-             myfilters=effDaytypeChart.filters();
-             if (!myfilters || !myfilters.length){
-                 d3.select("#daytype-filter").text('None');
-             } else {
-                 d3.select("#daytype-filter").text(myfilters);
-                 //d3.select("#daytype-count").text(myfilters.length);
-             }
-         });
-     });
-
-
-
-
-     effortTable.width(2 * width).height(1200)
-     //.showGroups(true
-                .dimension(modeDim)
-                .group(function(d){ return "" })
-                .columns([
-                    function(d) { return d.area; },
-                    function(d) { return d.season; },
-                    function(d) { return d.dtp; },
-                    function(d) { return d.period; },
-                    function(d) { return d.mode; },
-                    function(d) { return d.effre; },
-                    function(d) { return d.effro_s; }
-                ])
-                .sortBy(function(d){ return d.mode; })
-                .order(d3.ascending);
-
-     //var recordCount =  dc.dataCount('.dc-data-count');
-     // record count will not render all option or the filter-count in the html.
-     var recordCount = dc.dataCount('.dc-data-count')
-                         .dimension(estimates)
-                         .group(all)
-                         .html({
-                             some: '<strong>%filter-count</strong> selected out of <strong>%total-count</strong> records' +
-                                   ' | <a href=\'javascript:dc.filterAll(); dc.renderAll();\'>Reset All</a>',
-                             all: 'All <strong>%total-count</strong> records selected. Please click on a graph to apply filters.'
-                         });
-
-
-     dc.renderAll();
-
-
-     // =================
-     //     MAP
-
-
-     // intiailize map based on the lake this creel occurs in
-     //var lat = {{ creel.lake.ddlat }}
-     //var lon =  {{ creel.lake.ddlon }}
-     //var zoom =  {{ creel.lake.zoom }}
-
-     var lat = 45
-     var lon = -81
-     var zoom = 7
-     
-     var  map = new L.map('map').setView([lat,lon], zoom);
-
-     function drawMap(){
-
-
-         L.mapbox.accessToken = 'pk.eyJ1IjoiYWNvdHRyaWxsIiwiYSI6ImNpazVmb3Q2eDAwMWZpZm0yZTQ1cjF3NTkifQ.Pb1wCYs0lKgjnTGz43DjVQ';
-         // Replace 'mapbox.streets' with your map id.
-         var mapboxTiles = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=' + L.mapbox.accessToken, {
-             attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
-         }).addTo(map);
-
-
-         var spaceMarkers = new L.FeatureGroup();
-         spaceMarkers.clearLayers();
-
-         $.each( spaces, function(i, x) {
-             if(x.ddlat & x.ddlon){
-                 var marker = L.circle([x.ddlat, x.ddlon], 25, {
-                     color:'red',
-                     fillColor: 'red',
-                     fillOpacity: 1
-                 });
-                 popup = "<p>Space: " + x.label + "</p>"
-                 marker.bindPopup(popup);
-                 spaceMarkers.addLayer(marker);
-             }
          });
 
-         var bubbleMarkers = new L.FeatureGroup();
-         // areaDim will response to filters and only include the
-         // selected records
-         var effortPoints = get_map_points(areaDim.top(Infinity));
-         var geojsonPts = points_to_geojson(effortPoints);
-         //
-         bubbleMarkers.clearLayers();
-         // add the bubbles first so that the net centroid markers are on top
-         if( geojsonPts ) {
-             bubbles = L.bubbleLayer(geojsonPts, { property: "est_effort_angler",
-                                                   legend: false,
-                                                   max_radius : 40,
-                                                   scale: 'YlGnBu',
-                                                   tooltip : "Estimated Effort"
-             });
-             bubbleMarkers.addLayer(bubbles);
-             map.addLayer(bubbles);
-         }
-         if(spaceMarkers ){
-             map.addLayer(spaceMarkers);
-         }
-         var bounds =spaceMarkers.getBounds();
-         if (bounds.isValid()){
-             map.fitBounds(bounds, {padding: [50,50]});
-         }
+         var geojson =  {"type": "FeatureCollection",
+                         "features": features };
 
-
+         return geojson
      }
 
-     drawMap();
 
-     // refresh our map each time one of the charts change
-     dcCharts = [effSeasonChart, effSpaceChart, effModeChart, effPeriodChart, effDaytypeChart];
 
-     _.each(dcCharts, function (dcChart) {
-         dcChart.on("filtered", function (chart, filter) {
-             map.eachLayer(function (layer) {
-                 map.removeLayer(layer)
-             });
-             drawMap();
+     // var effSeasonChart = dc.barChart('#eff-season-chart');
+     // var effSpaceChart = dc.barChart('#eff-space-chart');
+
+     // var chartGroup = "myCharts";
+     var effSeasonChart = dc.rowChart('#eff-season-chart'); //, chartGroup);
+     var effSpaceChart = dc.rowChart('#eff-space-chart'); //, chartGroup);
+
+     var effModeChart = dc.pieChart('#eff-mode-chart'); //, chartGroup);
+     var effPeriodChart = dc.pieChart('#eff-period-chart'); //, chartGroup);
+     var effDaytypeChart = dc.pieChart('#eff-daytype-chart'); //, chartGroup);
+
+     var effortTable = dc.dataTable('#dc-data-table');//); //, chartGroup);
+
+     d3.json("{% url 'effort_estimates' creel.slug %}", function (error, data) {
+         
+         //var mydateformat = d3.time.format('%B %d, %Y');
+         //var isodateformat = d3.time.format.iso;
+
+         data.forEach(function(d,i){
+             d.mode = d.mode;
+             d.season = d.season;
+             d.dtp = d.dtp;
+             d.period = d.period;
+             d.area = d.area;
+             //d.date = isodateformat.parse(d.date);
+             d.effre = +d.effre;
+             d.effae = +d.effae;
+             d.effao_s = d.effao_s;
+             d.effro_s = d.effro_s;
+             d.ddlat = +d.ddlat;
+             d.ddlon = +d.ddlon;
+
          });
-     });
+
+         var estimates = crossfilter(data);
+
+         var all = estimates.groupAll();
+         var all_effre = all.reduceSum(function(d){return d.effre;});
+         //var all_effae = all.reduceSum(function(d){return d.effae;});
+
+         var n = all.reduceCount().value();
+
+         //create a dimension for each strata
+         var modeDim = estimates.dimension(function(d) { return d.mode; });
+         var ssnDim = estimates.dimension(function(d) { return d.season; });
+         var daytypeDim = estimates.dimension(function(d) { return d.dtp; });
+         var periodDim = estimates.dimension(function(d) { return d.period; });
+         var areaDim = estimates.dimension(function(d) { return d.area; });
+
+         // create goups from each of our dimensions
+         var modeGroup = modeDim.group();
+         var ssnGroup = ssnDim.group();
+         var daytypeGroup = daytypeDim.group();
+         var periodGroup = periodDim.group();
+         var areaGroup = areaDim.group();
+
+         // reducer functions for each group:
+         // sum for now, but could be more complicated later
+
+         var modeGroupeffre = modeDim.group().reduceSum(function(d) {return d.effre;});
+         var ssnGroupeffre = ssnDim.group().reduceSum(function(d) {return d.effre;});
+         var daytypeGroupeffre = daytypeDim.group().reduceSum(function(d) {return d.effre;});
+         var periodGroupeffre = periodDim.group().reduceSum(function(d) {return d.effre;});
+         var areaGroupeffre = areaDim.group().reduceSum(function(d) {return d.effre;});
+
+         // =================
+         //     CHARTS
+
+         var width = 500;
+         var height = 500;
+
+         var sm_width = width * 0.6;
+         var sm_height = width * 0.6;
+         var radius = (sm_width * 0.8)/2;
+
+         effSeasonChart.width(width)
+                       .height(height)
+                       .dimension(ssnDim)
+                       .group(ssnGroupeffre)
+                       .x(d3.scale.linear().domain([0,100]))
+                       .elasticX(true)
+                       .render();
+
+         effSeasonChart.on("renderlet", function(chart) {
+             dc.events.trigger(function() {
+                 myfilters=effSeasonChart.filters();
+                 if (!myfilters || !myfilters.length){
+                     d3.select("#season-filter").text('None');
+                 } else {
+                     d3.select("#season-filter").text(myfilters);
+                     //d3.select("#season-count").text(myfilters.length);
+                 }
+             });
+         });
+
+
+         effSpaceChart.width(width)
+                      .height(height)
+                      .dimension(areaDim)
+                      .group(areaGroupeffre)
+                      .x(d3.scale.linear().domain([0,100]))
+                      .elasticX(true)
+                      .render();
+
+         effSpaceChart.on("renderlet", function(chart) {
+             dc.events.trigger(function() {
+                 myfilters=effSpaceChart.filters();
+                 if (!myfilters || !myfilters.length){
+                     d3.select("#space-filter").text('None');
+                 } else {
+                     d3.select("#space-filter").text(myfilters);
+                     //d3.select("#space-count").text(myfilters.length);
+                 }
+             });
+         });
+
+         effModeChart.width(sm_width)
+                     .height(sm_height)
+                     .radius(radius)
+                     .dimension(modeDim)
+                     .group(modeGroupeffre)
+                     .render();
+
+         effModeChart.on("renderlet", function(chart) {
+             dc.events.trigger(function() {
+                 myfilters=effModeChart.filters();
+                 if (!myfilters || !myfilters.length){
+                     d3.select("#mode-filter").text('None');
+                 } else {
+                     d3.select("#mode-filter").text(myfilters);
+                     //d3.select("#mode-count").text(myfilters.length);
+                 }
+             });
+         });
+
+
+
+         effPeriodChart.width(sm_width)
+                       .height(sm_height)
+                       .dimension(periodDim)
+                       .group(periodGroupeffre)
+                       .radius(radius)
+         //.x(d3.scale.linear().domain([0,100]))
+         //.elasticX(true)
+                       .render();
+
+
+         effPeriodChart.on("renderlet", function(chart) {
+             dc.events.trigger(function() {
+                 myfilters=effPeriodChart.filters();
+                 if (!myfilters || !myfilters.length){
+                     d3.select("#period-filter").text('None');
+                 } else {
+                     d3.select("#period-filter").text(myfilters);
+                     //d3.select("#period-count").text(myfilters.length);
+                 }
+             });
+         });
 
 
 
 
- } )
+         effDaytypeChart.width(sm_width)
+                        .height(sm_height)
+                        .dimension(daytypeDim)
+                        .group(daytypeGroupeffre)
+                        .radius(radius)
+         //.x(d3.scale.linear().domain([0,100]))
+         //.elasticX(true)
+                        .render();
+
+         effDaytypeChart.on("renderlet", function(chart) {
+             dc.events.trigger(function() {
+                 myfilters=effDaytypeChart.filters();
+                 if (!myfilters || !myfilters.length){
+                     d3.select("#daytype-filter").text('None');
+                 } else {
+                     d3.select("#daytype-filter").text(myfilters);
+                     //d3.select("#daytype-count").text(myfilters.length);
+                 }
+             });
+         });
 
 
 
 
-</script>
+         effortTable.width(2 * width).height(1200)
+         //.showGroups(true
+                    .dimension(modeDim)
+                    .group(function(d){ return "" })
+                    .columns([
+                        function(d) { return d.area; },
+                        function(d) { return d.season; },
+                        function(d) { return d.dtp; },
+                        function(d) { return d.period; },
+                        function(d) { return d.mode; },
+                        function(d) { return d.effre; },
+                        function(d) { return d.effro_s; }
+                    ])
+                    .sortBy(function(d){ return d.mode; })
+                    .order(d3.ascending);
+
+         //var recordCount =  dc.dataCount('.dc-data-count');
+         // record count will not render all option or the filter-count in the html.
+         var recordCount = dc.dataCount('.dc-data-count')
+                             .dimension(estimates)
+                             .group(all)
+                             .html({
+                                 some: '<strong>%filter-count</strong> selected out of <strong>%total-count</strong> records' +
+                                       ' | <a href=\'javascript:dc.filterAll(); dc.renderAll();\'>Reset All</a>',
+                                 all: 'All <strong>%total-count</strong> records selected. Please click on a graph to apply filters.'
+                             });
+
+
+         dc.renderAll();
+
+
+         // =================
+         //     MAP
+
+
+         // intiailize map based on the lake this creel occurs in
+         //var lat = {{ creel.lake.ddlat }}
+         //var lon =  {{ creel.lake.ddlon }}
+         //var zoom =  {{ creel.lake.zoom }}
+
+         var lat = 45
+         var lon = -81
+         var zoom = 7
+         
+         var  map = new L.map('map').setView([lat,lon], zoom);
+
+         function drawMap(){
+
+
+             // add the OpenStreetMap tiles
+             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                 attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+             }).addTo(map);
+
+
+             var spaceMarkers = new L.FeatureGroup();
+             spaceMarkers.clearLayers();
+
+             $.each( spaces, function(i, x) {
+                 if(x.ddlat & x.ddlon){
+                     var marker = L.circle([x.ddlat, x.ddlon], 25, {
+                         color:'red',
+                         fillColor: 'red',
+                         fillOpacity: 1
+                     });
+                     popup = "<p>Space: " + x.label + "</p>"
+                     marker.bindPopup(popup);
+                     spaceMarkers.addLayer(marker);
+                 }
+             });
+
+             var bubbleMarkers = new L.FeatureGroup();
+             // areaDim will response to filters and only include the
+             // selected records
+             var effortPoints = get_map_points(areaDim.top(Infinity));
+             var geojsonPts = points_to_geojson(effortPoints);
+             //
+             bubbleMarkers.clearLayers();
+             // add the bubbles first so that the net centroid markers are on top
+             if( geojsonPts ) {
+                 bubbles = L.bubbleLayer(geojsonPts, { property: "est_effort_angler",
+                                                       legend: false,
+                                                       max_radius : 40,
+                                                       scale: 'YlGnBu',
+                                                       tooltip : "Estimated Effort"
+                 });
+                 bubbleMarkers.addLayer(bubbles);
+                 map.addLayer(bubbles);
+             }
+             if(spaceMarkers ){
+                 map.addLayer(spaceMarkers);
+             }
+             var bounds =spaceMarkers.getBounds();
+             if (bounds.isValid()){
+                 map.fitBounds(bounds, {padding: [50,50]});
+             }
+
+
+         }
+
+         drawMap();
+
+         // refresh our map each time one of the charts change
+         dcCharts = [effSeasonChart, effSpaceChart, effModeChart, effPeriodChart, effDaytypeChart];
+
+         _.each(dcCharts, function (dcChart) {
+             dcChart.on("filtered", function (chart, filter) {
+                 map.eachLayer(function (layer) {
+                     map.removeLayer(layer)
+                 });
+                 drawMap();
+             });
+         });
+
+
+
+
+     } )
+
+
+
+
+    </script>
 
 {% endblock %}
