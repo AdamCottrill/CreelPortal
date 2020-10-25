@@ -692,8 +692,8 @@ class FN112(models.Model):
             anydate, self.atytm0
         )
         self.atydur = delta.total_seconds() / (60 * 60)
-
-        raw_slug = "-".join([self.sama.creel.prj_cd, self.sama.sama, self.aty0])
+        ts = self.atytm0.strftime("%H:%M")
+        raw_slug = "-".join([self.sama.creel.prj_cd, self.sama.sama, ts])
         self.slug = slugify(raw_slug)
 
         super(FN112, self).save(*args, **kwargs)

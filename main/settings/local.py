@@ -1,16 +1,14 @@
 from main.settings.base import *
 
-# Database
-# https://docs.djangoproject.com/en/1.10/ref/settings/#databases
+import os
 
+# install gdal in virtualenv:
+VIRTUAL_ENV = os.environ["VIRTUAL_ENV"].replace("(", "").replace(")", "")
+OSGEO_VENV = os.path.join(VIRTUAL_ENV, "Lib/site-packages/osgeo")
+GEOS_LIBRARY_PATH = os.path.join(OSGEO_VENV, "geos_c.dll")
+GDAL_LIBRARY_PATH = os.path.join(OSGEO_VENV, "gdal300.dll")
+os.environ["PATH"] += os.pathsep + str(OSGEO_VENV)
 
-# DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': os.path.join(BASE_DIR, '../db/db.sqlite3'),
-#    }
-# }
-#
 
 INSTALLED_APPS = INSTALLED_APPS + ["debug_toolbar", "django_extensions"]
 
@@ -20,16 +18,6 @@ INTERNAL_IPS = [
     # ...
 ]
 
-# DATABASES = {
-#    "default": {
-#        #        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-#        #        'NAME': 'fisheye',
-#        #        'USER': 'cottrillad',
-#        #        'PASSWORD': 'django123',
-#        "ENGINE": "django.db.backends.sqlite3",
-#        "NAME": os.path.join(BASE_DIR, "../db/creel_portal.db"),
-#    }
-# }
 
 DATABASES = {
     "default": {

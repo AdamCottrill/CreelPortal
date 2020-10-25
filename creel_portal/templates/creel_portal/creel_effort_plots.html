@@ -464,23 +464,29 @@
          dc.renderAll();
 
 
-         // =================
-         //     MAP
-
-
-         // intiailize map based on the lake this creel occurs in
-         //var lat = {{ creel.lake.ddlat }}
-         //var lon =  {{ creel.lake.ddlon }}
-         //var zoom =  {{ creel.lake.zoom }}
-
-         var lat = 45
-         var lon = -81
-         var zoom = 7
          
-         var  map = new L.map('map').setView([lat,lon], zoom);
-
          function drawMap(){
 
+             // =================
+             //     MAP
+             
+             let bbox = {{ creel.lake.envelope_ontario.json|safe }};
+
+             function leafletBounds(bbox_json){
+                 let pt1 = bbox_json.coordinates[0][0]
+                 let pt2 = bbox_json.coordinates[0][2]
+                 return [
+                     [pt1[1], pt1[0]],
+                     [pt2[1], pt2[0]],                         
+                 ]
+             }
+             
+             let map = new L.map('map', {
+                 zoomSnap: 0.1
+             }).fitBounds(leafletBounds(bbox));
+
+
+             
 
              // add the OpenStreetMap tiles
              L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -527,7 +533,7 @@
              }
              var bounds =spaceMarkers.getBounds();
              if (bounds.isValid()){
-                 map.fitBounds(bounds, {padding: [50,50]});
+                 map.fitBounds(bounds, {padding: [100,100]});
              }
 
 

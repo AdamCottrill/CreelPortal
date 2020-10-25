@@ -1,6 +1,8 @@
 
 {% extends "creel_portal_base.html" %}
 
+{% load humanize %} 
+
 {% block extrahead %}
 
 
@@ -63,7 +65,7 @@
                             </tr>
                             <tr>
                                 <td>Project Lead:</td>
-                                <td>{{ object.prj_ldr|title }}</td>
+                                <td>{{ object.prj_ldr.first_name }} {{ object.prj_ldr.last_name }}</td>
                             </tr>
                             <tr>
                                 <td>Project Start:</td>
@@ -457,18 +459,22 @@
      // add the creel locations here as a json string.
      var spaces = {{ spaces|safe }};
 
-
-     // intiailize map based on the lake this creel occurs in
-     //var lat = {{ creel.lake.ddlat }}
-     //    var lon =  {{ creel.lake.ddlon }}
-     //        var zoom =  {{ creel.lake.zoom }}
-
-     let lat=45.0;
-     let lon = -81.0;
-     let zoom = 7;
      
+     let bbox = {{ creel.lake.envelope_ontario.json|safe }};
 
-     var  map = new L.map('map').setView([lat,lon], zoom);
+     function leafletBounds(bbox){
+         let pt1 = bbox.coordinates[0][0]
+         let pt2 = bbox.coordinates[0][2]
+         return [
+             [pt1[1], pt1[0]],
+             [pt2[1], pt2[0]],                         
+         ]
+     }
+     
+     let map = new L.map('map', {
+         zoomSnap: 0.1
+     }).fitBounds(leafletBounds(bbox));
+     
 
      function drawMap(){
 

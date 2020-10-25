@@ -219,440 +219,444 @@
 
     <script type="text/javascript">
 
-        var spaces = {{ spaces|safe }};
-
-        function get_map_points(x, pts){
-        // give a list/array, extract format the elements
-        // for use with leaflet.
-        var len = x.length
-        var points={};
-
-        // create an list of objects that will use the area string as their key
-
-        //TODO - add second level to each area for spc
-        for (var i = 0; i < len; i++) {
-        var tmp = x[i];
-        // if it exists, add the values from this iteration
-        if (points[tmp.area] !=undefined){
-        points[tmp.area].catne += tmp.catne;
-
-        if(points[tmp.area].species[tmp.species]!=undefined){
-        points[tmp.area].species[tmp.species] += tmp.catne;
-        } else {
-        points[tmp.area].species[tmp.species] = tmp.catne;
-        }
-
-
-        } else {
-        // if not, create on
-        points[tmp.area] = {
-        area: tmp.area,
-        species: tmp.species,
-        ddlat: tmp.ddlat,
-        ddlon: tmp.ddlon,
-        catne: tmp.catne,
-        };
-        points[tmp.area].species = {};
-        points[tmp.area].species[tmp.species] = tmp.catne;
-        }
-        }
-        return points
-        }
-
-
-        function get_spc_list(pt){
-        var species_string = '';
-        if (Object.keys(pt.species)){
-        species_names = Object.keys(pt.species);
-        species_string += '<ul>';
-        for (spc in species_names){
-        species_string += '<li>' + species_names[spc] + ': ' + pt.species[species_names[spc]].toFixed(1) + '</li>';
-        }
-        species_string += '</ul>';
-        } else {
-        species_string = 'None';
-        }
-        return species_string;
-        }
-
-
-        function points_to_geojson(points){
-        // this function takes a list of points and converts it to geoJson format
-        // required by leaflet-bubble.js
-        var features = []
-        _.each(points, function (d){
-
-        spc_list = get_spc_list(d);
-
-        features.push({
-        "type": "Feature",
-        "geometry":{
-        "type": "Point",
-        "coordinates": [d.ddlon, d.ddlat]},
-        "properties":{
-        "Space": d.area,
-        "Total Catch": d.catne.toFixed(1),
-        'species':spc_list
-        }});
-        });
-
-        var geojson =  {"type": "FeatureCollection",
-        "features": features };
-
-        return geojson
-        }
-
-
-
-        // var catSeasonChart = dc.barChart('#catch-season-chart');
-        // var catSpaceChart = dc.barChart('#catch-space-chart');
-
-        var catSpeciesChart = dc.pieChart('#catch-species-chart');
-        var catSpeciesBarChart = dc.rowChart('#catch-species-barchart');
-        var catSeasonChart = dc.rowChart('#catch-season-chart');
-        var catSpaceChart = dc.rowChart('#catch-space-chart');
-
-
-        var catModeChart = dc.pieChart('#catch-mode-chart');
-        var catPeriodChart = dc.pieChart('#catch-period-chart');
-        var catDaytypeChart = dc.pieChart('#catch-daytype-chart');
-
-        var catchTable = dc.dataTable('#dc-data-table');//); //, chartGroup);
-
-        d3.json("{% url 'catch_estimates' creel.slug %}", function (error, data) {
-
-        data.forEach(function(d){
-        d.mode = d.mode;
-        d.season = d.season;
-        d.dtp = d.dtp;
-        d.period = d.period;
-        d.species = d.species_name;
-        d.area = d.area;
-        d.sek = d.sek;
-        d.catne = +d.catne;
-        d.ddlat = +d.ddlat;
-        d.ddlon = +d.ddlon;
-
-        });
-
-        var estimates = crossfilter(data);
-
-        var all = estimates.groupAll();
-        var all_catne = all.reduceSum(function(d){return d.catne;});
-
-        // needed for data to work??
-        var n = all.reduceCount().value();
-
-        //create a dimension for each strata
-        var modeDim = estimates.dimension(function(d) { return d.mode; });
-        var ssnDim = estimates.dimension(function(d) { return d.season; });
-        var daytypeDim = estimates.dimension(function(d) { return d.dtp; });
-        var periodDim = estimates.dimension(function(d) { return d.period; });
-        var areaDim = estimates.dimension(function(d) { return d.area; });
-        var speciesDim = estimates.dimension(function(d) { return d.species; });
-        var speciesBarDim = estimates.dimension(function(d) { return d.species; });
-
-        // create goups from each of our dimensions
-        //var modeGroup = modeDim.group();
-        //var ssnGroup = ssnDim.group();
-        //var daytypeGroup = daytypeDim.group();
-        //var periodGroup = periodDim.group();
-        //var areaGroup = areaDim.group();
-        //var speciesGroup = speciesDim.group();
-        //var speciesBarGroup = speciesDim.group();
-
-        // reducer functions for each group:
-        // sum for now, but could be more complicated later
-
-        var modeGroupcatne = modeDim.group().reduceSum(function(d) {return d.catne;});
-        var ssnGroupcatne = ssnDim.group().reduceSum(function(d) {return d.catne;});
-        var daytypeGroupcatne = daytypeDim.group().reduceSum(function(d) {return d.catne;});
-        var periodGroupcatne = periodDim.group().reduceSum(function(d) {return d.catne;});
-        var areaGroupcatne = areaDim.group().reduceSum(function(d) {return d.catne;});
-        var speciesGroupcatne = speciesDim.group().reduceSum(function(d) {return d.catne;});
-        var speciesBarGroupcatne = speciesDim.group().reduceSum(function(d) {return d.catne;});
-
-        // =================
-        //     CHARTS
-
-        var width = 400;
-        var height = 400;
-        var radius = (width * 0.7)/2;
-
-        catSpeciesChart.width(width)
-        .height(height)
-        .radius(radius)
-        .dimension(speciesDim)
-        .group(speciesGroupcatne);
-
-
-
-        catSpeciesChart.on("renderlet", function(chart) {
-        dc.events.trigger(function() {
-        myfilters= catSpeciesBarChart.filters() + catSpeciesChart.filters();
-        if (!myfilters || !myfilters.length){
-        d3.select("#species-filter").text('None');
-        } else {
-        d3.select("#species-filter").text(myfilters);
-        //d3.select("#species-count").text(myfilters.length);
-        }
-        });
-        });
-
-
-
-        catSpeciesBarChart.width(width)
-        .height(height)
-        .dimension(speciesBarDim)
-        .group(speciesBarGroupcatne)
-        .x(d3.scale.linear().domain([0,100]))
-        .elasticX(true);
-
-
-        catSpeciesBarChart.on("renderlet", function(chart) {
-        dc.events.trigger(function() {
-        myfilters= catSpeciesBarChart.filters() + catSpeciesChart.filters();
-        if (!myfilters || !myfilters.length){
-        d3.select("#species-filter").text('None');
-        } else {
-        d3.select("#species-filter").text(myfilters);
-        //d3.select("#species-count").text(myfilters.length);
-        }
-        });
-        });
-
-
-        catSeasonChart.width(width)
-        .height(height)
-        .dimension(ssnDim)
-        .group(ssnGroupcatne)
-        .x(d3.scale.linear().domain([0,100]))
-        .elasticX(true);
-
-        catSeasonChart.on("renderlet", function(chart) {
-        dc.events.trigger(function() {
-        myfilters=catSeasonChart.filters();
-        if (!myfilters || !myfilters.length){
-        d3.select("#season-filter").text('None');
-        } else {
-        d3.select("#season-filter").text(myfilters);
-        //d3.select("#season-count").text(myfilters.length);
-        }
-        });
-        });
-
-
-
-        catSpaceChart.width(width)
-        .height(height)
-        .dimension(areaDim)
-        .group(areaGroupcatne)
-        .x(d3.scale.linear().domain([0,100]))
-        .elasticX(true);
-
-        catSpaceChart.on("renderlet", function(chart) {
-        dc.events.trigger(function() {
-        myfilters=catSpaceChart.filters();
-        if (!myfilters || !myfilters.length){
-        d3.select("#space-filter").text('None');
-        } else {
-        d3.select("#space-filter").text(myfilters);
-        //d3.select("#space-count").text(myfilters.length);
-        }
-        });
-        });
-
-
-        catModeChart.width(width)
-        .height(height)
-        .radius(radius)
-        .dimension(modeDim)
-        .group(modeGroupcatne);
-
-        catModeChart.on("renderlet", function(chart) {
-        dc.events.trigger(function() {
-        myfilters=catModeChart.filters();
-        if (!myfilters || !myfilters.length){
-        d3.select("#mode-filter").text('None');
-        } else {
-        d3.select("#mode-filter").text(myfilters);
-        //d3.select("#mode-count").text(myfilters.length);
-        }
-        });
-        });
-
-
-        catPeriodChart.width(width)
-        .height(height)
-        .dimension(periodDim)
-        .group(periodGroupcatne)
-        .radius(radius);
-
-        catPeriodChart.on("renderlet", function(chart) {
-        dc.events.trigger(function() {
-        myfilters=catPeriodChart.filters();
-        if (!myfilters || !myfilters.length){
-        d3.select("#period-filter").text('None');
-        } else {
-        d3.select("#period-filter").text(myfilters);
-        //d3.select("#period-count").text(myfilters.length);
-        }
-        });
-        });
-
-
-        catDaytypeChart.width(width)
-        .height(height)
-        .dimension(daytypeDim)
-        .group(daytypeGroupcatne)
-        .radius(radius);
-
-        catDaytypeChart.on("renderlet", function(chart) {
-        dc.events.trigger(function() {
-        myfilters=catDaytypeChart.filters();
-        if (!myfilters || !myfilters.length){
-        d3.select("#daytype-filter").text('None');
-        } else {
-        d3.select("#daytype-filter").text(myfilters);
-        //d3.select("#daytype-count").text(myfilters.length);
-        }
-        });
-        });
-
-
-
-
-        catchTable.width(2 * width).height(1200)
-        //.showGroups(true
-        .dimension(modeDim)
-        .group(function(d){ return "" })
-        .columns([
-        function(d) { return d.area; },
-        function(d) { return d.season; },
-        function(d) { return d.dtp; },
-        function(d) { return d.period; },
-        function(d) { return d.mode; },
-        function(d) { return d.sek; },
-        function(d) { return d.species; },
-        function(d) { return d.catne; }
-        ])
-        .sortBy(function(d){ return d.area; })
-        .order(d3.ascending);
-
-
-
-
-        //var recordCount =  dc.dataCount('.dc-data-count');
-        // record count will not render all option or the filter-count in the html.
-        //var recordCount =
-        dc.dataCount('.dc-data-count')
-        .dimension(estimates)
-        .group(all)
-        .html({
-        some: '<strong>%filter-count</strong> selected out of <strong>%total-count</strong> records' +
-        ' | <a href=\'javascript:dc.filterAll(); dc.renderAll();\'>Reset All</a>',
-        all: 'All <strong>%total-count<\strong> records selected. Please click on a graph to apply filters.'
-        });
-
-        dc.renderAll();
-
-
-
-        // intiailize map based on the lake this creel occurs in
-        //var lat = {{ creel.lake.ddlat }}
-        //var lon =  {{ creel.lake.ddlon }}
-        //var zoom =  {{ creel.lake.zoom }}
-
-        // intiailize map based on the lake this creel occurs in
-        var lat = 45;
-        var lon =  -81.0
-        var zoom =  7
-
-        
-        var  map = new L.map('map').setView([lat,lon], zoom);
-
-
-        function drawMap(){
-
-
-        // add the OpenStreetMap tiles
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
-        }).addTo(map);
-
-
-        
-        var spaceMarkers = new L.FeatureGroup();
-        spaceMarkers.clearLayers();
-
-
-        $.each( spaces, function(i, x) {
-        var marker = L.circle([x.ddlat, x.ddlon], 25, {
-        color:'red',
-        fillColor: 'red',
-        fillOpacity: 1
-        });
-        popup = "<p>Space: " + x.label + "</p>"
-        marker.bindPopup(popup);
-        spaceMarkers.addLayer(marker);
-
-        });
-
-        var bubbleMarkers = new L.FeatureGroup();
-        // areaDim will response to filters and only include the
-        // selected records
-        var mapPoints = get_map_points(areaDim.top(Infinity));
-        var geojsonPts = points_to_geojson(mapPoints);
-        //
-        bubbleMarkers.clearLayers();
-        bubbles = L.bubbleLayer(geojsonPts, { property: "Total Catch",
-        legend: false,
-        max_radius : 40,
-        scale: 'YlGnBu',
-        tooltip : "Total Catch"
-        });
-
-        // add the bubbles first so that the net centroid markers are on top
-        bubbleMarkers.addLayer(bubbles);
-        map.addLayer(bubbles);
-
-        map.addLayer(spaceMarkers);
-        var bounds =spaceMarkers.getBounds();
-        if (bounds.isValid()){
-        map.fitBounds(bounds, {padding: [50,50]});
+     var spaces = {{ spaces|safe }};
+
+     function get_map_points(x, pts){
+         // give a list/array, extract format the elements
+         // for use with leaflet.
+         var len = x.length
+         var points={};
+
+         // create an list of objects that will use the area string as their key
+
+         //TODO - add second level to each area for spc
+         for (var i = 0; i < len; i++) {
+             var tmp = x[i];
+             // if it exists, add the values from this iteration
+             if (points[tmp.area] !=undefined){
+                 points[tmp.area].catne += tmp.catne;
+
+                 if(points[tmp.area].species[tmp.species]!=undefined){
+                     points[tmp.area].species[tmp.species] += tmp.catne;
+                 } else {
+                     points[tmp.area].species[tmp.species] = tmp.catne;
+                 }
+
+
+             } else {
+                 // if not, create on
+                 points[tmp.area] = {
+                     area: tmp.area,
+                     species: tmp.species,
+                     ddlat: tmp.ddlat,
+                     ddlon: tmp.ddlon,
+                     catne: tmp.catne,
+                 };
+                 points[tmp.area].species = {};
+                 points[tmp.area].species[tmp.species] = tmp.catne;
+             }
          }
-
+         return points
      }
 
-     drawMap();
 
-     // refresh our map each time one of the charts change
+     function get_spc_list(pt){
+         var species_string = '';
+         if (Object.keys(pt.species)){
+             species_names = Object.keys(pt.species);
+             species_string += '<ul>';
+             for (spc in species_names){
+                 species_string += '<li>' + species_names[spc] + ': ' + pt.species[species_names[spc]].toFixed(1) + '</li>';
+             }
+             species_string += '</ul>';
+         } else {
+             species_string = 'None';
+         }
+         return species_string;
+     }
 
-     dcCharts = [catSpeciesChart,
-                 catSpeciesBarChart,
-                 catSeasonChart,
-                 catSpaceChart,
-                 catModeChart,
-                 catPeriodChart,
-                 catDaytypeChart]
+
+     function points_to_geojson(points){
+         // this function takes a list of points and converts it to geoJson format
+         // required by leaflet-bubble.js
+         var features = []
+         _.each(points, function (d){
+
+             spc_list = get_spc_list(d);
+
+             features.push({
+                 "type": "Feature",
+                 "geometry":{
+                     "type": "Point",
+                     "coordinates": [d.ddlon, d.ddlat]},
+                 "properties":{
+                     "Space": d.area,
+                     "Total Catch": d.catne.toFixed(1),
+                     'species':spc_list
+             }});
+         });
+
+         var geojson =  {"type": "FeatureCollection",
+                         "features": features };
+
+         return geojson
+     }
 
 
-     _.each(dcCharts, function (dcChart) {
-         dcChart.on("filtered", function (chart, filter) {
-             map.eachLayer(function (layer) {
-                 map.removeLayer(layer)
+
+     // var catSeasonChart = dc.barChart('#catch-season-chart');
+     // var catSpaceChart = dc.barChart('#catch-space-chart');
+
+     var catSpeciesChart = dc.pieChart('#catch-species-chart');
+     var catSpeciesBarChart = dc.rowChart('#catch-species-barchart');
+     var catSeasonChart = dc.rowChart('#catch-season-chart');
+     var catSpaceChart = dc.rowChart('#catch-space-chart');
+
+
+     var catModeChart = dc.pieChart('#catch-mode-chart');
+     var catPeriodChart = dc.pieChart('#catch-period-chart');
+     var catDaytypeChart = dc.pieChart('#catch-daytype-chart');
+
+     var catchTable = dc.dataTable('#dc-data-table');//); //, chartGroup);
+
+     d3.json("{% url 'catch_estimates' creel.slug %}", function (error, data) {
+
+         data.forEach(function(d){
+             d.mode = d.mode;
+             d.season = d.season;
+             d.dtp = d.dtp;
+             d.period = d.period;
+             d.species = d.species_name;
+             d.area = d.area;
+             d.sek = d.sek;
+             d.catne = +d.catne;
+             d.ddlat = +d.ddlat;
+             d.ddlon = +d.ddlon;
+
+         });
+
+         var estimates = crossfilter(data);
+
+         var all = estimates.groupAll();
+         var all_catne = all.reduceSum(function(d){return d.catne;});
+
+         // needed for data to work??
+         var n = all.reduceCount().value();
+
+         //create a dimension for each strata
+         var modeDim = estimates.dimension(function(d) { return d.mode; });
+         var ssnDim = estimates.dimension(function(d) { return d.season; });
+         var daytypeDim = estimates.dimension(function(d) { return d.dtp; });
+         var periodDim = estimates.dimension(function(d) { return d.period; });
+         var areaDim = estimates.dimension(function(d) { return d.area; });
+         var speciesDim = estimates.dimension(function(d) { return d.species; });
+         var speciesBarDim = estimates.dimension(function(d) { return d.species; });
+
+         // create goups from each of our dimensions
+         //var modeGroup = modeDim.group();
+         //var ssnGroup = ssnDim.group();
+         //var daytypeGroup = daytypeDim.group();
+         //var periodGroup = periodDim.group();
+         //var areaGroup = areaDim.group();
+         //var speciesGroup = speciesDim.group();
+         //var speciesBarGroup = speciesDim.group();
+
+         // reducer functions for each group:
+         // sum for now, but could be more complicated later
+
+         var modeGroupcatne = modeDim.group().reduceSum(function(d) {return d.catne;});
+         var ssnGroupcatne = ssnDim.group().reduceSum(function(d) {return d.catne;});
+         var daytypeGroupcatne = daytypeDim.group().reduceSum(function(d) {return d.catne;});
+         var periodGroupcatne = periodDim.group().reduceSum(function(d) {return d.catne;});
+         var areaGroupcatne = areaDim.group().reduceSum(function(d) {return d.catne;});
+         var speciesGroupcatne = speciesDim.group().reduceSum(function(d) {return d.catne;});
+         var speciesBarGroupcatne = speciesDim.group().reduceSum(function(d) {return d.catne;});
+
+         // =================
+         //     CHARTS
+
+         var width = 400;
+         var height = 400;
+         var radius = (width * 0.7)/2;
+
+         catSpeciesChart.width(width)
+                        .height(height)
+                        .radius(radius)
+                        .dimension(speciesDim)
+                        .group(speciesGroupcatne);
+
+
+
+         catSpeciesChart.on("renderlet", function(chart) {
+             dc.events.trigger(function() {
+                 myfilters= catSpeciesBarChart.filters() + catSpeciesChart.filters();
+                 if (!myfilters || !myfilters.length){
+                     d3.select("#species-filter").text('None');
+                 } else {
+                     d3.select("#species-filter").text(myfilters);
+                     //d3.select("#species-count").text(myfilters.length);
+                 }
              });
-             drawMap();
          });
 
 
-     })
 
- });
+         catSpeciesBarChart.width(width)
+                           .height(height)
+                           .dimension(speciesBarDim)
+                           .group(speciesBarGroupcatne)
+                           .x(d3.scale.linear().domain([0,100]))
+                           .elasticX(true);
+
+
+         catSpeciesBarChart.on("renderlet", function(chart) {
+             dc.events.trigger(function() {
+                 myfilters= catSpeciesBarChart.filters() + catSpeciesChart.filters();
+                 if (!myfilters || !myfilters.length){
+                     d3.select("#species-filter").text('None');
+                 } else {
+                     d3.select("#species-filter").text(myfilters);
+                     //d3.select("#species-count").text(myfilters.length);
+                 }
+             });
+         });
+
+
+         catSeasonChart.width(width)
+                       .height(height)
+                       .dimension(ssnDim)
+                       .group(ssnGroupcatne)
+                       .x(d3.scale.linear().domain([0,100]))
+                       .elasticX(true);
+
+         catSeasonChart.on("renderlet", function(chart) {
+             dc.events.trigger(function() {
+                 myfilters=catSeasonChart.filters();
+                 if (!myfilters || !myfilters.length){
+                     d3.select("#season-filter").text('None');
+                 } else {
+                     d3.select("#season-filter").text(myfilters);
+                     //d3.select("#season-count").text(myfilters.length);
+                 }
+             });
+         });
+
+
+
+         catSpaceChart.width(width)
+                      .height(height)
+                      .dimension(areaDim)
+                      .group(areaGroupcatne)
+                      .x(d3.scale.linear().domain([0,100]))
+                      .elasticX(true);
+
+         catSpaceChart.on("renderlet", function(chart) {
+             dc.events.trigger(function() {
+                 myfilters=catSpaceChart.filters();
+                 if (!myfilters || !myfilters.length){
+                     d3.select("#space-filter").text('None');
+                 } else {
+                     d3.select("#space-filter").text(myfilters);
+                     //d3.select("#space-count").text(myfilters.length);
+                 }
+             });
+         });
+
+
+         catModeChart.width(width)
+                     .height(height)
+                     .radius(radius)
+                     .dimension(modeDim)
+                     .group(modeGroupcatne);
+
+         catModeChart.on("renderlet", function(chart) {
+             dc.events.trigger(function() {
+                 myfilters=catModeChart.filters();
+                 if (!myfilters || !myfilters.length){
+                     d3.select("#mode-filter").text('None');
+                 } else {
+                     d3.select("#mode-filter").text(myfilters);
+                     //d3.select("#mode-count").text(myfilters.length);
+                 }
+             });
+         });
+
+
+         catPeriodChart.width(width)
+                       .height(height)
+                       .dimension(periodDim)
+                       .group(periodGroupcatne)
+                       .radius(radius);
+
+         catPeriodChart.on("renderlet", function(chart) {
+             dc.events.trigger(function() {
+                 myfilters=catPeriodChart.filters();
+                 if (!myfilters || !myfilters.length){
+                     d3.select("#period-filter").text('None');
+                 } else {
+                     d3.select("#period-filter").text(myfilters);
+                     //d3.select("#period-count").text(myfilters.length);
+                 }
+             });
+         });
+
+
+         catDaytypeChart.width(width)
+                        .height(height)
+                        .dimension(daytypeDim)
+                        .group(daytypeGroupcatne)
+                        .radius(radius);
+
+         catDaytypeChart.on("renderlet", function(chart) {
+             dc.events.trigger(function() {
+                 myfilters=catDaytypeChart.filters();
+                 if (!myfilters || !myfilters.length){
+                     d3.select("#daytype-filter").text('None');
+                 } else {
+                     d3.select("#daytype-filter").text(myfilters);
+                     //d3.select("#daytype-count").text(myfilters.length);
+                 }
+             });
+         });
 
 
 
 
-</script>
+         catchTable.width(2 * width).height(1200)
+         //.showGroups(true
+                   .dimension(modeDim)
+                   .group(function(d){ return "" })
+                   .columns([
+                       function(d) { return d.area; },
+                       function(d) { return d.season; },
+                       function(d) { return d.dtp; },
+                       function(d) { return d.period; },
+                       function(d) { return d.mode; },
+                       function(d) { return d.sek; },
+                       function(d) { return d.species; },
+                       function(d) { return d.catne; }
+                   ])
+                   .sortBy(function(d){ return d.area; })
+                   .order(d3.ascending);
+
+
+
+
+         //var recordCount =  dc.dataCount('.dc-data-count');
+         // record count will not render all option or the filter-count in the html.
+         //var recordCount =
+         dc.dataCount('.dc-data-count')
+           .dimension(estimates)
+           .group(all)
+           .html({
+               some: '<strong>%filter-count</strong> selected out of <strong>%total-count</strong> records' +
+                     ' | <a href=\'javascript:dc.filterAll(); dc.renderAll();\'>Reset All</a>',
+               all: 'All <strong>%total-count<\strong> records selected. Please click on a graph to apply filters.'
+           });
+
+         dc.renderAll();
+
+
+         let bbox = {{ creel.lake.envelope_ontario.json|safe }};
+
+         function leafletBounds(bbox){
+
+             let pt1 = bbox.coordinates[0][0]
+             let pt2 = bbox.coordinates[0][2]
+                        
+             return [
+                 [pt1[1], pt1[0]],
+                 [pt2[1], pt2[0]],                         
+             ]
+         }
+         
+         let map = new L.map('map', {
+             zoomSnap: 0.1
+         }).fitBounds(leafletBounds(bbox));
+         
+
+         
+         function drawMap(){
+
+
+             // add the OpenStreetMap tiles
+             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                 attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+             }).addTo(map);
+
+
+             
+             var spaceMarkers = new L.FeatureGroup();
+             spaceMarkers.clearLayers();
+
+
+             $.each( spaces, function(i, x) {
+                 var marker = L.circle([x.ddlat, x.ddlon], 25, {
+                     color:'red',
+                     fillColor: 'red',
+                     fillOpacity: 1
+                 });
+                 popup = "<p>Space: " + x.label + "</p>"
+                 marker.bindPopup(popup);
+                 spaceMarkers.addLayer(marker);
+
+             });
+
+             var bubbleMarkers = new L.FeatureGroup();
+             // areaDim will response to filters and only include the
+             // selected records
+             var mapPoints = get_map_points(areaDim.top(Infinity));
+             var geojsonPts = points_to_geojson(mapPoints);
+             //
+             bubbleMarkers.clearLayers();
+             bubbles = L.bubbleLayer(geojsonPts, { property: "Total Catch",
+                                                   legend: false,
+                                                   max_radius : 40,
+                                                   scale: 'YlGnBu',
+                                                   tooltip : "Total Catch"
+             });
+
+             // add the bubbles first so that the net centroid markers are on top
+             bubbleMarkers.addLayer(bubbles);
+             map.addLayer(bubbles);
+
+             map.addLayer(spaceMarkers);
+             var bounds =spaceMarkers.getBounds();             
+             if (bounds.isValid()){
+                 map.fitBounds(bounds, {padding: [100,100]});
+             }
+
+         }
+
+         drawMap();
+
+         // refresh our map each time one of the charts change
+
+         dcCharts = [catSpeciesChart,
+                     catSpeciesBarChart,
+                     catSeasonChart,
+                     catSpaceChart,
+                     catModeChart,
+                     catPeriodChart,
+                     catDaytypeChart]
+
+
+         _.each(dcCharts, function (dcChart) {
+             dcChart.on("filtered", function (chart, filter) {
+                 map.eachLayer(function (layer) {
+                     map.removeLayer(layer)
+                 });
+                 drawMap();
+             });
+
+
+         })
+
+     });
+
+
+
+
+    </script>
 
 {% endblock %}

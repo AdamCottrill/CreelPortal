@@ -7,7 +7,7 @@
 {% if lake or q %}
 
 {% if lake and object_list %}
-<h3>All creels run on Lake {{lake|title}}:</h3>
+<h3>All creels run on {{lake|title}}:</h3>
 {% endif %}
 
 {% if q and object_list %}
@@ -70,7 +70,7 @@
 
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title"> Lake {{ lake.grouper.lake_name|title }} ({{ lake.grouper.abbrev }})</h3>
+        <h3 class="panel-title"> {{ lake.grouper.lake_name|title }} ({{ lake.grouper.abbrev }})</h3>
     </div>
     <div class="panel-body">
         <table class="table">

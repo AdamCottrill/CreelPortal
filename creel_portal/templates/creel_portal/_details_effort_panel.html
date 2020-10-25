@@ -1,3 +1,5 @@
+{% load humanize %} 
+
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">Effort Estimates for {{ fr713.fr712.stratum.stratum_label }}</h3>
@@ -19,14 +21,14 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>{{ fr713.tripno }}</td>
-                    <td>{{ fr713.tripne }}</td>
-                    <td>{{ fr713.atycnt_s }}</td>
-                    <td>{{ fr713.cif_nn }}</td>
-                    <td>{{ fr713.angler_s }}</td>
-                    <td>{{ fr713.rod_s }}</td>
-                    <td>{{ fr713.effae }}</td>
-                    <td>{{ fr713.effre }}</td>
+                    <td class="text-right">{{ fr713.tripno | default_if_none:"---" | intcomma }}</td>
+                    <td class="text-right">{{ fr713.tripne | default_if_none:"---" | intcomma }}</td>
+                    <td class="text-right">{{ fr713.atycnt_s | default_if_none:"---" | intcomma }}</td>
+                    <td class="text-right">{{ fr713.cif_nn | default_if_none:"---" | intcomma }}</td>
+                    <td class="text-right">{{ fr713.angler_s | default_if_none:"---" | intcomma }}</td>
+                    <td class="text-right">{{ fr713.rod_s | default_if_none:"---" | intcomma }}</td>
+                    <td class="text-right">{{ fr713.effae | default_if_none:"---" | intcomma }}</td>
+                    <td class="text-right">{{ fr713.effre | default_if_none:"---" | intcomma }}</td>
                 </tr>
             </tbody>
         </table>
