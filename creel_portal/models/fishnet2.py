@@ -97,6 +97,7 @@ class FN011(models.Model):
     v0 = models.TextField(blank=True, null=True)
 
     class Meta:
+        app_label = "creel_portal"
         verbose_name = "FN011 - Creel"
         ordering = ["-prj_date1"]
 
@@ -296,6 +297,7 @@ class FN121(models.Model):
     comment1 = models.TextField(blank=False, null=True)
 
     class Meta:
+        app_label = "creel_portal"
         verbose_name = "FN121 - Inveriew"
         ordering = ["sama__creel__prj_cd", "sam"]
         # unique_together = ['sama__creel_id', 'sam']
@@ -340,6 +342,7 @@ class FN123(models.Model):
     slug = models.SlugField(blank=True, unique=True, editable=False)
 
     class Meta:
+        app_label = "creel_portal"
         verbose_name = "FN123 - Catch Count"
         ordering = ["interview", "species"]
         unique_together = ["interview", "grp", "species"]
@@ -408,6 +411,7 @@ class FN125(models.Model):
     slug = models.SlugField(blank=True, unique=True, editable=False)
 
     class Meta:
+        app_label = "creel_portal"
         verbose_name = "FN125 - Bio Sample"
         ordering = ["catch", "fish"]
         unique_together = ["catch", "fish"]
@@ -474,6 +478,7 @@ class FN125_Lamprey(models.Model):
     comment_lam = models.TextField(blank=True, null=True)
 
     class Meta:
+        app_label = "creel_portal"
         ordering = ["slug", "lamid"]
 
     # unique_together = ('fish', 'tagnum', 'grp')
@@ -521,6 +526,7 @@ class FN125_Tag(models.Model):
     comment_tag = models.TextField(blank=True, null=True)
 
     class Meta:
+        app_label = "creel_portal"
         ordering = ["fish", "fish_tag_id"]
         unique_together = ("fish", "fish_tag_id")
 
@@ -559,6 +565,7 @@ class FN126(models.Model):
     comment6 = models.TextField(blank=True, null=True)
 
     class Meta:
+        app_label = "creel_portal"
         ordering = ["fish", "food"]
         unique_together = ("fish", "food")
 
@@ -592,6 +599,7 @@ class FN127(models.Model):
     nca = models.IntegerField(blank=True, null=True)
 
     class Meta:
+        app_label = "creel_portal"
         verbose_name = "FN127 - AgeEstimate"
         ordering = ["fish", "ageid"]
         unique_together = ["fish", "ageid"]
