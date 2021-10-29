@@ -8,3 +8,13 @@ TAGS
 *fly_make*
 .dir-locals.el
 pytest.ini
+.coverage
+.flake8
+*.egg-info/*
+*.coverage*
+dist/*
+docs/
+htmlcov/*
+sandbox.py
+static/*
+utils/*
