@@ -37,20 +37,29 @@ def get_Species_cache():
     return {x.spc: x for x in Species.objects.all()}
 
 
-def get_FN011_cache():
+def get_FN011_cache(lake=None):
     """Return a dictionary of django FN011 objects keyed off of their
-    project code.  saves calls to teh database each time we need a reference to a project.
+    project code.  saves calls to the database each time we need a reference to a project.
 
     """
-    return {x.prj_cd: x for x in FN011.objects.all()}
+    if lake:
+        qs = {x.prj_cd: x for x in FN011.objects.filter(lake__abbrev=lake)}
+    else:
+        qs = {x.prj_cd: x for x in FN011.objects.all()}
+
+    return qs
 
 
-def get_FN022_cache():
+def get_FN022_cache(lake=None):
     """our FN022 cache will be a two level dictionary - first level will be
      the prj_cd, the second witll be season.
     """
     FN022_cache = {}
-    seasons = FN022.objects.all().select_related("creel")
+    if lake:
+        seasons = FN022.objects.filter(creel__lake__abbrev=lake).select_related("creel")
+    else:
+        seasons = FN022.objects.all().select_related("creel")
+
     for ssn in seasons:
         prj_cd = ssn.creel.prj_cd
         x = FN022_cache.get(prj_cd)
@@ -62,24 +71,37 @@ def get_FN022_cache():
     return FN022_cache
 
 
-def get_FN023_cache():
+def get_FN023_cache(lake=None):
     """
     """
     cache = {}
-    items = FN023.objects.all().select_related("season", "season__creel")
+    if lake:
+        items = FN023.objects.filter(season__creel__lake__abbrev=lake).select_related(
+            "season", "season__creel"
+        )
+    else:
+        items = FN023.objects.all().select_related("season", "season__creel")
+
     for item in items:
         key = "{}-{}-{}".format(item.season.creel.prj_cd, item.season.ssn, item.dtp)
         cache[key] = item
     return cache
 
 
-def get_FN024_cache():
+def get_FN024_cache(lake=None):
     """
     """
     cache = {}
-    items = FN024.objects.all().select_related(
-        "daytype", "daytype__season", "daytype__season__creel"
-    )
+
+    if lake:
+        items = FN024.objects.filter(
+            daytype__season__creel__lake__abbrev=lake
+        ).select_related("daytype", "daytype__season", "daytype__season__creel")
+    else:
+        items = FN024.objects.all().select_related(
+            "daytype", "daytype__season", "daytype__season__creel"
+        )
+
     for item in items:
         key = "{}-{}-{}-{}".format(
             item.daytype.season.creel.prj_cd,
@@ -91,7 +113,7 @@ def get_FN024_cache():
     return cache
 
 
-def get_FN026_cache():
+def get_FN026_cache(lake=None):
     """Return a dictionary of dictionaries that reference the spaces
     available for each creel.
 
@@ -102,7 +124,11 @@ def get_FN026_cache():
     """
 
     FN026_cache = {}
-    spaces = FN026.objects.all().select_related("creel")
+    if lake:
+        spaces = FN026.objects.filter(creel__lake__abbrev=lake).select_related("creel")
+    else:
+        spaces = FN026.objects.all().select_related("creel")
+
     for space in spaces:
         prj_cd = space.creel.prj_cd
         x = FN026_cache.get(prj_cd)
@@ -114,7 +140,38 @@ def get_FN026_cache():
     return FN026_cache
 
 
-def get_FN028_cache():
+def get_FN026area_cache(lake=None):
+    """Return a dictionary of dictionaries that reference the areas
+    available for each creel - this is a work around for those creel
+    where areas is not the same as space (according to the creesys
+    manual, it should be.)
+
+    useage:
+
+    fn026 = FN026_cache[prj_cd][area]
+
+    """
+
+    FN026_cache = {}
+    if lake:
+        spaces = FN026.objects.filter(creel__lake__abbrev=lake)
+    else:
+        spaces = FN026.objects.all()
+
+    spaces = spaces.exclude(area_lst__isnull=True).select_related("creel")
+
+    for space in spaces:
+        prj_cd = space.creel.prj_cd
+        x = FN026_cache.get(prj_cd)
+        if x:
+            x[space.area_lst] = space
+        else:
+            x = {space.area_lst: space}
+        FN026_cache[prj_cd] = x
+    return FN026_cache
+
+
+def get_FN028_cache(lake=None):
     """Return a dictionary of dictionaries that reference the modes
     available for each creel.
 
@@ -125,7 +182,11 @@ def get_FN028_cache():
     """
 
     FN028_cache = {}
-    modes = FN028.objects.all().select_related("creel")
+    if lake:
+        modes = FN028.objects.filter(creel__lake__abbrev=lake).select_related("creel")
+    else:
+        modes = FN028.objects.all().select_related("creel")
+
     for mode in modes:
         prj_cd = mode.creel.prj_cd
         x = FN028_cache.get(prj_cd)
@@ -137,7 +198,7 @@ def get_FN028_cache():
     return FN028_cache
 
 
-def get_FN111_cache():
+def get_FN111_cache(lake=None):
     """Return a dictionary of dictionaries that reference the creel logs
     available for each creel.
 
@@ -146,7 +207,11 @@ def get_FN111_cache():
     fn111 = FN111_cache[prj_cd][sama]
     """
     cache = {}
-    samas = FN111.objects.all().select_related("creel")
+    if lake:
+        samas = FN111.objects.filter(creel__lake__abbrev=lake).select_related("creel")
+    else:
+        samas = FN111.objects.all().select_related("creel")
+
     for sama in samas:
         prj_cd = sama.creel.prj_cd
         x = cache.get(prj_cd)
@@ -158,7 +223,7 @@ def get_FN111_cache():
     return cache
 
 
-def get_FN121_cache():
+def get_FN121_cache(lake=None):
     """Return a dictionary of dictionaries that reference the interviews
     available for each creel.
 
@@ -168,7 +233,13 @@ def get_FN121_cache():
     """
 
     cache = {}
-    sams = FN121.objects.all().select_related("sama__creel")
+    if lake:
+        sams = FN121.objects.filter(sama__creel__lake__abbrev=lake).select_related(
+            "sama__creel"
+        )
+    else:
+        sams = FN121.objects.all().select_related("sama__creel")
+
     for sam in sams:
         prj_cd = sam.sama.creel.prj_cd
         x = cache.get(prj_cd)
@@ -180,7 +251,7 @@ def get_FN121_cache():
     return cache
 
 
-def get_FN123_cache():
+def get_FN123_cache(lake=None):
     """Return a dictionary of available catch counts that is keyed by a
     string made up of the project code, sam number, species code and
     group
@@ -191,9 +262,14 @@ def get_FN123_cache():
 
     """
     cache = {}
-    items = FN123.objects.all().select_related(
-        "interview", "interview__sama__creel", "species"
-    )
+    if lake:
+        items = FN123.objects.filter(
+            interview__sama__creel__lake__abbrev=lake
+        ).select_related("interview", "interview__sama__creel", "species")
+    else:
+        items = FN123.objects.all().select_related(
+            "interview", "interview__sama__creel", "species"
+        )
     for item in items:
         key = "{}-{}-{}-{}".format(
             item.interview.sama.creel.prj_cd,
@@ -205,7 +281,7 @@ def get_FN123_cache():
     return cache
 
 
-def get_FN125_cache():
+def get_FN125_cache(lake=None):
     """Return a dictionary of sampled fish that is keyed by a string made
     up of the project code, sam number, species code, group and fish
     number
@@ -216,9 +292,22 @@ def get_FN125_cache():
 
     """
     cache = {}
-    items = FN125.objects.all().select_related(
-        "catch", "catch__interview", "catch__interview__sama__creel", "catch__species"
-    )
+    if lake:
+        items = FN125.objects.filter(
+            catch__interview__sama__creel__lake__abbrev=lake
+        ).select_related(
+            "catch",
+            "catch__interview",
+            "catch__interview__sama__creel",
+            "catch__species",
+        )
+    else:
+        items = FN125.objects.all().select_related(
+            "catch",
+            "catch__interview",
+            "catch__interview__sama__creel",
+            "catch__species",
+        )
     for item in items:
         key = "{}-{}-{}-{}-{}".format(
             item.catch.interview.sama.creel.prj_cd,
@@ -231,15 +320,20 @@ def get_FN125_cache():
     return cache
 
 
-def get_FR712_cache():
+def get_FR712_cache(lake=None):
     """Return a dictionary of available of known strata that is keyed by a
     string made up of the project code, run number, strata, and record type
     """
     # FR712 records our unique by: prj_cd, run, rec_tp, strat
     cache = {}
-    objects = FR712.objects.all().select_related(
-        "stratum", "stratum__creel_run", "stratum__creel_run__creel"
-    )
+    if lake:
+        objects = FR712.objects.filter(
+            stratum__creel_run__creel__lake__abbrev=lake
+        ).select_related("stratum", "stratum__creel_run", "stratum__creel_run__creel")
+    else:
+        objects = FR712.objects.all().select_related(
+            "stratum", "stratum__creel_run", "stratum__creel_run__creel"
+        )
     for item in objects:
         key = "{}-{}-{}-{}".format(
             item.stratum.creel_run.creel.prj_cd,
@@ -279,17 +373,13 @@ def int_or_none(val, default=None):
     - `x`:
     """
     if val is None:
-        if default is not None:
-            return default
-        else:
-            return None
-    elif val == "":
-        if default is not None:
-            return default
-        else:
-            return None
+        return default
     else:
-        return int(val)
+        try:
+            ret = int(val)
+        except ValueError:
+            ret = default
+        return ret
 
 
 def time_or_none(val):
@@ -305,10 +395,18 @@ def time_or_none(val):
     elif val == "" or val.replace(" ", "") == ":":
         return None
     else:
-        return datetime.strptime(val, "%H:%M")
+        try:
+            if val == "24:00":
+                # use one second before midnight:
+                my_time = datetime.strptime("23:59:59", "%H:%M:%S").time()
+            else:
+                my_time = datetime.strptime(val, "%H:%M").time()
+        except ValueError:
+            my_time = None
+        return my_time
 
 
-def float_or_none(val):
+def float_or_none(val, default=None):
     """
 
     Arguments:
@@ -316,11 +414,13 @@ def float_or_none(val):
     """
 
     if val is None:
-        return None
-    elif val == "":
-        return None
+        return default
     else:
-        return float(val)
+        try:
+            ret = float(val)
+        except ValueError:
+            ret = default
+        return ret
 
 
 def bool_or_none(val):

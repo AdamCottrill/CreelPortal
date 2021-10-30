@@ -1,6 +1,6 @@
-=====
+============
 Creel Portal
-=====
+============
 
 
 Creel Portal is a Django application that provides an interface and
@@ -39,7 +39,7 @@ Updating the Application
 
 
 Rebuilding the App.
-------------------------
+-------------------
 
 Creel_portal was built as a standard applicaiton can be rebuild for
 distrubition following the instructions found here:

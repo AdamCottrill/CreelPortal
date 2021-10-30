@@ -1,3 +1,5 @@
+{% load humanize %}
+
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">Catch Estimates for {{ fr714.grouper }}</h3>
@@ -27,22 +29,22 @@
                 {% for spc in fr714.list %}
                 <tr>
                     <td>{{ spc.species.spc_nmco }}</td>
-                    <td>{{ spc.hvsno_s }}</td>
-                    <td>{{ spc.hvsne }}</td>
-                    <td>{{ spc.hvsno1_s }}</td>
-                    <td>{{ spc.hvsne1 }}</td>
-                    <td>{{ spc.catno_s }}</td>
-                    <td>{{ spc.catne }}</td>
-                    <td>{{ spc.catno1_s }}</td>
-                    <td>{{ spc.catne1 }}</td>
+                    <td  class="text-right">{{ spc.hvsno_s  | default_if_none:"---" | floatformat:0 | intcomma }}</td>
+                    <td  class="text-right">{{ spc.hvsne  | default_if_none:"---" | floatformat:0 | intcomma }}</td>
+                    <td  class="text-right">{{ spc.hvsno1_s  | default_if_none:"---" | floatformat:0 | intcomma }}</td>
+                    <td  class="text-right">{{ spc.hvsne1  | default_if_none:"---" | floatformat:0 | intcomma }}</td>
+                    <td  class="text-right">{{ spc.catno_s  | default_if_none:"---" | floatformat:0 | intcomma }}</td>
+                    <td  class="text-right">{{ spc.catne  | default_if_none:"---" | floatformat:0 | intcomma }}</td>
+                    <td  class="text-right">{{ spc.catno1_s  | default_if_none:"---" | floatformat:0 | intcomma }}</td>
+                    <td  class="text-right">{{ spc.catne1  | default_if_none:"---" | floatformat:0 | intcomma }}</td>
 
-                    <td>{{ spc.effao1_s }}</td>
-                    <td>{{ spc.effae1 }}</td>
+                    <td  class="text-right">{{ spc.effao1_s  | default_if_none:"---" | floatformat | intcomma }}</td>
+                    <td  class="text-right">{{ spc.effae1  | default_if_none:"---" | floatformat | intcomma }}</td>
 
-                    <td>{{ spc.cuenao }}</td>
-                    <td>{{ spc.cuenae }}</td>
-                    <td>{{ spc.cuenao1 }}</td>
-                    <td>{{ spc.cuenae1 }}</td>
+                    <td  class="text-right">{{ spc.cuenao | default_if_none:"---" | floatformat:3 }}</td>
+                    <td  class="text-right">{{ spc.cuenae | default_if_none:"---" | floatformat:3 }}</td>
+                    <td  class="text-right">{{ spc.cuenao1 | default_if_none:"---" | floatformat:3 }}</td>
+                    <td  class="text-right">{{ spc.cuenae1 | default_if_none:"---" | floatformat:3 }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

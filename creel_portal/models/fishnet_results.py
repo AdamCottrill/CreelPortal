@@ -60,6 +60,7 @@ class Strata(models.Model):
     )
 
     class Meta:
+        app_label = "creel_portal"
 
         unique_together = ["creel_run", "stratum_label"]
         ordering = ["creel_run__creel__prj_cd", "creel_run__run", "stratum_label"]
@@ -146,6 +147,7 @@ class FR711(models.Model):
     strat_comb = models.CharField(max_length=11, default="++_++_++_++")
 
     class Meta:
+        app_label = "creel_portal"
         verbose_name = "FR711 - Effort Estimate"
         ordering = ["creel", "run"]
         unique_together = ["creel", "run"]
@@ -194,6 +196,9 @@ class FR712(models.Model):
     )
     strat1 = models.CharField(blank=True, null=True, max_length=11)
     strat_nn = models.IntegerField(default=1)
+
+    class Meta:
+        app_label = "creel_portal"
 
     def __str__(self):
         """return the object type (stratum values), the stratum label, record
@@ -298,6 +303,7 @@ class FR713(models.Model):
     rod_ss = models.IntegerField(blank=True, null=True)
 
     class Meta:
+        app_label = "creel_portal"
         verbose_name = "EffortEstimate"
         unique_together = ["fr712", "date"]
 
@@ -445,6 +451,7 @@ class FR714(models.Model):
     hvsep1_xy = models.FloatField(blank=True, null=True)
 
     class Meta:
+        app_label = "creel_portal"
         verbose_name = "HarvestEstimate"
         ##ordering = [
         #    "stratum__creel_run__creel__prj_cd",
@@ -504,6 +511,7 @@ class FR715(models.Model):
     pty_prop = models.FloatField()
 
     class Meta:
+        app_label = "creel_portal"
         verbose_name = "Angler Options"
 
     def __str__(self):

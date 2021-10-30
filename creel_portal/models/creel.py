@@ -51,6 +51,7 @@ class FN022(models.Model):
     slug = models.SlugField(blank=True, unique=True, editable=False)
 
     class Meta:
+        app_label = "creel_portal"
         verbose_name = "FN022 - Season"
         ordering = ["ssn"]
         unique_together = ["creel", "ssn"]
@@ -154,6 +155,7 @@ class FN023(models.Model):
     slug = models.SlugField(blank=True, unique=True, editable=False)
 
     class Meta:
+        app_label = "creel_portal"
         verbose_name = "FN023 - Day Type"
         ordering = ["dtp"]
         unique_together = ["season", "dtp"]
@@ -218,6 +220,7 @@ class FN024(models.Model):
     slug = models.SlugField(blank=True, unique=True, editable=False)
 
     class Meta:
+        app_label = "creel_portal"
         verbose_name = "FN024 - Period"
         ordering = ["prd"]
         unique_together = ["daytype", "prd"]
@@ -294,6 +297,7 @@ class FN025(models.Model):
     slug = models.SlugField(blank=True, unique=True, editable=False)
 
     class Meta:
+        app_label = "creel_portal"
         verbose_name = "FN025 - Exception Date"
         ordering = ["date"]
         unique_together = ["season", "date"]
@@ -370,6 +374,7 @@ class FN026(models.Model):
     ddlon = models.FloatField(blank=True, null=True)
 
     class Meta:
+        app_label = "creel_portal"
         verbose_name = "FN026 - Spatial Strata"
         verbose_name_plural = "FN026 - Spatial Strata"
         ordering = ["space"]
@@ -450,6 +455,7 @@ class FN028(models.Model):
     slug = models.SlugField(blank=True, unique=True, editable=False)
 
     class Meta:
+        app_label = "creel_portal"
         verbose_name = "FN028 - Fishing Mode"
         ordering = ["mode"]
         unique_together = ["creel", "mode"]
@@ -529,6 +535,7 @@ class FN111(models.Model):
     slug = models.SlugField(blank=True, unique=True, editable=False)
 
     class Meta:
+        app_label = "creel_portal"
         verbose_name = "FN111 - Inveriew Log"
         ordering = ["creel__prj_cd", "sama"]
         unique_together = ["creel", "sama"]
@@ -667,6 +674,7 @@ class FN112(models.Model):
     slug = models.SlugField(blank=True, unique=True, editable=False)
 
     class Meta:
+        app_label = "creel_portal"
         verbose_name = "FN112 - Activity Count"
         ordering = ["sama", "atytm0", "atytm1"]
         unique_together = ["sama", "atytm0", "atytm1"]
@@ -692,8 +700,8 @@ class FN112(models.Model):
             anydate, self.atytm0
         )
         self.atydur = delta.total_seconds() / (60 * 60)
-
-        raw_slug = "-".join([self.sama.creel.prj_cd, self.sama.sama, self.aty0])
+        ts = self.atytm0.strftime("%H:%M")
+        raw_slug = "-".join([self.sama.creel.prj_cd, self.sama.sama, ts])
         self.slug = slugify(raw_slug)
 
         super(FN112, self).save(*args, **kwargs)
