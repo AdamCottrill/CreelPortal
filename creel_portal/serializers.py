@@ -6,6 +6,9 @@ from .models.creel import FN022, FN023, FN024, FN025, FN026, FN028, FN111, FN112
 from .models.fishnet_results import Strata, FR711, FR713, FR714
 
 
+from .api.serializers import UserSerializer
+
+
 class LakeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lake
@@ -19,6 +22,9 @@ class SpeciesSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class FN011Serializer(serializers.HyperlinkedModelSerializer):
+
+    prj_ldr = UserSerializer()
+
     class Meta:
         model = FN011
         fields = (

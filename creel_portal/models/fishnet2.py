@@ -326,7 +326,9 @@ class FN123(models.Model):
     interview = models.ForeignKey(
         FN121, related_name="catch_counts", on_delete=models.CASCADE
     )
-    species = models.ForeignKey(Species, on_delete=models.CASCADE)
+    species = models.ForeignKey(
+        Species, related_name="sc_catch_counts", on_delete=models.CASCADE
+    )
 
     grp = models.CharField(max_length=3, default="00", db_index=True)
     sek = models.BooleanField(default=True)

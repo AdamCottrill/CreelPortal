@@ -134,11 +134,22 @@ STATICFILES_DIRS = [
     # os.path.join(BASE_DIR, "static"),
 ]
 
+# install gdal in virtualenv:
 VIRTUAL_ENV = os.environ["VIRTUAL_ENV"]
 OSGEO_VENV = os.path.join(VIRTUAL_ENV, "Lib/site-packages/osgeo")
 GEOS_LIBRARY_PATH = os.path.join(OSGEO_VENV, "geos_c.dll")
-GDAL_LIBRARY_PATH = os.path.join(OSGEO_VENV, "gdal300.dll")
+GDAL_LIBRARY_PATH = os.path.join(OSGEO_VENV, "gdal303.dll")
+PROJ_LIB = os.path.join(OSGEO_VENV, "data/proj")
+os.environ["PROJ_LIB"] = PROJ_LIB
 os.environ["PATH"] += os.pathsep + str(OSGEO_VENV)
+
+if not os.path.exists(GDAL_LIBRARY_PATH):
+    print("Unable to find GDAL_DLL {}: ".format(GDAL_LIBRARY_PATH))
+if not os.path.exists(GEOS_LIBRARY_PATH):
+    print("Unable to find GEOS_DLL {}: ".format(GEOS_LIBRARY_PATH))
+if not os.path.exists(PROJ_LIB):
+    print("Unable to find PROJ_LIB {}: ".format(PROJ_LIB))
+
 
 # custom user settings
 AUTH_USER_MODEL = "myusers.CustomUser"
