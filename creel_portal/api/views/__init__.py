@@ -1,6 +1,6 @@
 from .FN011_views import CreelList, CreelDetail, FN011ListView
 from .FN022_views import SeasonList, SeasonDetail, TemporalStrataList, FN022ListView
-from .FN023_views import DayTypeList, DayTypeDetail
+from .FN023_views import DayTypeList, DayTypeDetail, FN023ListView
 from .FN024_views import PeriodList, PeriodDetail
 from .FN025_views import ExceptionDateList, ExceptionDateDetail
 from .FN026_views import SpaceList, SpaceDetail
