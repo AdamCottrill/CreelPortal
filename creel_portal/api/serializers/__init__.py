@@ -7,7 +7,7 @@ from .FN022_serializers import (
     FN022ListSerializer,
 )
 from .FN023_serializers import FN023Serializer, FN023ListSerializer
-from .FN024_serializers import FN024Serializer
+from .FN024_serializers import FN024Serializer, FN024ListSerializer
 from .FN025_serializers import FN025Serializer
 from .FN026_serializers import FN026Serializer
 from .FN028_serializers import FN028Serializer
