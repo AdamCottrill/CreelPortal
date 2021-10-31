@@ -1,4 +1,4 @@
-from .FN011_views import CreelList, CreelDetail
+from .FN011_views import CreelList, CreelDetail, FN011ListView
 from .FN022_views import SeasonList, SeasonDetail, TemporalStrataList
 from .FN023_views import DayTypeList, DayTypeDetail
 from .FN024_views import PeriodList, PeriodDetail

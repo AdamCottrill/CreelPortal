@@ -36,3 +36,28 @@ class FN011Serializer(serializers.ModelSerializer):
             "contmeth",
             "slug",
         )
+
+
+class FN011ReadOnlySerializer(serializers.ModelSerializer):
+    """A serializer for our FN011 creel objects. It is readonly, fast and flat."""
+
+    prj_ldr = serializers.CharField(read_only=True, source="_prj_ldr")
+    lake = serializers.CharField(read_only=True, source="_lake")
+
+    class Meta:
+        model = FN011
+
+        fields = (
+            "slug",
+            "lake",
+            "prj_date0",
+            "prj_date1",
+            "prj_cd",
+            "year",
+            "prj_nm",
+            "prj_ldr",
+            # "field_crew",
+            "comment0",
+            "contmeth",
+            "slug",
+        )

@@ -55,26 +55,27 @@ urlpatterns = [
         name="edit_creel_space",
     ),
     # api urls
-    path("api/v1/", include(router.urls)),
+    path("api/v0/", include(router.urls)),
     path(
-        ("api/v1/effort_estimates/<slug:slug>/"),
+        ("api/v0/effort_estimates/<slug:slug>/"),
         # api_views.EffortEstimates.as_view(),
         views.effort_estimates_json,
         name="effort_estimates",
     ),
     path(
-        ("api/v1/catch_estimates/<slug:slug>/"),
+        ("api/v0/catch_estimates/<slug:slug>/"),
         # api_views.CatchEstimates.as_view(),
         views.catch_estimates_json,
         name="catch_estimates",
     ),
     path(
-        ("api/v1/creel_spaces/<slug:slug>/"),
+        ("api/v0/creel_spaces/<slug:slug>/"),
         api_views.CreelSpaces.as_view(),
         name="creel_spaces",
     ),
     # The real api:
     path(
-        "api/", include(("creel_portal.api.urls", "creel-api"), namespace="creel-api")
+        "api/v1/",
+        include(("creel_portal.api.urls", "creel-api"), namespace="creel-api"),
     ),
 ]

@@ -32,6 +32,7 @@ from .views import (
     ActivityCountList,
     InterviewLogList,
     InterviewList,
+    FN011ListView,
 )
 
 urlpatterns = [
@@ -107,4 +108,5 @@ urlpatterns = [
     path(
         "creel/<str:prj_cd>/interviews", InterviewList.as_view(), name="interview-list"
     ),
+    path("fn011/", FN011ListView.as_view(), name="fn011-list"),
 ]
