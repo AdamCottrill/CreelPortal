@@ -1,7 +1,11 @@
 from .common_serializers import UserSerializer, LakeSerializer, SpeciesSerializer
 
 from .FN011_serializers import FN011Serializer, FN011ReadOnlySerializer
-from .FN022_serializers import FN022Serializer, TemporalStrataSerializer
+from .FN022_serializers import (
+    FN022Serializer,
+    TemporalStrataSerializer,
+    FN022ListSerializer,
+)
 from .FN023_serializers import FN023Serializer
 from .FN024_serializers import FN024Serializer
 from .FN025_serializers import FN025Serializer
