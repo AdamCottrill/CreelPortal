@@ -43,6 +43,8 @@ from .views import (
     FN112ListView,
     FN121ListView,
     FN123ListView,
+    FN125ListView,
+    FN125LampreyListView,
 )
 
 urlpatterns = [
@@ -129,4 +131,6 @@ urlpatterns = [
     path("sc112/", FN112ListView.as_view(), name="fn112-list"),
     path("sc121/", FN121ListView.as_view(), name="fn121-list"),
     path("sc123/", FN123ListView.as_view(), name="fn123-list"),
+    path("sc125/", FN125ListView.as_view(), name="fn125-list"),
+    path("sc125lamprey/", FN125LampreyListView.as_view(), name="fn125-lamprey-list"),
 ]

@@ -9,3 +9,5 @@ from .FN111_Filter import FN111Filter
 from .FN112_Filter import FN112Filter
 from .FN121_Filter import FN121Filter
 from .FN123_Filter import FN123Filter
+from .FN125_Filter import FN125Filter
+from .FN125Lamprey_Filter import FN125LampreyFilter

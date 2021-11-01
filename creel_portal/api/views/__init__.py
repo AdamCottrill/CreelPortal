@@ -9,3 +9,5 @@ from .FN111_views import InterviewLogList, ActivityCountList, FN111ListView
 from .FN112_views import FN112ListView
 from .FN121_views import InterviewList, FN121ListView
 from .FN123_views import FN123ListView
+from .FN125_views import FN125ListView
+from .FN125Lamprey_views import FN125LampreyListView
