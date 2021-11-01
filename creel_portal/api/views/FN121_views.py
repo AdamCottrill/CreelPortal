@@ -1,8 +1,11 @@
+from django.db.models import F
 from rest_framework import generics
 
 from ...models import FN121
 from ..filters import FN121Filter
-from ..serializers import FN121Serializer
+from ..serializers import FN121Serializer, FN121ListSerializer
+from ..permissions import ReadOnly
+from ..pagination import StandardResultsSetPagination
 
 
 class InterviewList(generics.ListAPIView):
@@ -13,8 +16,7 @@ class InterviewList(generics.ListAPIView):
     filter_class = FN121Filter
 
     def get_queryset(self):
-        """
-        """
+        """ """
 
         prj_cd = self.kwargs.get("prj_cd")
         return (
@@ -28,5 +30,60 @@ class InterviewList(generics.ListAPIView):
                 "sama__daytype",
                 "sama__area",
                 "sama__mode",
+            )
+        )
+
+
+class FN121ListView(generics.ListAPIView):
+    """A readonly enpoint to return FN121 - season strata data in format
+    that closely matches FN-portal and FN-2 schema.."""
+
+    serializer_class = FN121ListSerializer
+    filterset_class = FN121Filter
+    pagination_class = StandardResultsSetPagination
+    permission_classes = [ReadOnly]
+
+    def get_queryset(self):
+        """"""
+        return (
+            FN121.objects.select_related("sama", "sama__creel")
+            .annotate(
+                prj_cd=F("sama__creel__prj_cd"),
+                _sama=F("sama__sama"),
+                season=F("sama__season__ssn"),
+                daytype=F("sama__daytype__dtp"),
+                period=F("sama__period__prd"),
+                space=F("sama__area__space"),
+                mode=F("sama__mode__mode"),
+            )
+            .order_by("slug")
+            .values(
+                "prj_cd",
+                "_sama",
+                "season",
+                "daytype",
+                "period",
+                "space",
+                "mode",
+                "sam",
+                "itvseq",
+                "itvtm0",
+                "date",
+                "efftm0",
+                "efftm1",
+                "effcmp",
+                "effdur",
+                "persons",
+                "anglers",
+                "rods",
+                "angmeth",
+                "angvis",
+                "angorig",
+                "angop1",
+                "angop2",
+                "angop3",
+                "comment1",
+                "slug",
+                "id",
             )
         )
