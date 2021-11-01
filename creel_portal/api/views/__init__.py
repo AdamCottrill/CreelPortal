@@ -6,4 +6,5 @@ from .FN025_views import ExceptionDateList, ExceptionDateDetail, FN025ListView
 from .FN026_views import SpaceList, SpaceDetail, FN026ListView
 from .FN028_views import FishingModeList, FishingModeDetail, FN028ListView
 from .FN111_views import InterviewLogList, ActivityCountList, FN111ListView
+from .FN112_views import FN112ListView
 from .FN121_views import InterviewList
