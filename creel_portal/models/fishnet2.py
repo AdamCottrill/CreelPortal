@@ -45,8 +45,7 @@ User = get_user_model()
 
 # note = move this to main.models too
 class FN011(models.Model):
-    """Class to hold a record for each project
-    """
+    """Class to hold a record for each project"""
 
     lake = models.ForeignKey(
         Lake, default=1, related_name="creels", on_delete=models.CASCADE
@@ -263,8 +262,7 @@ class FN011(models.Model):
 
 
 class FN121(models.Model):
-    """Class to represent the creel intervews.
-    """
+    """Class to represent the creel intervews."""
 
     # creel = models.ForeignKey(FN011, related_name='interviews')
     sama = models.ForeignKey(
@@ -303,8 +301,7 @@ class FN121(models.Model):
         # unique_together = ['sama__creel_id', 'sam']
 
     def save(self, *args, **kwargs):
-        """
-        """
+        """ """
 
         raw_slug = "-".join([self.sama.creel.prj_cd, self.sam])
 
@@ -313,8 +310,8 @@ class FN121(models.Model):
 
     def __str__(self):
         """return the object type, the interview log number (sama), the stratum,
-        and project code of the creel this record is assoicated
-       with.
+         and project code of the creel this record is assoicated
+        with.
 
         """
         repr = "<Interview: {} ({})>"
@@ -322,8 +319,7 @@ class FN121(models.Model):
 
 
 class FN123(models.Model):
-    """Class to represent the creel catch counts.
-    """
+    """Class to represent the creel catch counts."""
 
     interview = models.ForeignKey(
         FN121, related_name="catch_counts", on_delete=models.CASCADE
@@ -348,8 +344,7 @@ class FN123(models.Model):
         unique_together = ["interview", "grp", "species"]
 
     def save(self, *args, **kwargs):
-        """
-        """
+        """ """
 
         raw_slug = "-".join(
             [
@@ -365,8 +360,8 @@ class FN123(models.Model):
 
     def __str__(self):
         """return the object type, the interview log number (sama), the stratum,
-        and project code of the creel this record is assoicated
-       with.
+         and project code of the creel this record is assoicated
+        with.
 
         """
         repr = "<Catch: {}-{}-{}-{}>"
@@ -379,8 +374,7 @@ class FN123(models.Model):
 
 
 class FN125(models.Model):
-    """Class to represent the attributes of sampled fish..
-    """
+    """Class to represent the attributes of sampled fish.."""
 
     SEX_CHOICES = ((1, "Male"), (2, "Female"), (9, "Unknown"))
 
@@ -417,8 +411,7 @@ class FN125(models.Model):
         unique_together = ["catch", "fish"]
 
     def save(self, *args, **kwargs):
-        """
-        """
+        """ """
 
         raw_slug = "-".join(
             [
@@ -449,7 +442,7 @@ class FN125(models.Model):
 
 
 class FN125_Lamprey(models.Model):
-    """ a table for lamprey data. """
+    """a table for lamprey data."""
 
     fish = models.ForeignKey(
         FN125, related_name="lamprey_marks", on_delete=models.CASCADE
@@ -509,8 +502,7 @@ class FN125_Lamprey(models.Model):
 
 
 class FN125_Tag(models.Model):
-    """ a table for the tag(s) assoicated with a fish.
-    """
+    """a table for the tag(s) assoicated with a fish."""
 
     fish = models.ForeignKey(FN125, related_name="fishtags", on_delete=models.CASCADE)
     slug = models.CharField(max_length=100, unique=True)
@@ -553,15 +545,51 @@ class FN125_Tag(models.Model):
 
 
 class FN126(models.Model):
-    """ a table for diet data collected in the field.
-    """
+    """a table for diet data collected in the field."""
 
     fish = models.ForeignKey(FN125, related_name="diet_data", on_delete=models.CASCADE)
     slug = models.CharField(max_length=100, unique=True)
     food = models.IntegerField()
 
-    taxon = models.CharField(max_length=10, db_index=True, blank=True, null=True)
-    foodcnt = models.IntegerField(blank=True, null=True)
+    taxon = models.CharField(
+        "A taxonomic code used to identify the type of food item.",
+        max_length=10,
+        db_index=True,
+        blank=True,
+        null=True,
+    )
+    foodcnt = models.IntegerField("Food Count", blank=True, null=True)
+    foodval = models.FloatField("Food Measure Value", blank=True, null=True)
+
+    FDMES_CHOICES = (
+        (None, "No Data"),
+        ("L", "Length"),
+        ("W", "Weight"),
+        ("V", "Volume"),
+    )
+    fdmes = models.CharField(
+        help_text="Food Measure Code",
+        max_length=2,
+        blank=True,
+        choices=FDMES_CHOICES,
+    )
+
+    LIFESTAGE_CHOICES = (
+        (None, "No Data"),
+        ("10", "10"),
+        ("20", "20"),
+        ("30", "30"),
+        ("40", "40"),
+        ("50", "50"),
+        ("60", "60"),
+    )
+    lf = models.CharField(
+        help_text="Life Stage",
+        max_length=2,
+        blank=True,
+        choices=LIFESTAGE_CHOICES,
+    )
+
     comment6 = models.TextField(blank=True, null=True)
 
     class Meta:
@@ -592,17 +620,39 @@ class FN127(models.Model):
     )
 
     ageid = models.IntegerField()
-    agea = models.IntegerField(blank=True, null=True)
-    agemt = models.CharField(max_length=6)
-    conf = models.IntegerField(blank=True, null=True)
-    edge = models.CharField(max_length=2, blank=True, null=True)
-    nca = models.IntegerField(blank=True, null=True)
+
+    agea = models.IntegerField(
+        "Age Assessed (yr)", blank=True, null=True, db_index=True
+    )
+    agemt = models.CharField("Age Method Data", max_length=6)
+    edge = models.CharField("Edge Code", max_length=2, blank=True, null=True)
+    conf = models.IntegerField("Confidence", blank=True, null=True)
+    nca = models.IntegerField("Number of Complete Annuli", blank=True, null=True)
+
+    preferred = models.BooleanField(
+        "Preferred age estimate for a fish", default=False, db_index=True
+    )
+    agest = models.CharField(
+        "Age Structure", max_length=5, db_index=True, blank=True, null=True
+    )
+
+    ageaDate = models.DateTimeField(blank=True, null=True)
+    comment7 = models.TextField(blank=True, null=True)
+    slug = models.SlugField(max_length=100, unique=True)
 
     class Meta:
         app_label = "creel_portal"
         verbose_name = "FN127 - AgeEstimate"
         ordering = ["fish", "ageid"]
         unique_together = ["fish", "ageid"]
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.fishnet_keys())
+        super(FN127, self).save(*args, **kwargs)
+
+    def fishnet_keys(self):
+        """return the fish-net II key fields for this record"""
+        return "{}-{}".format(self.fish, self.ageid)
 
     def __str__(self):
         """return the object type (fish), and the fishnet key fields prj_cd,

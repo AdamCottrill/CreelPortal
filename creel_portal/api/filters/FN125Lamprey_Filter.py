@@ -34,17 +34,11 @@ class FN125LampreyFilter(FishAttrFilters):
     lamijc__null = django_filters.BooleanFilter(
         field_name="lamijc", lookup_expr="isnull"
     )
-    lamijc__not_null = django_filters.BooleanFilter(
-        field_name="lamijc", lookup_expr="isnull", exclude=True
-    )
 
     lamijc_type = ValueInFilter(field_name="lamijc_type")
     lamijc_type__not = ValueInFilter(field_name="lamijc_type", exclude=True)
     lamijc_type__null = django_filters.BooleanFilter(
         field_name="lamijc_type", lookup_expr="isnull"
-    )
-    lamijc_type__not_null = django_filters.BooleanFilter(
-        field_name="lamijc_type", lookup_expr="isnull", exclude=True
     )
 
     class Meta:

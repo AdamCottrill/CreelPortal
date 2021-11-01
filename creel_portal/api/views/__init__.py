@@ -11,3 +11,6 @@ from .FN121_views import InterviewList, FN121ListView
 from .FN123_views import FN123ListView
 from .FN125_views import FN125ListView
 from .FN125Lamprey_views import FN125LampreyListView
+from .FN125Tag_views import FN125TagListView
+from .FN126_views import FN126ListView
+from .FN127_views import FN127ListView

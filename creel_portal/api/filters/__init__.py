@@ -11,3 +11,6 @@ from .FN121_Filter import FN121Filter
 from .FN123_Filter import FN123Filter
 from .FN125_Filter import FN125Filter
 from .FN125Lamprey_Filter import FN125LampreyFilter
+from .FN125Tag_Filter import FN125TagFilter
+from .FN126_Filter import FN126Filter
+from .FN127_Filter import FN127Filter
