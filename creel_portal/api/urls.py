@@ -42,6 +42,7 @@ from .views import (
     FN111ListView,
     FN112ListView,
     FN121ListView,
+    FN123ListView,
 )
 
 urlpatterns = [
@@ -117,14 +118,15 @@ urlpatterns = [
     path(
         "creel/<str:prj_cd>/interviews", InterviewList.as_view(), name="interview-list"
     ),
-    path("fn011/", FN011ListView.as_view(), name="fn011-list"),
-    path("fn022/", FN022ListView.as_view(), name="fn022-list"),
-    path("fn023/", FN023ListView.as_view(), name="fn023-list"),
-    path("fn024/", FN024ListView.as_view(), name="fn024-list"),
-    path("fn025/", FN025ListView.as_view(), name="fn025-list"),
-    path("fn026/", FN026ListView.as_view(), name="fn026-list"),
-    path("fn028/", FN028ListView.as_view(), name="fn028-list"),
-    path("fn111/", FN111ListView.as_view(), name="fn111-list"),
-    path("fn112/", FN112ListView.as_view(), name="fn112-list"),
-    path("fn121/", FN121ListView.as_view(), name="fn121-list"),
+    path("sc011/", FN011ListView.as_view(), name="fn011-list"),
+    path("sc022/", FN022ListView.as_view(), name="fn022-list"),
+    path("sc023/", FN023ListView.as_view(), name="fn023-list"),
+    path("sc024/", FN024ListView.as_view(), name="fn024-list"),
+    path("sc025/", FN025ListView.as_view(), name="fn025-list"),
+    path("sc026/", FN026ListView.as_view(), name="fn026-list"),
+    path("sc028/", FN028ListView.as_view(), name="fn028-list"),
+    path("sc111/", FN111ListView.as_view(), name="fn111-list"),
+    path("sc112/", FN112ListView.as_view(), name="fn112-list"),
+    path("sc121/", FN121ListView.as_view(), name="fn121-list"),
+    path("sc123/", FN123ListView.as_view(), name="fn123-list"),
 ]
