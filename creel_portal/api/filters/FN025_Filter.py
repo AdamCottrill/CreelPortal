@@ -172,14 +172,6 @@ class FN025Filter(FN025SubFilter):
     class Meta:
         model = FN025
         fields = [
-            "season__creel__year",
-            "season__creel__prj_cd",
-            "season__creel__lake",
-            "season__creel__contmeth",
-            "season__ssn",
-            "season__ssn_des",
-            "season__ssn_date0",
-            "season__ssn_date1",
             "dtp1",
             "date",
             "description",

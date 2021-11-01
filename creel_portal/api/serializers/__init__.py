@@ -11,7 +11,7 @@ from .FN024_serializers import FN024Serializer, FN024ListSerializer
 from .FN025_serializers import FN025Serializer, FN025ListSerializer
 from .FN026_serializers import FN026Serializer, FN026ListSerializer
 from .FN028_serializers import FN028Serializer, FN028ListSerializer
-from .FN111_serializers import FN111Serializer
+from .FN111_serializers import FN111Serializer, FN111ListSerializer
 from .FN112_serializers import FN112Serializer
 from .FN121_serializers import FN121Serializer
 from .FN123_serializers import FN123Serializer

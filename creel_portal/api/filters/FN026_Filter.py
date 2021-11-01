@@ -144,10 +144,6 @@ class FN026Filter(FN026SubFilter):
     class Meta:
         model = FN026
         fields = [
-            "creel__year",
-            "creel__prj_cd",
-            "creel__lake",
-            "creel__contmeth",
             "space",
             "space_des",
             "space_siz",

@@ -134,10 +134,6 @@ class FN022Filter(FN022SubFilter):
     class Meta:
         model = FN022
         fields = [
-            "creel__year",
-            "creel__prj_cd",
-            "creel__lake",
-            "creel__contmeth",
             "ssn",
             "ssn_des",
             "ssn_date0",

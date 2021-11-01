@@ -202,16 +202,6 @@ class FN024Filter(FN024SubFilter):
     class Meta:
         model = FN024
         fields = [
-            "daytype__season__creel__year",
-            "daytype__season__creel__prj_cd",
-            "daytype__season__creel__lake",
-            "daytype__season__creel__contmeth",
-            "daytype__season__ssn",
-            "daytype__season__ssn_des",
-            "daytype__season__ssn_date0",
-            "daytype__season__ssn_date1",
-            "daytype__dtp",
-            "daytype__dtp_nm",
             "prd",
             "prdtm0",
             "prdtm1",
