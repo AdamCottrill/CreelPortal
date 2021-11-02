@@ -634,9 +634,7 @@ class FN123Admin(admin.ModelAdmin):
     get_sam.short_description = "SAM"
 
     def get_species(self, object):
-        return "{} ({})".format(
-            object.species.common_name.title(), object.species.species_code
-        )
+        return "{} ({})".format(object.species.spc_nmco.title(), object.species.spc)
 
     get_species.short_description = "Species"
 

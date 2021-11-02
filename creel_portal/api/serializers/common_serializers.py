@@ -45,4 +45,4 @@ class SpeciesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Species
-        fields = ("id", "species_code", "common_name", "scientific_name")
+        fields = ("id", "spc", "spc_nmco", "spc_nmsc")

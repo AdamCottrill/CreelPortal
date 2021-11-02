@@ -18,7 +18,7 @@ class LakeSerializer(serializers.ModelSerializer):
 class SpeciesSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Species
-        fields = ("id", "species_code", "common_name", "scientific_name")
+        fields = ("id", "spc", "spc_nmco", "spc_nmsc")
 
 
 class FN011Serializer(serializers.HyperlinkedModelSerializer):
@@ -257,7 +257,7 @@ class FR714Serializer(serializers.ModelSerializer):
     ddlat = serializers.FloatField(source="stratum.area.ddlat", read_only=True)
     ddlon = serializers.FloatField(source="stratum.area.ddlon", read_only=True)
 
-    species = serializers.CharField(source="species.common_name", read_only=True)
+    species = serializers.CharField(source="species.spc_nmco", read_only=True)
 
     class Meta:
         model = FR714

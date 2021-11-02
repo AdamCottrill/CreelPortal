@@ -1,11 +1,20 @@
-from django.urls import path, include
-from rest_framework import routers
+from django.urls import path, include, re_path
+from rest_framework import routers, permissions
+
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
 
 from . import views
 from . import api_views
 
-prj_cd_regex = r"(?P<slug>[A-Za-z]{3}_[A-Za-z]{2}\d{2}_([A-Za-z]|\d){3})"
+# readonly api endpoints:
+from .api.urls import urlpatterns as api_urls
 
+
+API_TITLE = "Creel Portal API"
+API_DESC = "A Restful API for your Creel Survey Data"
+
+prj_cd_regex = r"(?P<slug>[A-Za-z]{3}_[A-Za-z]{2}\d{2}_([A-Za-z]|\d){3})"
 
 router = routers.DefaultRouter()
 router.register(r"species", api_views.SpeciesViewSet)
@@ -31,9 +40,6 @@ router.register(r"age_estimates", api_views.AgeEstimateViewSet)
 
 
 urlpatterns = [
-    path("", views.CreelListView.as_view(), name="creel_list"),
-    path("", views.CreelListView.as_view(), name="home"),
-    path("<str:lake>/", views.CreelListView.as_view(), name="creels_by_lake"),
     path(
         ("creel_detail/<slug:slug>/"),
         views.CreelDetailView.as_view(),
@@ -78,4 +84,42 @@ urlpatterns = [
         "api/v1/",
         include(("creel_portal.api.urls", "creel-api"), namespace="creel-api"),
     ),
+]
+
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title=API_TITLE,
+        default_version="v1",
+        description=API_DESC,
+        terms_of_service="https://www.google.com/policies/terms/",
+        contact=openapi.Contact(email="adam.cottrill@ontario.ca"),
+        license=openapi.License(name="BSD License"),
+    ),
+    # generate docs for all endpoint from here down:
+    patterns=api_urls,
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
+
+
+urlpatterns += [
+    # =============================================
+    #          API AND DOCUMENTATION
+    # api documentation
+    re_path(
+        r"^swagger(?P<format>\.json|\.yaml)$",
+        schema_view.without_ui(cache_timeout=0),
+        name="schema-json",
+    ),
+    path(
+        "swagger/",
+        schema_view.with_ui("swagger", cache_timeout=0),
+        name="schema-swagger-ui",
+    ),
+    path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
+    #          API AND DOCUMENTATION
+    path("", views.CreelListView.as_view(), name="home"),
+    path("", views.CreelListView.as_view(), name="creel_list"),
+    path("<str:lake>/", views.CreelListView.as_view(), name="creels_by_lake"),
 ]
