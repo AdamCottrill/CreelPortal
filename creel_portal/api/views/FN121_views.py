@@ -50,9 +50,9 @@ class FN121ListView(generics.ListAPIView):
             .annotate(
                 prj_cd=F("sama__creel__prj_cd"),
                 _sama=F("sama__sama"),
-                season=F("sama__season__ssn"),
-                daytype=F("sama__daytype__dtp"),
-                period=F("sama__period__prd"),
+                ssn=F("sama__season__ssn"),
+                dtp=F("sama__daytype__dtp"),
+                prd=F("sama__period__prd"),
                 space=F("sama__area__space"),
                 mode=F("sama__mode__mode"),
             )
@@ -60,9 +60,9 @@ class FN121ListView(generics.ListAPIView):
             .values(
                 "prj_cd",
                 "_sama",
-                "season",
-                "daytype",
-                "period",
+                "ssn",
+                "dtp",
+                "prd",
                 "space",
                 "mode",
                 "sam",

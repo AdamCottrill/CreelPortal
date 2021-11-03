@@ -70,20 +70,20 @@ class FN111ListView(generics.ListAPIView):
             )
             .annotate(
                 prj_cd=F("creel__prj_cd"),
-                _season=F("season__ssn"),
-                _daytype=F("daytype__dtp"),
-                _period=F("period__prd"),
-                _area=F("area__space"),
+                ssn=F("season__ssn"),
+                dtp=F("daytype__dtp"),
+                prd=F("period__prd"),
+                space=F("area__space"),
                 _mode=F("mode__mode"),
             )
             .order_by("slug")
             .values(
                 "prj_cd",
                 "sama",
-                "_season",
-                "_daytype",
-                "_period",
-                "_area",
+                "ssn",
+                "dtp",
+                "prd",
+                "space",
                 "_mode",
                 "date",
                 "samtm0",
