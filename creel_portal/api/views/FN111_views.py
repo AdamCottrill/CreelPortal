@@ -5,7 +5,7 @@ from ...models import FN111
 from ..filters import FN111Filter
 from ..serializers import FN111Serializer, FN111ListSerializer
 from ..permissions import IsPrjLeadOrAdminOrReadOnly, ReadOnly
-from ..pagination import StandardResultsSetPagination
+from ..pagination import LargeResultsSetPagination
 
 
 class InterviewLogList(generics.ListAPIView):
@@ -54,7 +54,7 @@ class FN111ListView(generics.ListAPIView):
 
     serializer_class = FN111ListSerializer
     filterset_class = FN111Filter
-    pagination_class = StandardResultsSetPagination
+    pagination_class = LargeResultsSetPagination
     permission_classes = [ReadOnly]
 
     def get_queryset(self):

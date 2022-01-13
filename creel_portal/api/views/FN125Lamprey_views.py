@@ -5,7 +5,7 @@ from ...models import FN125_Lamprey
 from ..filters import FN125LampreyFilter
 from ..serializers import FN125LampreyListSerializer
 from ..permissions import ReadOnly
-from ..pagination import StandardResultsSetPagination
+from ..pagination import LargeResultsSetPagination
 
 
 class FN125LampreyListView(generics.ListAPIView):
@@ -14,7 +14,7 @@ class FN125LampreyListView(generics.ListAPIView):
 
     serializer_class = FN125LampreyListSerializer
     filterset_class = FN125LampreyFilter
-    pagination_class = StandardResultsSetPagination
+    pagination_class = LargeResultsSetPagination
     permission_classes = [ReadOnly]
 
     def get_queryset(self):

@@ -5,7 +5,7 @@ from ...models import FN125_Tag
 from ..filters import FN125TagFilter
 from ..serializers import FN125TagListSerializer
 from ..permissions import ReadOnly
-from ..pagination import StandardResultsSetPagination
+from ..pagination import LargeResultsSetPagination
 
 
 class FN125TagListView(generics.ListAPIView):
@@ -14,7 +14,7 @@ class FN125TagListView(generics.ListAPIView):
 
     serializer_class = FN125TagListSerializer
     filterset_class = FN125TagFilter
-    pagination_class = StandardResultsSetPagination
+    pagination_class = LargeResultsSetPagination
     permission_classes = [ReadOnly]
 
     def get_queryset(self):

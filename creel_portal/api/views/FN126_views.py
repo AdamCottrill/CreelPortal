@@ -5,7 +5,7 @@ from ...models import FN126
 from ..filters import FN126Filter
 from ..serializers import FN126ListSerializer
 from ..permissions import ReadOnly
-from ..pagination import StandardResultsSetPagination
+from ..pagination import LargeResultsSetPagination
 
 
 class FN126ListView(generics.ListAPIView):
@@ -14,7 +14,7 @@ class FN126ListView(generics.ListAPIView):
 
     serializer_class = FN126ListSerializer
     filterset_class = FN126Filter
-    pagination_class = StandardResultsSetPagination
+    pagination_class = LargeResultsSetPagination
     permission_classes = [ReadOnly]
 
     def get_queryset(self):

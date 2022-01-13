@@ -51,11 +51,6 @@ class FN111ListSerializer(serializers.ModelSerializer):
     dtp = serializers.CharField(read_only=True)
     prd = serializers.CharField(read_only=True)
     space = serializers.CharField(read_only=True)
-
-    # season = serializers.CharField(read_only=True, source="_season")
-    # daytype = serializers.CharField(read_only=True, source="_daytype")
-    # period = serializers.CharField(read_only=True, source="_period")
-    # space = serializers.CharField(read_only=True, source="_area")
     mode = serializers.CharField(read_only=True, source="_mode")
 
     class Meta:
