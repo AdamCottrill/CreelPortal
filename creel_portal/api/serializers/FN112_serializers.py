@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from ...models.creel import FN112
+from ...models import FN112
 
 
 class FN112Serializer(serializers.ModelSerializer):

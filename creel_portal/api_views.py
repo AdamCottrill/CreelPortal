@@ -3,9 +3,8 @@ from rest_framework import viewsets, generics
 
 from common.models import Lake, Species
 
-from creel_portal.models.fishnet2 import FN011, FN121, FN123, FN125, FN127
-
-from creel_portal.models.creel import (
+from creel_portal.models.FN0_models import (
+    FN011,
     FN022,
     FN023,
     FN024,
@@ -15,7 +14,8 @@ from creel_portal.models.creel import (
     FN111,
     FN112,
 )
-from creel_portal.models.fishnet_results import Strata, FR711, FR713, FR714
+from creel_portal.models.FN1_models import FN121, FN123, FN125, FN127
+from creel_portal.models.FR7_models import Strata, FR711, FR713, FR714
 
 
 # serializers for common elements
@@ -223,8 +223,7 @@ class EffortEstimates(generics.ListAPIView):
     serializer_class = FR713Serializer
 
     def get_queryset(self):
-        """
-        """
+        """ """
         slug = self.kwargs["slug"]
 
         # final_run = FN011.objects.get(slug=slug).final_run.run
@@ -284,8 +283,7 @@ class CatchEstimates(generics.ListAPIView):
     serializer_class = FR714Serializer
 
     def get_queryset(self):
-        """
-        """
+        """ """
         slug = self.kwargs["slug"]
 
         final_run = FN011.objects.get(slug=slug).final_run.run
@@ -304,8 +302,7 @@ class CreelSpaces(generics.ListAPIView):
     serializer_class = FN026Serializer
 
     def get_queryset(self):
-        """
-        """
+        """ """
         slug = self.kwargs["slug"]
 
         qs = FN026.objects.filter(creel__slug=slug).filter(

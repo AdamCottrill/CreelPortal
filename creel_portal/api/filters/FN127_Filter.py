@@ -1,7 +1,7 @@
 import django_filters
 from rest_framework import serializers
 
-from ...models.fishnet2 import FN127
+from ...models import FN127
 from .filter_utils import ValueInFilter
 from .FishAttr_Filter import FishAttrFilters
 

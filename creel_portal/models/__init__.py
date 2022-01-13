@@ -1,5 +1,4 @@
-from .fishnet2 import (
-    FN011,
+from .FN1_models import (
     FN121,
     FN123,
     FN125,
@@ -9,5 +8,5 @@ from .fishnet2 import (
     FN127,
 )
 
-from .creel import FN022, FN023, FN024, FN025, FN026, FN028, FN111, FN112
-from .fishnet_results import Strata, FR711, FR712, FR713, FR714
+from .FN0_models import FN011, FN022, FN023, FN024, FN025, FN026, FN028, FN111, FN112
+from .FR7_models import Strata, FR711, FR712, FR713, FR714, FR715

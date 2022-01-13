@@ -15,7 +15,7 @@
 import django_filters
 from django_filters import rest_framework as filters
 
-from ...models.fishnet2 import FN123
+from ...models import FN123
 from .filter_utils import ValueInFilter
 
 

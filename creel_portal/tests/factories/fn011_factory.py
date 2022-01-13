@@ -19,7 +19,7 @@ import factory
 
 from datetime import datetime
 
-from creel_portal.models.fishnet2 import FN011
+from creel_portal.models import FN011
 from .user_factory import UserFactory
 from .common_factories import LakeFactory
 

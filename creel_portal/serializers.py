@@ -1,9 +1,20 @@
 from rest_framework import serializers
 
 from common.models import Lake, Species
-from .models.fishnet2 import FN011, FN121, FN123, FN125, FN127
-from .models.creel import FN022, FN023, FN024, FN025, FN026, FN028, FN111, FN112
-from .models.fishnet_results import Strata, FR711, FR713, FR714
+
+from .models.FN0_models import (
+    FN011,
+    FN022,
+    FN023,
+    FN024,
+    FN025,
+    FN026,
+    FN028,
+    FN111,
+    FN112,
+)
+from .models.FN1_models import FN121, FN123, FN125, FN127
+from .models.FR7_models import Strata, FR711, FR713, FR714
 
 
 from .api.serializers import UserSerializer

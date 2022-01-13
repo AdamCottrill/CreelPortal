@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from ...models.fishnet2 import FN123
+from ...models import FN123
 from .common_serializers import SpeciesSerializer
 
 

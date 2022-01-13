@@ -17,7 +17,7 @@ import factory
 from datetime import datetime
 
 from .fn011_factory import FN011Factory
-from creel_portal.models.creel import (
+from creel_portal.models import (
     FN022,
     FN023,
     FN024,

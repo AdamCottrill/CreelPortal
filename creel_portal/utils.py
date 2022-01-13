@@ -16,7 +16,7 @@ import json
 from django.db.models import Sum, F
 
 from common.models import Species
-from .models.fishnet_results import FR713, FR714
+from .models import FR713, FR714
 
 
 def is_admin(user):

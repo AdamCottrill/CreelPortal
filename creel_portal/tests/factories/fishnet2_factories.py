@@ -24,7 +24,7 @@ import factory
 
 from datetime import datetime
 
-from creel_portal.models.fishnet2 import (
+from creel_portal.models import (
     FN121,
     FN123,
     FN125,
@@ -88,9 +88,7 @@ class FN125Factory(factory.DjangoModelFactory):
 
 
 class FN125TagFactory(factory.DjangoModelFactory):
-    """A factory for tags associated wtih a fish
-
-    """
+    """A factory for tags associated wtih a fish"""
 
     class Meta:
         model = FN125_Tag
@@ -104,9 +102,7 @@ class FN125TagFactory(factory.DjangoModelFactory):
 
 
 class FN125LampreyFactory(factory.DjangoModelFactory):
-    """A factory for Lamprey Wounds associated wtih a fish
-
-    """
+    """A factory for Lamprey Wounds associated wtih a fish"""
 
     class Meta:
         model = FN125_Lamprey
@@ -120,9 +116,7 @@ class FN125LampreyFactory(factory.DjangoModelFactory):
 
 
 class FN127Factory(factory.DjangoModelFactory):
-    """A factory for age estimates for a particular fish.
-
-    """
+    """A factory for age estimates for a particular fish."""
 
     class Meta:
         model = FN127

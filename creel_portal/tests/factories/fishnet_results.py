@@ -14,7 +14,7 @@
 
 import factory
 
-from creel_portal.models.fishnet_results import (
+from creel_portal.models import (
     FR711,
     Strata,
     FR712,
@@ -99,9 +99,7 @@ class FR712Factory(factory.DjangoModelFactory):
 
 
 class FR713Factory(factory.DjangoModelFactory):
-    """A factory for creel effort estimates.
-
-    """
+    """A factory for creel effort estimates."""
 
     class Meta:
         model = FR713
@@ -127,9 +125,7 @@ class FR713Factory(factory.DjangoModelFactory):
 
 
 class FR714Factory(factory.DjangoModelFactory):
-    """A factory for creel harvest estimates.
-
-    """
+    """A factory for creel harvest estimates."""
 
     class Meta:
         model = FR714
@@ -168,8 +164,7 @@ class FR714Factory(factory.DjangoModelFactory):
 
 
 class FR715Factory(factory.DjangoModelFactory):
-    """A factory for angler option results.
-    """
+    """A factory for angler option results."""
 
     class Meta:
         model = FR715

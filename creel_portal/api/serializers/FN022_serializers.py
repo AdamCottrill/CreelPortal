@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from ...models.creel import FN022
+from ...models import FN022
 from .FN023_serializers import NestedFN023Serializer
 from .FN025_serializers import FN025Serializer
 

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from ...models.fishnet2 import FN011
+from ...models import FN011
 
 from .common_serializers import UserSerializer, LakeSerializer
 

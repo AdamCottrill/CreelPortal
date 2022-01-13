@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from ...models.fishnet2 import FN125_Tag
+from ...models import FN125_Tag
 
 
 class FN125TagListSerializer(serializers.ModelSerializer):

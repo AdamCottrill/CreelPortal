@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from ...models.creel import FN025
+from ...models import FN025
 
 
 class FN025Serializer(serializers.ModelSerializer):

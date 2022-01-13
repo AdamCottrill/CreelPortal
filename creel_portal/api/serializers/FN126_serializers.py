@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from ...models.fishnet2 import FN126
+from ...models import FN126
 
 
 class FN126ListSerializer(serializers.ModelSerializer):

@@ -22,9 +22,7 @@ from django.db import models
 
 from common.models import Species
 
-from .fishnet2 import FN011
-
-from .creel import FN022, FN023, FN024, FN026, FN028
+from .FN0_models import FN011, FN022, FN023, FN024, FN026, FN028
 
 from .choices import CONTMETH_CHOICES, REC_TP_CHOICES, ANG_FN_CHOICES
 
@@ -67,8 +65,8 @@ class Strata(models.Model):
 
     def __str__(self):
         """return the object type, the interview log number (sama), the stratum,
-        and project code of the creel this record is assoicated
-       with.
+         and project code of the creel this record is assoicated
+        with.
 
         """
 
@@ -308,8 +306,7 @@ class FR713(models.Model):
         unique_together = ["fr712", "date"]
 
     def __str__(self):
-        """return the object type (EffortEstimate), and the prj_cd.
-        """
+        """return the object type (EffortEstimate), and the prj_cd."""
 
         if self.date:
             repr = "<Effort Estimate: {} (run:{} strat:{} rec_tp: {} date:{})>"
@@ -495,9 +492,7 @@ class FR714(models.Model):
 
 
 class FR715(models.Model):
-    """Class to hold angler options.
-
-    """
+    """Class to hold angler options."""
 
     fr712 = models.ForeignKey(
         FR712, related_name="angler_options", on_delete=models.CASCADE

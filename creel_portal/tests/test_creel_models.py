@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 
 from datetime import datetime
 
-from creel_portal.models.creel import FN025
+from creel_portal.models import FN025
 
 from .factories.fishnet2_factories import FN011Factory
 from .factories.creel_factories import (

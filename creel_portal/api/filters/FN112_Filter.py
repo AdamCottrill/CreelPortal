@@ -1,7 +1,7 @@
 import django_filters
 from django_filters import rest_framework as filters
 
-from ...models.creel import FN112
+from ...models import FN112
 from .filter_utils import ValueInFilter
 
 
