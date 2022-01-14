@@ -46,7 +46,9 @@ def test_fn023_list(api_client, creel):
     prj_cd = creel.prj_cd
     ssn = "12"
 
-    url = reverse("creel-api:day-type-list", kwargs={"prj_cd": prj_cd, "ssn": ssn})
+    url = reverse(
+        "creel_portal:api:day-type-list", kwargs={"prj_cd": prj_cd, "ssn": ssn}
+    )
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK
 
@@ -68,7 +70,8 @@ def test_fn023_detail(api_client, creel):
     dtp = 1
 
     url = reverse(
-        "creel-api:day-type-detail", kwargs={"prj_cd": prj_cd, "ssn": ssn, "dtp": dtp}
+        "creel_portal:api:day-type-detail",
+        kwargs={"prj_cd": prj_cd, "ssn": ssn, "dtp": dtp},
     )
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK

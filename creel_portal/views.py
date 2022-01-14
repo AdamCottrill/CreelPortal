@@ -1,21 +1,28 @@
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render, redirect
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.views.generic import ListView, DetailView
 from django.template import RequestContext
 from django.shortcuts import get_object_or_404
 from django.db.models import Q, F
+from django.urls import reverse
 
 import json
-from django.core.serializers.json import DjangoJSONEncoder
+
 
 from creel_portal.models import FN011, FN026, FR713, FR714
-from creel_portal.forms import FN026Form
+from creel_portal.forms import FN026Form, DataUploadForm
 
 from .utils import (
     get_aggregate_catch_estimates,
     get_aggregate_effort_estimates,
     get_catch_totals,
 )
+
+from .data_upload.project_upload import process_accdb_upload
 
 
 class CreelListView(ListView):
@@ -266,3 +273,149 @@ def catch_estimates_json(request, slug):
     )
 
     return JsonResponse(list(qs), safe=False)
+
+
+# # move this to someplace more appropriate:
+def handle_uploaded_file(f):
+
+    upload_dir = settings.UPLOAD_DIR
+    fname = os.path.join(upload_dir, f.name)
+    if os.path.isfile(fname):
+        os.remove(fname)
+    with open(fname, "wb+") as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
+        # now connect to the uploaded file and insert the contents in the appropriate tables...
+
+    data = process_accdb_upload(upload_dir, f.name)
+    # delete the file when we are done. if we can.  Not a problem if
+    # not, we will periodically nuke the upload directory anyway.
+    try:
+        os.remove(fname)
+    except (PermissionError, OSError):
+        pass
+    return data
+
+
+def get_errors(errors):
+    """A helper function to extract relavant information from each error
+    message so it can be displayed in the template"""
+    error_list = []
+    for err in errors:
+        slug, validation_error = err
+        table = validation_error.model.schema().get("title", "")
+        for error in validation_error.errors():
+            # msg = f"\t{title} => {slug} - {'-'.join(error['loc'])}: {error['msg']}"
+            error_dict = {
+                "table": table,
+                "slug": slug,
+                "fields": "-".join(error["loc"]),
+                "message": error["msg"],
+            }
+            error_list.append(error_dict)
+    return error_list
+
+
+@login_required
+def project_data_upload(request):
+    """A view to process data uploads.  It will be only available to logged in users.
+
+    The uploaded file will be check for validity with cerberus - if it
+    looks like it has the correct shape, the data will be passed to a
+    stocking event formset, that will allow final editing and form
+    validation. Once submitted, the stocking event objects will be
+    created.
+
+    Only new stocking model objects can be created for now. An
+    extension will be to allow users to bulk edit rrecords - as long
+    as the stock_id number can be matched back to the original record.
+
+    """
+
+    if request.method == "POST":
+
+        form = DataUploadForm(request.POST, request.FILES)
+
+        if form.is_valid():
+
+            try:
+                data_file = form.cleaned_data["file_upload"]
+
+                if not (
+                    data_file.name.endswith(".accdb") or data_file.name.endswith(".db")
+                ):
+                    msg = "Choosen file is not an Access (*.accdb) file!"
+                    messages.error(request, msg)
+                    return HttpResponseRedirect(
+                        reverse("creel_portal:upload_project_data")
+                    )
+                # if file is too large, return
+                if data_file.multiple_chunks():
+                    filesize = data_file.size / (1000 * 1000)
+                    msg = (
+                        f"The uploaded file is too big ({filesize:.2f} MB). "
+                        + "Compact the database before uploading it or considering splitting it into smaller packets."
+                    )
+                    messages.error(request, msg)
+                    return HttpResponseRedirect(
+                        reverse("creel_portal:upload_project_data")
+                    )
+
+                upload = handle_uploaded_file(data_file)
+
+                if upload["status"] == "insert-error":
+
+                    messages.error(
+                        request,
+                        "There was a problem inserting the data from: "
+                        + data_file.name
+                        + ". "
+                        + str(upload["errors"]),
+                    )
+                    return render(request, "creel_portal/project_data_upload.html")
+
+                if upload["status"] == "error":
+                    msg = (
+                        "There was a problem validating the data from: "
+                        + data_file.name
+                        + " Please address the issues identified below and try again."
+                    )
+                    messages.error(request, msg)
+                    # pass errors to redirect so that they are available in the response.
+                    # return HttpResponseRedirect(reverse("creel_portal:upload_project_data"))
+                    error_list = get_errors(upload.get("errors"))
+                    return render(
+                        request,
+                        "creel_portal/project_data_upload.html",
+                        {"errors": error_list},
+                    )
+                else:
+                    prj_cds = upload.get("prj_cds")
+
+                    msg = f"Data for {', '.join(prj_cds)} was successfully uploaded!"
+                    messages.success(request, message=msg)
+
+                    if len(prj_cds) == 1:
+                        slug = prj_cds[0].lower()
+                        return HttpResponseRedirect(
+                            reverse("creel_portal:creel_detail", kwargs={"slug": slug})
+                        )
+                    else:
+                        return redirect(
+                            reverse("creel_portal:creel_list")
+                            + f"?prj_cd={','.join(prj_cds)}"
+                        )
+
+            except Exception as e:
+                messages.error(request, "Unable to upload file. " + repr(e))
+                return HttpResponseRedirect(reverse("creel_portal:upload_project_data"))
+    else:
+        form = DataUploadForm()
+    return render(
+        request,
+        "creel_portal/project_data_upload.html",
+        {
+            "form": form,
+            "upload_template_version": settings.CREEL_UPLOAD_TEMPLATE_VERSION,
+        },
+    )

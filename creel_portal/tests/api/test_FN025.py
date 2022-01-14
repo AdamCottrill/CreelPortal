@@ -50,7 +50,7 @@ def test_fn025_list(api_client, creel):
     ssn = "12"
 
     url = reverse(
-        "creel-api:exception-date-list", kwargs={"prj_cd": prj_cd, "ssn": ssn}
+        "creel_portal:api:exception-date-list", kwargs={"prj_cd": prj_cd, "ssn": ssn}
     )
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK
@@ -67,14 +67,13 @@ def test_fn025_list(api_client, creel):
 
 @pytest.mark.django_db
 def test_fn025_detail(api_client, creel):
-    """
-    """
+    """ """
 
     prj_cd = creel.prj_cd
     ssn = "12"
 
     url = reverse(
-        "creel-api:exception-date-detail",
+        "creel_portal:api:exception-date-detail",
         kwargs={"prj_cd": prj_cd, "ssn": ssn, "date": "2017-02-16"},
     )
     response = api_client.get(url)

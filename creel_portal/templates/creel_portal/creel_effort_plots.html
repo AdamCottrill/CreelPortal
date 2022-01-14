@@ -180,7 +180,7 @@
 
 
      //function get_spaces() {
-     //    return $.getJSON("{%  url 'creel_spaces' creel.slug %}");
+     //    return $.getJSON("{%  url 'creel_portal:creel_spaces' creel.slug %}");
      //}
 
      var spaces = {{ spaces|safe }};
@@ -260,8 +260,8 @@
 
      var effortTable = dc.dataTable('#dc-data-table');//); //, chartGroup);
 
-     d3.json("{% url 'effort_estimates' creel.slug %}", function (error, data) {
-         
+     d3.json("{% url 'creel_portal:effort_estimates' creel.slug %}", function (error, data) {
+
          //var mydateformat = d3.time.format('%B %d, %Y');
          //var isodateformat = d3.time.format.iso;
 
@@ -464,12 +464,12 @@
          dc.renderAll();
 
 
-         
+
          function drawMap(){
 
              // =================
              //     MAP
-             
+
              let bbox = {{ creel.lake.envelope_ontario.json|safe }};
 
              function leafletBounds(bbox_json){
@@ -477,16 +477,16 @@
                  let pt2 = bbox_json.coordinates[0][2]
                  return [
                      [pt1[1], pt1[0]],
-                     [pt2[1], pt2[0]],                         
+                     [pt2[1], pt2[0]],
                  ]
              }
-             
+
              let map = new L.map('map', {
                  zoomSnap: 0.1
              }).fitBounds(leafletBounds(bbox));
 
 
-             
+
 
              // add the OpenStreetMap tiles
              L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

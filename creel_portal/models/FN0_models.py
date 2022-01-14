@@ -96,7 +96,7 @@ class FN011(models.Model):
 
     def get_absolute_url(self):
         """return the url for the project"""
-        url = reverse("creel_detail", kwargs={"slug": self.slug})
+        url = reverse("creel_portal:creel_detail", kwargs={"slug": self.slug})
         return url
         # return reverse("creel_detail", {"slug": self.slug})
 

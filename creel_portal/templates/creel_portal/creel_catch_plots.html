@@ -319,7 +319,7 @@
 
      var catchTable = dc.dataTable('#dc-data-table');//); //, chartGroup);
 
-     d3.json("{% url 'catch_estimates' creel.slug %}", function (error, data) {
+     d3.json("{% url 'creel_portal:catch_estimates' creel.slug %}", function (error, data) {
 
          data.forEach(function(d){
              d.mode = d.mode;
@@ -563,19 +563,19 @@
 
              let pt1 = bbox.coordinates[0][0]
              let pt2 = bbox.coordinates[0][2]
-                        
+
              return [
                  [pt1[1], pt1[0]],
-                 [pt2[1], pt2[0]],                         
+                 [pt2[1], pt2[0]],
              ]
          }
-         
+
          let map = new L.map('map', {
              zoomSnap: 0.1
          }).fitBounds(leafletBounds(bbox));
-         
 
-         
+
+
          function drawMap(){
 
 
@@ -585,7 +585,7 @@
              }).addTo(map);
 
 
-             
+
              var spaceMarkers = new L.FeatureGroup();
              spaceMarkers.clearLayers();
 
@@ -621,7 +621,7 @@
              map.addLayer(bubbles);
 
              map.addLayer(spaceMarkers);
-             var bounds =spaceMarkers.getBounds();             
+             var bounds =spaceMarkers.getBounds();
              if (bounds.isValid()){
                  map.fitBounds(bounds, {padding: [100,100]});
              }

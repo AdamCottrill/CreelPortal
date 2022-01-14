@@ -10,6 +10,7 @@ from . import api_views
 # readonly api endpoints:
 from .api.urls import urlpatterns as api_urls
 
+app_name = "creel_portal"
 
 API_TITLE = "Creel Portal API"
 API_DESC = "A Restful API for your Creel Survey Data"
@@ -60,6 +61,11 @@ urlpatterns = [
         views.edit_creel_space,
         name="edit_creel_space",
     ),
+    path(
+        "project_data_upload/",
+        view=views.project_data_upload,
+        name="upload_project_data",
+    ),
     # api urls
     path("api/v0/", include(router.urls)),
     path(
@@ -82,7 +88,7 @@ urlpatterns = [
     # The real api:
     path(
         "api/v1/",
-        include(("creel_portal.api.urls", "creel-api"), namespace="creel-api"),
+        include(("creel_portal.api.urls", "creel-api"), namespace="api"),
     ),
 ]
 

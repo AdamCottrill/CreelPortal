@@ -1,14 +1,21 @@
 
 {% extends "creel_portal_base.html" %}
 
-{% load humanize %} 
+{% load humanize %}
 
 {% block extrahead %}
 
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.min.js" integrity="sha512-SeiQaaDh73yrb56sTW/RgVdi/mMqNeM2oBwubFHagc5BkixSpP1fvqF47mKzPGWYSSy4RwbBunrJBQ4Co8fRWA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.min.js"
+            integrity="sha512-SeiQaaDh73yrb56sTW/RgVdi/mMqNeM2oBwubFHagc5BkixSpP1fvqF47mKzPGWYSSy4RwbBunrJBQ4Co8fRWA=="
+            crossorigin="anonymous">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.min.css" integrity="sha512-1xoFisiGdy9nvho8EgXuXvnpR5GAMSjFwp40gSRE3NwdUdIMIKuPa7bqoUhLD0O/5tPNhteAsE5XyyMi5reQVA==" crossorigin="anonymous" />
+    </script>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.min.css"
+          integrity="sha512-1xoFisiGdy9nvho8EgXuXvnpR5GAMSjFwp40gSRE3NwdUdIMIKuPa7bqoUhLD0O/5tPNhteAsE5XyyMi5reQVA=="
+          crossorigin="anonymous" />
 
 
     <style type="text/css" media="screen">
@@ -42,12 +49,12 @@
             {% if not object.final_run %}
 
                 <div class="alert alert-danger" role="alert">
-                    This creel does not appear to have been completed.                
+                    This creel does not appear to have been completed.
                 </div>
-                
+
             {% endif %}
 
-            
+
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Project Details</h3>
@@ -115,10 +122,10 @@
 
                     <div  class="row" >
                         <div  class="col-md-4" >
-                            <a class="btn btn-primary btn-block" href="{% url 'effort_estimates_plots' object.slug %}" role="button">Effort</a>
+                            <a class="btn btn-primary btn-block" href="{% url 'creel_portal:effort_estimates_plots' object.slug %}" role="button">Effort</a>
                         </div>
                         <div  class="col-md-4" >
-                            <a class="btn btn-primary btn-block" href="{% url 'catch_estimates_plots' object.slug %}" role="button">Catch/Harvest</a>
+                            <a class="btn btn-primary btn-block" href="{% url 'creel_portal:catch_estimates_plots' object.slug %}" role="button">Catch/Harvest</a>
                         </div>
                         <div  class="col-md-4" >
                             <a class="btn btn-primary btn-block" href="#" role="button" disabled="disabled">Option Questions</a>
@@ -138,7 +145,7 @@
         <div>
 
 
-            
+
 
             <!-- Nav tabs -->
             <ul class="nav nav-tabs" role="tablist">
@@ -147,7 +154,7 @@
                 <li role="presentation"><a href="#effort" aria-controls="effort" role="tab" data-toggle="tab">Effort</a></li>
                 <li role="presentation"><a href="#catch" aria-controls="catch" role="tab" data-toggle="tab">Catch</a></li>
             </ul>
-            
+
             <!-- Tab panes -->
             <div class="tab-content">
 
@@ -252,7 +259,7 @@
 
                                                     <td>
 
-                                                        {% url 'edit_creel_space' item.creel.slug item.space as the_url %}
+                                                        {% url 'creel_portal:edit_creel_space' item.creel.slug item.space as the_url %}
 
                                                         {% if item.ddlat and item.ddlon %}
 
@@ -321,7 +328,7 @@
                 <div role="tabpanel" class="tab-pane" id="effort">
 
                     {% if effort_estimates %}
-                        
+
 
                         {% for strata in effort_estimates %}
                             {% for fr713 in effort_estimates %}
@@ -332,12 +339,12 @@
                         {% endfor %}
 
 
-                        
+
                     {% else %}
 
                         <div class="alert alert-warning" role="alert">
                             <h4>Oops - It doesn't look like there are any Effort Estimates for this creel</h4>
-                            
+
                         </div>
 
                     {% endif %}
@@ -409,9 +416,9 @@
 
 
                             {% if catch_estimates %}
-                                
+
                                 {% regroup catch_estimates by fr712.stratum.stratum_label as stratum_list %}
-                                
+
                                 {% for fr714 in stratum_list %}
                                     {% include 'creel_portal/_detail_catch_panel.html' %}
                                 {% endfor %}
@@ -420,11 +427,11 @@
 
                                 <div class="alert alert-warning" role="alert">
                                     <h4>Oops - It doesn't look like there are any Catch Estimates for this creel</h4>
-                                    
+
                                 </div>
 
                             {% endif %}
-                            
+
                             <!--
 
 
@@ -438,8 +445,8 @@
 
                             -->
 
-                            
-                            
+
+
                         </div>
                     </div>
                 </div>
@@ -459,7 +466,7 @@
      // add the creel locations here as a json string.
      var spaces = {{ spaces|safe }};
 
-     
+
      let bbox = {{ creel.lake.envelope_ontario.json|safe }};
 
      function leafletBounds(bbox){
@@ -467,14 +474,14 @@
          let pt2 = bbox.coordinates[0][2]
          return [
              [pt1[1], pt1[0]],
-             [pt2[1], pt2[0]],                         
+             [pt2[1], pt2[0]],
          ]
      }
-     
+
      let map = new L.map('map', {
          zoomSnap: 0.1
      }).fitBounds(leafletBounds(bbox));
-     
+
 
      function drawMap(){
 
@@ -510,7 +517,7 @@
      {% else %}
      var catch_data = {};
      {% endif %}
-     
+
      // data arrays for plots:
      let species = [];
      let catne = [];
@@ -535,7 +542,7 @@
 
 
      const populate_arrays = function(){
-         
+
          // load the catch data into the proper arrays
          $.each(catch_data, function(i,d){
              if(d.xcatne>0){

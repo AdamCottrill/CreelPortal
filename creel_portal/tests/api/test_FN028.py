@@ -40,7 +40,7 @@ def test_fn028_list(api_client, creel):
 
     prj_cd = creel.prj_cd
 
-    url = reverse("creel-api:fishing-mode-list", kwargs={"prj_cd": prj_cd})
+    url = reverse("creel_portal:api:fishing-mode-list", kwargs={"prj_cd": prj_cd})
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK
 
@@ -53,14 +53,13 @@ def test_fn028_list(api_client, creel):
 
 @pytest.mark.django_db
 def test_fn028_detail(api_client, creel):
-    """
-    """
+    """ """
 
     prj_cd = creel.prj_cd
     mode = "m1"
 
     url = reverse(
-        "creel-api:fishing-mode-detail", kwargs={"prj_cd": prj_cd, "mode": mode}
+        "creel_portal:api:fishing-mode-detail", kwargs={"prj_cd": prj_cd, "mode": mode}
     )
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK

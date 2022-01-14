@@ -39,9 +39,8 @@ from creel_portal.tests.pytest_fixtures import api_client, user, user2, creel, c
 
 @pytest.mark.django_db
 def test_fn011_list(api_client, creels):
-    """
-    """
-    url = reverse("creel-api:creel-list")
+    """ """
+    url = reverse("creel_portal:api:creel-list")
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK
 
@@ -69,7 +68,7 @@ def test_fn011_detail(api_client, creel):
 
     prj_cd = creel.prj_cd
 
-    url = reverse("creel-api:creel-detail", kwargs={"slug": prj_cd.lower()})
+    url = reverse("creel_portal:api:creel-detail", kwargs={"slug": prj_cd.lower()})
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK
 
@@ -87,7 +86,11 @@ def test_fn011_detail(api_client, creel):
 
     field_crew = creel.field_crew.all()
     field_crew_list = [
-        {"username": x.username, "first_name": x.first_name, "last_name": x.last_name,}
+        {
+            "username": x.username,
+            "first_name": x.first_name,
+            "last_name": x.last_name,
+        }
         for x in field_crew
     ]
 

@@ -96,7 +96,7 @@
             </tbody>
         </table>
         {% if not q %}
-        <a class="btn btn-info"  href="{% url 'creels_by_lake' lake.grouper.lake_name %}">All Lake {{ lake.grouper.lake_name|title }} creels</a>
+        <a class="btn btn-info"  href="{% url 'creel_portal:creels_by_lake' lake.grouper.lake_name %}">All Lake {{ lake.grouper.lake_name|title }} creels</a>
         {% endif %}
     </div>
 

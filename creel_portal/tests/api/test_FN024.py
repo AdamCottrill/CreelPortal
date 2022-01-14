@@ -44,7 +44,7 @@ def test_fn024_list(api_client, creel):
     dtp = 1  # weekend
 
     url = reverse(
-        "creel-api:period-list", kwargs={"prj_cd": prj_cd, "ssn": ssn, "dtp": 1}
+        "creel_portal:api:period-list", kwargs={"prj_cd": prj_cd, "ssn": ssn, "dtp": 1}
     )
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK
@@ -71,7 +71,7 @@ def test_fn024_detail(api_client, creel):
     prd = 1
 
     url = reverse(
-        "creel-api:period-detail",
+        "creel_portal:api:period-detail",
         kwargs={"prj_cd": prj_cd, "ssn": ssn, "dtp": dtp, "prd": prd},
     )
     response = api_client.get(url)

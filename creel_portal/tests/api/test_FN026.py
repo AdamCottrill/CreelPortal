@@ -34,12 +34,11 @@ from creel_portal.tests.pytest_fixtures import creel, api_client, user, user2
 
 @pytest.mark.django_db
 def test_fn026_list(api_client, creel):
-    """
-    """
+    """ """
 
     prj_cd = creel.prj_cd
 
-    url = reverse("creel-api:space-list", kwargs={"prj_cd": prj_cd})
+    url = reverse("creel_portal:api:space-list", kwargs={"prj_cd": prj_cd})
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK
 
@@ -55,13 +54,14 @@ def test_fn026_list(api_client, creel):
 
 @pytest.mark.django_db
 def test_fn026_detail(api_client, creel):
-    """
-    """
+    """ """
 
     prj_cd = creel.prj_cd
     space = "S1"
 
-    url = reverse("creel-api:space-detail", kwargs={"prj_cd": prj_cd, "space": space})
+    url = reverse(
+        "creel_portal:api:space-detail", kwargs={"prj_cd": prj_cd, "space": space}
+    )
     response = api_client.get(url)
     assert response.status_code == status.HTTP_200_OK
 

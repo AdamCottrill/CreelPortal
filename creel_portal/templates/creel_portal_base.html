@@ -45,20 +45,28 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="{% url 'home' %}">Creel Portal</a>
+                <a class="navbar-brand" href="{% url 'creel_portal:home' %}">Creel Portal</a>
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav">
-                    <li><a href="{% url 'creel_list' %}">Creels</a> </li>
+                    <li><a href="{% url 'creel_portal:creel_list' %}">Creels</a> </li>
+
+                            {% if user.is_authenticated  %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url "creel_portal:upload_project_data" %}">Upload Data</a>
+                            </li>
+                            {% endif %}
+
+
 
                     {% block navbar_other_apps %}
                     {% endblock %}
                 </ul>
 
                 <div class="col-sm-3">
-                    <form class="navbar-form navbar-left" role="search" action={% url 'creel_list' %}>
+                    <form class="navbar-form navbar-left" role="search" action={% url 'creel_portal:creel_list' %}>
                         <div class="input-group">
                             <input type="text" class="form-control" name="q"
                                    placeholder="Project Code Or Name">
