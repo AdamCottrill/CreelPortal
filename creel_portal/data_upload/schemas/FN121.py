@@ -51,7 +51,7 @@ class FN121(FNBase):
     slug: str
 
     sam: constr(max_length=6)
-    itvseq: int
+    itvseq: conint(ge=1)
     itvtm0: time
     date: date
     efftm0: time
@@ -102,10 +102,17 @@ class FN121(FNBase):
 
     # @validator("efftm1")
     # def efftm0_before_efftm1(cls, v, values):
-    #     efftm0 = values.get("efftm0")
-    #     if v and efftm0:
-    #         if efftm0 > v:
-    #             raise ValueError(
-    #                 f"Lift date (efftm1={v}) occurs before set date(efftm0={efftm0})."
-    #             )
-    #     return v
+    #    efftm0 = values.get("efftm0")
+    #    if v and efftm0:
+    #        if efftm0 > v:
+    #            raise ValueError(
+    #                f"Lift date (efftm1={v}) occurs before set date(efftm0={efftm0})."
+    #            )
+    #    return v
+
+    @validator("effcmp")
+    def effcmp_when_efftm1(cls, v, values):
+        efftm1 = values.get("efftm1")
+        if efftm1 and v is False:
+            raise ValueError("effcmp should be True if efftm1 is populated.")
+        return v
