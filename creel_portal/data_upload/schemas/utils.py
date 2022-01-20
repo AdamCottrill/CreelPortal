@@ -12,6 +12,8 @@ A. Cottrill
 
 
 from typing import Optional
+from datetime import datetime
+
 
 from pydantic.validators import str_validator
 
@@ -79,3 +81,11 @@ def yr_to_year(yr):
         return f"20{yr}"
     else:
         return f"19{yr}"
+
+
+def strip_date(value):
+    """pyodbc treats times as datetimes. we need to strip the date off if
+    it is there."""
+    if isinstance(value, datetime):
+        return value.time()
+    return value

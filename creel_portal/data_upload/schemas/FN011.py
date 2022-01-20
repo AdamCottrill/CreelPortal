@@ -1,11 +1,18 @@
 from datetime import date
 from typing import Optional
-
+from enum import Enum
 from pydantic import validator, constr
 
 from .utils import to_titlecase, yr_to_year
 
-from .FNBase import FNBase, prj_cd_regex
+from .FNBase import FNBase, creel_prj_cd_regex
+
+
+class ContMethEnum(str, Enum):
+    access = "A2"
+    roving_no_interview = "R0"
+    roving_different_day = "R1"
+    roving_sam_day = "R2"
 
 
 class FN011(FNBase):
@@ -20,16 +27,28 @@ class FN011(FNBase):
     """
 
     lake_id: int
-    protocol_id: int
     prj_ldr_id: int
     slug: str
-    prj_cd: constr(regex=prj_cd_regex)
+    prj_cd: constr(regex=creel_prj_cd_regex)
     year: int
     prj_nm: str
     prj_date0: date
     prj_date1: date
 
     comment0: Optional[str]
+
+    contmeth: ContMethEnum
+
+    # these are old FN-2 fields that might go away...
+    aru: Optional[str]
+    fof_loc: Optional[str]
+    fof_nm: Optional[str]
+    wby: Optional[str]
+    wby_nm: Optional[str]
+    prj_his: Optional[str]
+    prj_size: Optional[str]
+    prj_ver: Optional[str]
+    v0: Optional[constr(max_length=4)]
 
     _prj_nm_titlecase = validator("prj_nm", allow_reuse=True)(to_titlecase)
 

@@ -8,45 +8,39 @@ from pydantic import PositiveFloat, validator, constr
 from .FNBase import FNBase
 from .utils import not_specified, string_to_float, to_uppercase
 
-# gruse and orient need to be enums
-# test time constraints - valid times.
+
+class ItvUnitEnum(IntEnum):
+    """Interview Unit"""
+
+    person = 1
+    party = 2
 
 
-class OrientEnum(str, Enum):
+class AtyUnitEnum(IntEnum):
+    """Activity Unit"""
 
-    perpendicular = "1"
-    paralell = "2"
-    upstream = "U"
-    downstream = "D"
-    unknown = "9"
+    person = 1
+    party = 2
 
 
-class GrUseEnum(IntEnum):
+class ChkFlagEnum(IntEnum):
+    """Check Count"""
 
-    bottom_set = 1
-    canned = 2
-    kyted = 3
-    thermocline = 4
-    midwater = 5
-    surface = 6
-    unknown = 9
+    yes = 0
+    no = 1
 
 
 class FN028(FNBase):
+    """fishing modes"""
 
-    gear_id: int
-    project_id: int
-
+    creel_id: int
     slug: str
     mode_des: Optional[str] = "Not Specified"
     mode: constr(regex="^([A-Z0-9]{2})$", max_length=2)
-    gruse: GrUseEnum
-    orient: OrientEnum
-    effdur_ge: Optional[PositiveFloat] = None
-    effdur_lt: Optional[PositiveFloat] = None
 
-    efftm0_lt: Optional[time] = None
-    efftm0_ge: Optional[time] = None
+    atyunit: AtyUnitEnum
+    itvunit: ItvUnitEnum
+    chkflag: ChkFlagEnum
 
     class Config:
         validate_assignment = True
@@ -55,25 +49,10 @@ class FN028(FNBase):
 
     _to_titlecase = validator("mode_des", allow_reuse=True, pre=True)(not_specified)
 
-    _string_to_float = validator("effdur_ge", "effdur_lt", allow_reuse=True, pre=True)(
-        string_to_float
-    )
-
-    @validator("efftm0_ge", "efftm0_lt", pre=True)
-    def strip_date(cls, v):
-        """pyodbc treats times as datetimes. we need to strip the date off if
-        it is there."""
-        if isinstance(v, datetime):
-            return v.time()
-        return v
-
-    @validator("efftm0_ge")
-    @classmethod
-    def efftm0_ge_greater_than_efftm0_lt(cls, v, values, **kwargs):
-        tm0_lt = values.get("efftm0_lt")
-        if v and tm0_lt:
-            if v > tm0_lt:
-                err_msg = f"Latest set time (efftm0_lt={tm0_lt}) is earlier than earliest set time(efftm0_ge={v})"
-                raise ValueError(err_msg)
-
+    @validator("itvunit")
+    def itvunit_consistent_with_atyunit(cls, v, values):
+        atyunit = values.get("atyunit")
+        if atyunit == 2 and v != atyunit:
+            msg = "If ATYUNIT=2, then ITVUNIT must also equal 2."
+            raise ValueError(msg)
         return v

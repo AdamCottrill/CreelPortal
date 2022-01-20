@@ -2,7 +2,7 @@ from typing import Optional
 from enum import Enum, IntEnum
 from pydantic import conint, confloat, validator, constr
 
-from .FNBase import FNBase, prj_cd_regex
+from .FNBase import FNBase
 from .utils import string_to_int, string_to_float
 
 
@@ -42,16 +42,15 @@ class FN125(FNBase):
     rwt: Optional[confloat(gt=0)] = None
     flen: Optional[conint(gt=0)] = None
     tlen: Optional[conint(gt=0)] = None
-    girth: Optional[conint(gt=0)] = None
+
     sex: Optional[SexEnum]
     mat: Optional[MatEnum]
     gon: Optional[constr(regex=gon_regex)]
     clipc: Optional[str]
-    clipa: Optional[str]
-    nodc: Optional[str]
-    noda: Optional[str]
+
     tissue: Optional[str]
     agest: Optional[str]
+
     fate: FateEnum = FateEnum.killed
 
     age_flag: Optional[bool]
@@ -64,7 +63,7 @@ class FN125(FNBase):
     class Config:
         validate_assignment = True
 
-    _string_to_int = validator("tlen", "flen", "girth", allow_reuse=True, pre=True)(
+    _string_to_int = validator("tlen", "flen", allow_reuse=True, pre=True)(
         string_to_int
     )
 
@@ -114,9 +113,9 @@ class FN125(FNBase):
 
     # ascii-sort clips, node, agest and tissue
 
-    @validator("clipc", "clipa")
+    @validator("clipc")
     @classmethod
-    def check_clic_codes(cls, value, values):
+    def check_clipc_codes(cls, value, values):
         if value is not None:
             allowed = "01234567ABCDEFG"
             unknown = [c for c in value if c not in allowed]
@@ -125,7 +124,7 @@ class FN125(FNBase):
                 raise ValueError(msg)
         return value
 
-    @validator("clipc", "clipa", "tissue", "agest")
+    @validator("clipc", "tissue", "agest")
     @classmethod
     def check_ascii_sort(cls, value, values):
         if value is not None:

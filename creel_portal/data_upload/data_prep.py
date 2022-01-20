@@ -20,12 +20,15 @@ from pydantic.error_wrappers import ValidationError
 from .schemas import (
     FN011,
     FN022,
+    FN023,
+    FN024,
+    FN025,
     FN026,
     FN028,
+    FN111,
+    FN112,
     FN121,
-    FN122,
     FN123,
-    FN124,
     FN125,
     FN125Tags,
     FN125Lamprey,
@@ -76,6 +79,18 @@ def fn022(data, fn011_cache):
     return {"data": valid, "errors": errors}
 
 
+def fn023(data, fn022_cache):
+    pass
+
+
+def fn024(data, fn023_cache):
+    pass
+
+
+def fn026(data, fn022_cache):
+    pass
+
+
 def fn026(data, fn011_cache):
     """pop off prj_cd and replace it with project_id."""
 
@@ -119,6 +134,14 @@ def fn028(data, fn011_cache, gear_cache):
     return {"data": valid, "errors": errors}
 
 
+def fn111(data, fn022_cache, fn023_cache, fn024_cache, fn026_cache, fn028_cache):
+    pass
+
+
+def fn112(data, fn111_cache):
+    pass
+
+
 def fn121(
     data,
     fn011_cache,
@@ -157,27 +180,6 @@ def fn121(
     return {"data": valid, "errors": errors}
 
 
-def fn122(data, fn121_cache):
-
-    valid = []
-    errors = []
-
-    for item in data:
-        prj_cd = item.pop("prj_cd")
-        sam = item.pop("sam")
-        eff = item.get("eff")
-        fn121_key = f"{prj_cd}-{sam}".lower()
-        slug = f"{prj_cd}-{sam}-{eff}".lower()
-        item["sample_id"] = fn121_cache.get(fn121_key)
-        item["slug"] = slug
-        try:
-            tmp = FN122(**item)
-            valid.append(tmp)
-        except ValidationError as err:
-            errors.append([item.get("slug"), err])
-    return {"data": valid, "errors": errors}
-
-
 def fn123(data, fn122_cache, species_cache):
 
     valid = []
@@ -197,30 +199,6 @@ def fn123(data, fn122_cache, species_cache):
 
         try:
             tmp = FN123(**item)
-            valid.append(tmp)
-        except ValidationError as err:
-            errors.append([item.get("slug"), err])
-    return {"data": valid, "errors": errors}
-
-
-def fn124(data, fn123_cache):
-
-    valid = []
-    errors = []
-
-    for item in data:
-        prj_cd = item.pop("prj_cd")
-        sam = item.pop("sam")
-        eff = item.pop("eff")
-        spc = item.pop("spc")
-        grp = item.pop("grp")
-        siz = item.get("siz")
-        parent_key = f"{prj_cd}-{sam}-{eff}-{spc}-{grp}".lower()
-        slug = f"{prj_cd}-{sam}-{eff}-{spc}-{grp}-{siz}".lower()
-        item["catch_id"] = fn123_cache.get(parent_key)
-        item["slug"] = slug
-        try:
-            tmp = FN124(**item)
             valid.append(tmp)
         except ValidationError as err:
             errors.append([item.get("slug"), err])

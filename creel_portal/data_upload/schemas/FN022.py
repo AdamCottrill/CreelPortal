@@ -1,5 +1,5 @@
 from datetime import date
-
+from typing import Optional
 from pydantic import validator, constr
 
 from .utils import not_specified, to_uppercase, yr_to_year
@@ -14,11 +14,13 @@ class FN022(FNBase):
     """
 
     slug: str
-    project_id: int
+    creel_id: int
     ssn: constr(regex="^([A-Z0-9]{2})$", max_length=2)
     ssn_des: str
     ssn_date0: date
     ssn_date1: date
+
+    v0: Optional[constr(max_length=4)]
 
     class Config:
         validate_assignment = True
