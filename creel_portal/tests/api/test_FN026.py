@@ -11,7 +11,7 @@
   associated with a specific creel
 
   + the space detail endpoint will return the space code, space
-  description, ddlat, ddlon.
+  description, dd_lat, dd_lon.
 
  A. Cottrill
 =============================================================
@@ -43,7 +43,7 @@ def test_fn026_list(api_client, creel):
     assert response.status_code == status.HTTP_200_OK
 
     data = [
-        (x.get("space"), x.get("space_des"), x.get("ddlat"), x.get("ddlon"))
+        (x.get("space"), x.get("space_des"), x.get("dd_lat"), x.get("dd_lon"))
         for x in response.data["results"]
     ]
     assert len(data) == 2
@@ -68,8 +68,8 @@ def test_fn026_detail(api_client, creel):
     expected = {
         "space": "S1",
         "space_des": "Space 1",
-        "ddlat": 45.1,
-        "ddlon": -81.1,
+        "dd_lat": 45.1,
+        "dd_lon": -81.1,
     }
 
     for k, v in expected.items():

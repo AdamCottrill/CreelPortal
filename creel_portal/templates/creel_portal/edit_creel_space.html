@@ -100,13 +100,13 @@
                                             <br />
                                             <p><strong>Latitude:</strong></p>
                                             <div class="form-group">
-                                                <label class="sr-only" for="id_ddlat">Latitude:</label>
-                                                <input type="text" class="form-control" id="id_ddlat" name="ddlat" type="text" placeholder="Decimal Degrees" value="{{ form.ddlat.value|default_if_none:''}}">
-                                                <div id="ddlat_deg_error" class="alert alert-danger" role="alert">
+                                                <label class="sr-only" for="id_dd_lat">Latitude:</label>
+                                                <input type="text" class="form-control" id="id_dd_lat" name="dd_lat" type="text" placeholder="Decimal Degrees" value="{{ form.dd_lat.value|default_if_none:''}}">
+                                                <div id="dd_lat_deg_error" class="alert alert-danger" role="alert">
                                                     Degrees must be a number between -90 and 90!
                                                 </div>
-                                                {% if form.ddlat.errors %}
-                                                {% for error in form.ddlat.errors %}
+                                                {% if form.dd_lat.errors %}
+                                                {% for error in form.dd_lat.errors %}
                                                 <div class="has-error help-block text-danger">{{ error }}</div>
                                                 {% endfor %}
                                                 {% endif %}
@@ -114,13 +114,13 @@
 
                                             <p><strong>Longitude:</strong></p>
                                             <div class="form-group">
-                                                <label class="sr-only" for="id_ddlon">Longitude:</label>
-                                                <input type="text" class="form-control" id="id_ddlon" name="ddlon" type="text" placeholder="Decimal Degrees" value="{{ form.ddlon.value|default_if_none:'' }}">
-                                                <div id="ddlon_deg_error" class="alert alert-danger" role="alert">
+                                                <label class="sr-only" for="id_dd_lon">Longitude:</label>
+                                                <input type="text" class="form-control" id="id_dd_lon" name="dd_lon" type="text" placeholder="Decimal Degrees" value="{{ form.dd_lon.value|default_if_none:'' }}">
+                                                <div id="dd_lon_deg_error" class="alert alert-danger" role="alert">
                                                     Degrees must be a number between -180 and 180!
                                                 </div>
-                                                {% if form.ddlon.errors %}
-                                                {% for error in form.ddlon.errors %}
+                                                {% if form.dd_lon.errors %}
+                                                {% for error in form.dd_lon.errors %}
                                                 <div class="has-error help-block text-danger">{{ error }}</div>
                                                 {% endfor %}
                                                 {% endif %}
@@ -312,8 +312,8 @@
      refresh_map();
 
      function clear_lat_long_errors(){
-         $( "#ddlat_deg_error" ).hide();
-         $( "#ddlon_deg_error" ).hide();
+         $( "#dd_lat_deg_error" ).hide();
+         $( "#dd_lon_deg_error" ).hide();
 
          $( "#dms_lat_deg_error" ).hide();
          $( "#dms_lat_min_error" ).hide();
@@ -335,15 +335,15 @@
          // anytime one of the text box controls change (with a valid
          // value) we need to update the marker on our map
 
-         var ddlat = parseFloat($('input[id="id_ddlat"]').val());
-         var ddlon = parseFloat($('input[id="id_ddlon"]').val());
+         var dd_lat = parseFloat($('input[id="id_dd_lat"]').val());
+         var dd_lon = parseFloat($('input[id="id_dd_lon"]').val());
 
 
-         if(isNaN(ddlat)===false && isNaN(ddlon)===false){
+         if(isNaN(dd_lat)===false && isNaN(dd_lon)===false){
 
              $('input:radio[name="latlon_flag"]').val(["1"]); // 1 == 'Reported'
 
-             var pt = L.latLng(ddlat, ddlon);
+             var pt = L.latLng(dd_lat, dd_lon);
              clear_lat_long_errors();
 
              //if the length of our marker array is more than , we have a
@@ -368,13 +368,13 @@
 
          // else set zoom and coords to lake
 
-         var ddlat = 45;
-         var ddlon = -82;
+         var dd_lat = 45;
+         var dd_lon = -82;
          var zoom = 7;
 
-         my_map = new L.map('main_map').setView([ddlat, ddlon], zoom);
+         my_map = new L.map('main_map').setView([dd_lat, dd_lon], zoom);
 
-         
+
          // add the OpenStreetMap tiles
          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
              attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
@@ -382,13 +382,13 @@
      };
 
 
-     function update_controls(ddlat, ddlon){
+     function update_controls(dd_lat, dd_lon){
          // when we get a new lat-long - either from a click on our main map, or a submission from our popup-map,
          // we need to update the main map and then update each of the lat-long controls.
 
          // Every time when user click on map we want to update
          // the marker with the new position where the user clicked
-         var pt = L.latLng(ddlat, ddlon);
+         var pt = L.latLng(dd_lat, dd_lon);
 
          clear_lat_long_errors();
 
@@ -408,12 +408,12 @@
          my_map.panTo(pt);
 
          //update the other input values with the coordinates from the map marker:
-         var lat_idegrees = Math.floor(ddlat);
-         var lat_dminutes = (ddlat - lat_idegrees) * 60;
+         var lat_idegrees = Math.floor(dd_lat);
+         var lat_dminutes = (dd_lat - lat_idegrees) * 60;
          var lat_iminutes = Math.floor(lat_dminutes);
          var lat_seconds = (lat_dminutes - lat_iminutes) * 60;
 
-         $('input[id="id_ddlat"]').val(ddlat);
+         $('input[id="id_dd_lat"]').val(dd_lat);
 
          $('input[id="ddm_lat_deg"]').val(lat_idegrees);
          $('input[id="ddm_lat_min"]').val(lat_dminutes);
@@ -422,13 +422,13 @@
          $('input[id="dms_lat_min"]').val(lat_iminutes);
          $('input[id="dms_lat_sec"]').val(lat_seconds);
 
-         ddlon = Math.abs(ddlon);
-         var lon_idegrees = Math.floor(ddlon);
-         var lon_dminutes = (ddlon - lon_idegrees) * 60;
+         dd_lon = Math.abs(dd_lon);
+         var lon_idegrees = Math.floor(dd_lon);
+         var lon_dminutes = (dd_lon - lon_idegrees) * 60;
          var lon_iminutes = Math.floor(lon_dminutes);
          var lon_seconds = (lon_dminutes - lon_iminutes) * 60;
 
-         $('input[id="id_ddlon"]').val(ddlon * -1);
+         $('input[id="id_dd_lon"]').val(dd_lon * -1);
 
          $('input[id="ddm_lon_deg"]').val(lon_idegrees * -1);
          $('input[id="ddm_lon_min"]').val(lon_dminutes);
@@ -439,7 +439,7 @@
 
 
          // the coordinates under the map:
-         $("#latlon_text").html('<em>' +  ddlat.toFixed(4) + '&deg;N ' + ddlon.toFixed(4) + '&deg;W</em>');
+         $("#latlon_text").html('<em>' +  dd_lat.toFixed(4) + '&deg;N ' + dd_lon.toFixed(4) + '&deg;W</em>');
 
      }
 
@@ -447,30 +447,30 @@
      // from http://ipasic.com/article/let-user-add-point-map-geodjango-leaflet/
      function onMapClick(e) {
          // capture the click events on our map an update the other controls accordingly
-         var ddlat = e.latlng.lat;
-         var ddlon = e.latlng.lng;
+         var dd_lat = e.latlng.lat;
+         var dd_lon = e.latlng.lng;
 
-         update_controls(ddlat, ddlon);
+         update_controls(dd_lat, dd_lon);
      }
 
      // call the onMapClick function when user click on map
      my_map.on('click', onMapClick);
 
 
-     $('input[id="id_ddlon"]').change (function () {
+     $('input[id="id_dd_lon"]').change (function () {
 
-         var ddlon = parseFloat($('input[id="id_ddlon"]').val());
+         var dd_lon = parseFloat($('input[id="id_dd_lon"]').val());
 
-         var valid = check_ddlon(ddlon);
+         var valid = check_dd_lon(dd_lon);
 
          if (valid){
-             ddlon = Math.abs(ddlon);
-             var lon_idegrees = Math.floor(ddlon);
-             var lon_dminutes = (ddlon - lon_idegrees) * 60;
+             dd_lon = Math.abs(dd_lon);
+             var lon_idegrees = Math.floor(dd_lon);
+             var lon_dminutes = (dd_lon - lon_idegrees) * 60;
              var lon_iminutes = Math.floor(lon_dminutes);
              var lon_seconds = (lon_dminutes - lon_iminutes) * 60;
 
-             $('input[id="id_ddlon"]').val(ddlon * -1);
+             $('input[id="id_dd_lon"]').val(dd_lon * -1);
 
              $('input[id="ddm_lon_deg"]').val(lon_idegrees * -1);
              $('input[id="ddm_lon_min"]').val(lon_dminutes);
@@ -534,40 +534,40 @@
 
 
 
-     function check_ddlat(lat_degrees){
-         // check_ddlat
+     function check_dd_lat(lat_degrees){
+         // check_dd_lat
          // both degrees and minutes must be populated
          // minutes must be a float between 0 and 60
          // degrees must be an integer between -90 and 90
 
 
          if(isNaN(lat_degrees) || lat_degrees< -90 || lat_degrees> 90){
-             $( "#ddlat_deg_error" ).show();
-             $( 'input[id="id_ddlat"]' ).addClass("has-error");
+             $( "#dd_lat_deg_error" ).show();
+             $( 'input[id="id_dd_lat"]' ).addClass("has-error");
              return false
          } else {
-             $( "#ddlat_deg_error" ).hide();
-             $( 'input[id="id_ddlat"]' ).removeClass("has-error");
+             $( "#dd_lat_deg_error" ).hide();
+             $( 'input[id="id_dd_lat"]' ).removeClass("has-error");
          }
 
          return true
      }
 
 
-     function check_ddlon(lon_degrees){
-         // check_ddlon
+     function check_dd_lon(lon_degrees){
+         // check_dd_lon
          // both degrees and minutes must be populoned
          // minutes must be a float between 0 and 60
          // degrees must be an integer between -90 and 90
 
 
          if(isNaN(lon_degrees) || lon_degrees < -180 || lon_degrees> 180){
-             $( "#ddlon_deg_error" ).show();
-             $( 'input[id="id_ddlon"]' ).addClass("has-error");
+             $( "#dd_lon_deg_error" ).show();
+             $( 'input[id="id_dd_lon"]' ).addClass("has-error");
              return false
          } else {
-             $( "#ddlon_deg_error" ).hide();
-             $( 'input[id="id_ddlon"]' ).removeClass("has-error");
+             $( "#dd_lon_deg_error" ).hide();
+             $( 'input[id="id_dd_lon"]' ).removeClass("has-error");
          }
 
          return true
@@ -709,8 +709,8 @@
          if(valid){
 
              // update the controls on the dd tab
-             ddlat = lat_idegrees + lat_dminutes / 60;
-             $('input[id="id_ddlat"]').val(ddlat);
+             dd_lat = lat_idegrees + lat_dminutes / 60;
+             $('input[id="id_dd_lat"]').val(dd_lat);
 
              var lat_iminutes = Math.floor(lat_dminutes);
              var lat_seconds = (lat_dminutes - lat_iminutes) * 60;
@@ -737,8 +737,8 @@
              $('input[id="ddm_lon_deg"]').val(lon_idegrees * -1);
 
              // calculate decimal degrees and update the dd tab
-             var ddlon = (lon_idegrees + lon_dminutes / 60);
-             $('input[id="id_ddlon"]').val(ddlon * -1);
+             var dd_lon = (lon_idegrees + lon_dminutes / 60);
+             $('input[id="id_dd_lon"]').val(dd_lon * -1);
 
              var lon_iminutes = Math.floor(lon_dminutes);
              var lon_seconds = (lon_dminutes - lon_iminutes) * 60;
@@ -770,8 +770,8 @@
              $('input[id="ddm_lat_min"]').val(lat_dminutes);
 
              // decimal degree tab
-             var ddlat = lat_idegrees + lat_dminutes / 60;
-             $('input[id="id_ddlat"]').val(ddlat);
+             var dd_lat = lat_idegrees + lat_dminutes / 60;
+             $('input[id="id_dd_lat"]').val(dd_lat);
 
              refresh_map();
          }
@@ -799,8 +799,8 @@
              $('input[id="ddm_lon_min"]').val(lon_dminutes);
 
              // decimal degree tab
-             var ddlon = lon_idegrees + lon_dminutes / 60;
-             $('input[id="id_ddlon"]').val(ddlon * -1);
+             var dd_lon = lon_idegrees + lon_dminutes / 60;
+             $('input[id="id_dd_lon"]').val(dd_lon * -1);
 
              refresh_map();
          }
@@ -824,7 +824,7 @@
 
          if (spatial_flag === '0'){
 
-             $('input[id="id_ddlat"]').val('');
+             $('input[id="id_dd_lat"]').val('');
              $('input[id="ddm_lat_deg"]').val('');
              $('input[id="ddm_lat_min"]').val('');
 
@@ -833,7 +833,7 @@
              $('input[id="dms_lat_sec"]').val('');
 
 
-             $('input[id="id_ddlon"]').val('');
+             $('input[id="id_dd_lon"]').val('');
              $('input[id="ddm_lon_deg"]').val('');
              $('input[id="ddm_lon_min"]').val('');
 

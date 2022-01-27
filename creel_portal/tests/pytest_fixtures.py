@@ -43,8 +43,7 @@ def api_client():
 
 @pytest.fixture(scope=SCOPE)
 def user(db):
-    """return a normal user named homer
-    """
+    """return a normal user named homer"""
     password = "Abcd1234"
     homer = UserFactory.create(
         username="hsimpson",
@@ -96,7 +95,13 @@ def creel(db, user, user2):
 
     ssn = "12"
     ssn_des = "February"
-    creel = FN011Factory(prj_cd=prj_cd, prj_ldr=user, field_crew=[user2,])
+    creel = FN011Factory(
+        prj_cd=prj_cd,
+        prj_ldr=user,
+        field_crew=[
+            user2,
+        ],
+    )
     ssn_date0 = datetime.strptime("2017-02-01", "%Y-%m-%d")
     ssn_date1 = datetime.strptime("2017-02-28", "%Y-%m-%d")
     season = FN022Factory(
@@ -203,8 +208,12 @@ def creel(db, user, user2):
         description="Family Day",
     )
 
-    FN026Factory(creel=creel, space="S1", space_des="Space 1", ddlat=45.1, ddlon=-81.1)
-    FN026Factory(creel=creel, space="S2", space_des="Space 2", ddlat=45.2, ddlon=-81.2)
+    FN026Factory(
+        creel=creel, space="S1", space_des="Space 1", dd_lat=45.1, dd_lon=-81.1
+    )
+    FN026Factory(
+        creel=creel, space="S2", space_des="Space 2", dd_lat=45.2, dd_lon=-81.2
+    )
     FN028Factory(creel=creel, mode="m1", mode_des="Mode 1")
     FN028Factory(creel=creel, mode="m2", mode_des="Mode 2")
 

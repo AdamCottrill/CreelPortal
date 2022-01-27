@@ -39,15 +39,6 @@ def data():
         "prj_date0": datetime(2019, 8, 3),
         "prj_date1": datetime(2019, 8, 20),
         "comment0": "This is a fake project for testing.",
-        "fof_loc": "Owen Sound",
-        "fof_nm": "Lake Huron FAU",
-        "wby": "SC",
-        "aru": "00",
-        "wby_nm": "Huron, L.",
-        "prj_his": "",
-        "prj_ver": "2.0J (96.06.11)",
-        "prj_rdo": "",
-        "prj_size": "6644",
     }
     return data
 

@@ -206,8 +206,8 @@
                  // if not, create on
                  points[tmp.area] = {
                      area: tmp.area,
-                     ddlat: tmp.ddlat,
-                     ddlon: tmp.ddlon,
+                     dd_lat: tmp.dd_lat,
+                     dd_lon: tmp.dd_lon,
                      effae: tmp.effae,
                      effao_s: tmp.effao_s,
                      effre: tmp.effre,
@@ -229,7 +229,7 @@
                  "type": "Feature",
                  "geometry":{
                      "type": "Point",
-                     "coordinates": [d.ddlon, d.ddlat]},
+                     "coordinates": [d.dd_lon, d.dd_lat]},
                  "properties":{
                      "Space": d.area,
                      "est_effort_angler": d.effae.toFixed(1),
@@ -276,8 +276,8 @@
              d.effae = +d.effae;
              d.effao_s = d.effao_s;
              d.effro_s = d.effro_s;
-             d.ddlat = +d.ddlat;
-             d.ddlon = +d.ddlon;
+             d.dd_lat = +d.dd_lat;
+             d.dd_lon = +d.dd_lon;
 
          });
 
@@ -498,8 +498,8 @@
              spaceMarkers.clearLayers();
 
              $.each( spaces, function(i, x) {
-                 if(x.ddlat & x.ddlon){
-                     var marker = L.circle([x.ddlat, x.ddlon], 25, {
+                 if(x.dd_lat & x.dd_lon){
+                     var marker = L.circle([x.dd_lat, x.dd_lon], 25, {
                          color:'red',
                          fillColor: 'red',
                          fillOpacity: 1

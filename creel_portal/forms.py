@@ -9,35 +9,35 @@ class FN026Form(ModelForm):
 
     class Meta:
         model = FN026
-        fields = ["ddlat", "ddlon"]
+        fields = ["dd_lat", "dd_lon"]
 
         widgets = {
-            "ddlat": forms.TextInput(attrs={"class": "form-control"}),
-            "ddlon": forms.TextInput(attrs={"class": "form-control"}),
+            "dd_lat": forms.TextInput(attrs={"class": "form-control"}),
+            "dd_lon": forms.TextInput(attrs={"class": "form-control"}),
         }
 
-    def clean_ddlon(self):
-        """if ddlon is populated it must be between -90 and 90.  If ddlat is
-        populated, ddlon is also required."""
+    def clean_dd_lon(self):
+        """if dd_lon is populated it must be between -90 and 90.  If dd_lat is
+        populated, dd_lon is also required."""
 
-        ddlon = self.cleaned_data.get("ddlon")
-        if ddlon:
-            if ddlon < -180 or ddlon > 180:
-                err_msg = "ddlon must be numeric and lie between -180 and 180"
+        dd_lon = self.cleaned_data.get("dd_lon")
+        if dd_lon:
+            if dd_lon < -180 or dd_lon > 180:
+                err_msg = "dd_lon must be numeric and lie between -180 and 180"
                 raise forms.ValidationError(err_msg)
-        return ddlon
+        return dd_lon
 
-    def clean_ddlat(self):
-        """if ddlat is populated it must be between -90 and 90.  If ddlon is
-        populated, ddlat is also required."""
+    def clean_dd_lat(self):
+        """if dd_lat is populated it must be between -90 and 90.  If dd_lon is
+        populated, dd_lat is also required."""
 
-        ddlat = self.cleaned_data.get("ddlat")
+        dd_lat = self.cleaned_data.get("dd_lat")
 
-        if ddlat:
-            if ddlat < -90 or ddlat > 90:
-                err_msg = "ddlat must be numeric and lie between -90 and 90"
+        if dd_lat:
+            if dd_lat < -90 or dd_lat > 90:
+                err_msg = "dd_lat must be numeric and lie between -90 and 90"
                 raise forms.ValidationError(err_msg)
-        return ddlat
+        return dd_lat
 
     def clean(self):
         """
@@ -48,15 +48,15 @@ class FN026Form(ModelForm):
 
         cleaned_data = self.cleaned_data
 
-        ## DDLAT DDLON
-        ddlat = cleaned_data.get("ddlat")
-        ddlon = cleaned_data.get("ddlon")
+        ## DD_LAT DD_LON
+        dd_lat = cleaned_data.get("dd_lat")
+        dd_lon = cleaned_data.get("dd_lon")
 
-        if ddlat is None and ddlon is not None:
-            err_msg = "If ddlon is populated,  ddlat must be populated too"
+        if dd_lat is None and dd_lon is not None:
+            err_msg = "If dd_lon is populated,  dd_lat must be populated too"
             raise forms.ValidationError(err_msg)
-        if ddlat is not None and ddlon is None:
-            err_msg = "If ddlat is populated,  ddlon must be populated too"
+        if dd_lat is not None and dd_lon is None:
+            err_msg = "If dd_lat is populated,  dd_lon must be populated too"
             raise forms.ValidationError(err_msg)
 
         return cleaned_data

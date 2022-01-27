@@ -261,7 +261,7 @@
 
                                                         {% url 'creel_portal:edit_creel_space' item.creel.slug item.space as the_url %}
 
-                                                        {% if item.ddlat and item.ddlon %}
+                                                        {% if item.dd_lat and item.dd_lon %}
 
                                                             <a class="btn btn-xs btn-primary" href="{{ the_url }}" role="button">
                                                                 <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Edit
@@ -489,8 +489,8 @@
          spaceMarkers.clearLayers();
 
          $.each( spaces, function(i, x) {
-             if(x.ddlat & x.ddlon){
-                 var marker = L.marker([x.ddlat, x.ddlon]);
+             if(x.dd_lat & x.dd_lon){
+                 var marker = L.marker([x.dd_lat, x.dd_lon]);
                  popup = "<p>Space: " + x.label + "</p>"
                  marker.bindPopup(popup);
 

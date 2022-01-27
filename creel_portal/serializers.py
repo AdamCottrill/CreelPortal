@@ -89,8 +89,8 @@ class FN026Serializer(serializers.HyperlinkedModelSerializer):
             "area_cnt",
             "area_lst",
             "area_wt",
-            "ddlat",
-            "ddlon",
+            "dd_lat",
+            "dd_lon",
         )
 
 
@@ -235,8 +235,8 @@ class FR713Serializer(serializers.ModelSerializer):
     dtp = serializers.CharField(source="stratum.daytype.label", read_only=True)
     period = serializers.CharField(source="stratum.period.prd", read_only=True)
     area = serializers.CharField(source="stratum.area.label", read_only=True)
-    ddlat = serializers.FloatField(source="stratum.area.ddlat", read_only=True)
-    ddlon = serializers.FloatField(source="stratum.area.ddlon", read_only=True)
+    dd_lat = serializers.FloatField(source="stratum.area.dd_lat", read_only=True)
+    dd_lon = serializers.FloatField(source="stratum.area.dd_lon", read_only=True)
 
     class Meta:
         model = FR713
@@ -252,8 +252,8 @@ class FR713Serializer(serializers.ModelSerializer):
             "effae",
             "effao_s",
             "effro_s",
-            "ddlat",
-            "ddlon",
+            "dd_lat",
+            "dd_lon",
         )
 
 
@@ -265,8 +265,8 @@ class FR714Serializer(serializers.ModelSerializer):
     period = serializers.CharField(source="stratum.period.prd", read_only=True)
     area = serializers.CharField(source="stratum.area.label", read_only=True)
 
-    ddlat = serializers.FloatField(source="stratum.area.ddlat", read_only=True)
-    ddlon = serializers.FloatField(source="stratum.area.ddlon", read_only=True)
+    dd_lat = serializers.FloatField(source="stratum.area.dd_lat", read_only=True)
+    dd_lon = serializers.FloatField(source="stratum.area.dd_lon", read_only=True)
 
     species = serializers.CharField(source="species.spc_nmco", read_only=True)
 
@@ -288,6 +288,6 @@ class FR714Serializer(serializers.ModelSerializer):
             "hvsno1_s",
             "hvsne",
             "hvsne1",
-            "ddlat",
-            "ddlon",
+            "dd_lat",
+            "dd_lon",
         )

@@ -79,16 +79,6 @@ class FN011(models.Model):
         default="A2",
     )
 
-    aru = models.TextField(blank=True, null=True)
-    fof_loc = models.TextField(blank=True, null=True)
-    fof_nm = models.TextField(blank=True, null=True)
-    wby = models.TextField(blank=True, null=True)
-    wby_nm = models.TextField(blank=True, null=True)
-    prj_his = models.TextField(blank=True, null=True)
-    prj_size = models.TextField(blank=True, null=True)
-    prj_ver = models.TextField(blank=True, null=True)
-    v0 = models.TextField(blank=True, null=True)
-
     class Meta:
         app_label = "creel_portal"
         verbose_name = "FN011 - Creel"
@@ -267,8 +257,6 @@ class FN022(models.Model):
     )
     ssn_date0 = models.DateField(help_text="Season Start Date", blank=False)
     ssn_date1 = models.DateField(help_text="Season End Date", blank=False)
-
-    v0 = models.CharField(max_length=4, blank=False)
 
     slug = models.SlugField(blank=True, unique=True, editable=False)
 
@@ -588,8 +576,8 @@ class FN026(models.Model):
 
     slug = models.SlugField(blank=True, unique=True, editable=False)
 
-    ddlat = models.FloatField(blank=True, null=True)
-    ddlon = models.FloatField(blank=True, null=True)
+    dd_lat = models.FloatField(blank=True, null=True)
+    dd_lon = models.FloatField(blank=True, null=True)
 
     class Meta:
         app_label = "creel_portal"

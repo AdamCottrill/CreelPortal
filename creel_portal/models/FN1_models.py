@@ -150,8 +150,7 @@ class FN123(models.Model):
 class FN125(models.Model):
     """Class to represent the attributes of sampled fish.."""
 
-    SEX_CHOICES = ((1, "Male"), (2, "Female"), (9, "Unknown"))
-
+    SEX_CHOICES = ((1, "Male"), (2, "Female"), (3, "Hermaphrodite"), (9, "Unknown"))
     MAT_CHOICES = ((1, "Immature"), (2, "Mature"), (9, "Unknown"))
 
     # get from FN_Dict.

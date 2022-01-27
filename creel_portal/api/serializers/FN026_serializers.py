@@ -16,8 +16,8 @@ class FN026Serializer(serializers.ModelSerializer):
             "area_cnt",
             "area_lst",
             "area_wt",
-            "ddlat",
-            "ddlon",
+            "dd_lat",
+            "dd_lon",
         )
 
 
@@ -38,8 +38,8 @@ class FN026ListSerializer(serializers.ModelSerializer):
             "area_cnt",
             "area_lst",
             "area_wt",
-            "ddlat",
-            "ddlon",
+            "dd_lat",
+            "dd_lon",
             "slug",
             "id",
         )

@@ -20,8 +20,6 @@ class FN022(FNBase):
     ssn_date0: date
     ssn_date1: date
 
-    v0: Optional[constr(max_length=4)]
-
     class Config:
         validate_assignment = True
 

@@ -39,17 +39,6 @@ class FN011(FNBase):
 
     contmeth: ContMethEnum
 
-    # these are old FN-2 fields that might go away...
-    aru: Optional[str]
-    fof_loc: Optional[str]
-    fof_nm: Optional[str]
-    wby: Optional[str]
-    wby_nm: Optional[str]
-    prj_his: Optional[str]
-    prj_size: Optional[str]
-    prj_ver: Optional[str]
-    v0: Optional[constr(max_length=4)]
-
     _prj_nm_titlecase = validator("prj_nm", allow_reuse=True)(to_titlecase)
 
     @validator("year")

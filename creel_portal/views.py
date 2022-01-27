@@ -1,3 +1,4 @@
+import os
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -86,7 +87,7 @@ class CreelDetailView(DetailView):
 
         creel = kwargs.get("object")
 
-        spots = creel.spatial_strata.values("label", "ddlon", "ddlat")
+        spots = creel.spatial_strata.values("label", "dd_lon", "dd_lat")
         context["spaces"] = json.dumps(list(spots), cls=DjangoJSONEncoder)
 
         catch_estimates = get_aggregate_catch_estimates(creel)
@@ -135,7 +136,7 @@ def effort_estimates(request, slug):
 
     creel = get_object_or_404(FN011, slug=slug)
 
-    spots = creel.spatial_strata.values("label", "ddlon", "ddlat")
+    spots = creel.spatial_strata.values("label", "dd_lon", "dd_lat")
     spots_json = json.dumps(list(spots), cls=DjangoJSONEncoder)
 
     return render(
@@ -154,7 +155,7 @@ def catch_estimates(request, slug):
 
     creel = get_object_or_404(FN011, slug=slug)
 
-    spots = creel.spatial_strata.values("label", "ddlon", "ddlat")
+    spots = creel.spatial_strata.values("label", "dd_lon", "dd_lat")
     spots_json = json.dumps(list(spots), cls=DjangoJSONEncoder)
 
     return render(
@@ -197,8 +198,8 @@ def effort_estimates_json(request, slug):
             period=F("fr712__stratum__period__prd"),
             mode=F("fr712__stratum__mode__mode_des"),
             area=F("fr712__stratum__area__space_des"),
-            ddlat=F("fr712__stratum__area__ddlat"),
-            ddlon=F("fr712__stratum__area__ddlon"),
+            dd_lat=F("fr712__stratum__area__dd_lat"),
+            dd_lon=F("fr712__stratum__area__dd_lon"),
         )
         .values(
             "id",
@@ -211,8 +212,8 @@ def effort_estimates_json(request, slug):
             "dtp",
             "period",
             "area",
-            "ddlat",
-            "ddlon",
+            "dd_lat",
+            "dd_lon",
         )
     )
 
@@ -254,8 +255,8 @@ def catch_estimates_json(request, slug):
             period=F("fr712__stratum__period__prd"),
             mode=F("fr712__stratum__mode__mode_des"),
             area=F("fr712__stratum__area__space_des"),
-            ddlat=F("fr712__stratum__area__ddlat"),
-            ddlon=F("fr712__stratum__area__ddlon"),
+            dd_lat=F("fr712__stratum__area__dd_lat"),
+            dd_lon=F("fr712__stratum__area__dd_lon"),
         )
         .values(
             "id",
@@ -267,8 +268,8 @@ def catch_estimates_json(request, slug):
             "dtp",
             "period",
             "area",
-            "ddlat",
-            "ddlon",
+            "dd_lat",
+            "dd_lon",
         )
     )
 
@@ -317,7 +318,7 @@ def get_errors(errors):
 
 
 @login_required
-def project_data_upload(request):
+def creel_data_upload(request):
     """A view to process data uploads.  It will be only available to logged in users.
 
     The uploaded file will be check for validity with cerberus - if it
@@ -347,7 +348,7 @@ def project_data_upload(request):
                     msg = "Choosen file is not an Access (*.accdb) file!"
                     messages.error(request, msg)
                     return HttpResponseRedirect(
-                        reverse("creel_portal:upload_project_data")
+                        reverse("creel_portal:upload_creel_data")
                     )
                 # if file is too large, return
                 if data_file.multiple_chunks():
@@ -358,7 +359,7 @@ def project_data_upload(request):
                     )
                     messages.error(request, msg)
                     return HttpResponseRedirect(
-                        reverse("creel_portal:upload_project_data")
+                        reverse("creel_portal:upload_creel_data")
                     )
 
                 upload = handle_uploaded_file(data_file)
@@ -382,7 +383,7 @@ def project_data_upload(request):
                     )
                     messages.error(request, msg)
                     # pass errors to redirect so that they are available in the response.
-                    # return HttpResponseRedirect(reverse("creel_portal:upload_project_data"))
+                    # return HttpResponseRedirect(reverse("creel_portal:upload_creel_data"))
                     error_list = get_errors(upload.get("errors"))
                     return render(
                         request,
@@ -408,7 +409,7 @@ def project_data_upload(request):
 
             except Exception as e:
                 messages.error(request, "Unable to upload file. " + repr(e))
-                return HttpResponseRedirect(reverse("creel_portal:upload_project_data"))
+                return HttpResponseRedirect(reverse("creel_portal:upload_creel_data"))
     else:
         form = DataUploadForm()
     return render(

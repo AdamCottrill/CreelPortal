@@ -233,7 +233,7 @@ class EffortEstimates(generics.ListAPIView):
         #     .filter(fr712__stratum__creel_run__run=final_run)
         # )
 
-        # need to add mode, season, dtp, period, area, ddlat, ddlon
+        # need to add mode, season, dtp, period, area, dd_lat, dd_lon
 
         creel = FN011.objects.get(slug=slug)
         final_run = creel.final_run.run
@@ -258,8 +258,8 @@ class EffortEstimates(generics.ListAPIView):
                 period=F("fr712__stratum__period__prd"),
                 mode=F("fr712__stratum__mode__mode"),
                 area=F("fr712__stratum__area__space"),
-                ddlat=F("fr712__stratum__area__ddlat"),
-                ddlon=F("fr712__stratum__area__ddlon"),
+                dd_lat=F("fr712__stratum__area__dd_lat"),
+                dd_lon=F("fr712__stratum__area__dd_lon"),
             )
             .values(
                 "id",
@@ -271,8 +271,8 @@ class EffortEstimates(generics.ListAPIView):
                 "season",
                 "period",
                 "area",
-                "ddlat",
-                "ddlon",
+                "dd_lat",
+                "dd_lon",
             )
         )
 
@@ -306,7 +306,7 @@ class CreelSpaces(generics.ListAPIView):
         slug = self.kwargs["slug"]
 
         qs = FN026.objects.filter(creel__slug=slug).filter(
-            ddlat__isnull=False, ddlon__isnull=False
+            dd_lat__isnull=False, dd_lon__isnull=False
         )
 
         return qs

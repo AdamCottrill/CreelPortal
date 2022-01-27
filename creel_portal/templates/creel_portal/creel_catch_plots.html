@@ -248,8 +248,8 @@
                  points[tmp.area] = {
                      area: tmp.area,
                      species: tmp.species,
-                     ddlat: tmp.ddlat,
-                     ddlon: tmp.ddlon,
+                     dd_lat: tmp.dd_lat,
+                     dd_lon: tmp.dd_lon,
                      catne: tmp.catne,
                  };
                  points[tmp.area].species = {};
@@ -288,7 +288,7 @@
                  "type": "Feature",
                  "geometry":{
                      "type": "Point",
-                     "coordinates": [d.ddlon, d.ddlat]},
+                     "coordinates": [d.dd_lon, d.dd_lat]},
                  "properties":{
                      "Space": d.area,
                      "Total Catch": d.catne.toFixed(1),
@@ -330,8 +330,8 @@
              d.area = d.area;
              d.sek = d.sek;
              d.catne = +d.catne;
-             d.ddlat = +d.ddlat;
-             d.ddlon = +d.ddlon;
+             d.dd_lat = +d.dd_lat;
+             d.dd_lon = +d.dd_lon;
 
          });
 
@@ -591,7 +591,7 @@
 
 
              $.each( spaces, function(i, x) {
-                 var marker = L.circle([x.ddlat, x.ddlon], 25, {
+                 var marker = L.circle([x.dd_lat, x.dd_lon], 25, {
                      color:'red',
                      fillColor: 'red',
                      fillOpacity: 1
