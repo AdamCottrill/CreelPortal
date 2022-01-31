@@ -62,9 +62,9 @@ urlpatterns = [
         name="edit_creel_space",
     ),
     path(
-        "project_data_upload/",
-        view=views.project_data_upload,
-        name="upload_project_data",
+        "data_upload/",
+        view=views.creel_data_upload,
+        name="upload_creel_data",
     ),
     # api urls
     path("api/v0/", include(router.urls)),

@@ -11,7 +11,7 @@ class FN024(FNBase):
     slug: str
     daytype_id: int
 
-    prd: constr(regex="^([A-Z0-9]{2})$", max_length=2)
+    prd: constr(regex="^([A-Z0-9]{1})$", max_length=1)
     prdtm0: time
     prdtm1: time
     prd_dur: confloat(ge=0)

@@ -170,10 +170,19 @@ class FN125(models.Model):
     # gon should be a choice field too
     gon = models.CharField(max_length=2, blank=True, null=True)
     mat = models.IntegerField(choices=MAT_CHOICES, default=None, blank=True, null=True)
-    age = models.IntegerField(blank=True, null=True)
+    # age = models.IntegerField(blank=True, null=True)
     agest = models.CharField(max_length=8, blank=True, null=True)
     clipc = models.CharField(max_length=6, blank=True, null=True)
+    tissue = models.CharField(max_length=20, blank=True, null=True)
     fate = models.CharField(max_length=2, blank=True, null=True)
+
+    # flags for child tables:
+    age_flag = models.BooleanField(default=False)
+    stom_flag = models.BooleanField(default=False)
+    lam_flag = models.BooleanField(default=False)
+    tag_flag = models.BooleanField(default=False)
+
+    comment5 = models.CharField(max_length=500, blank=True, null=True)
 
     slug = models.SlugField(blank=True, unique=True, editable=False)
 

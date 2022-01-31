@@ -28,7 +28,7 @@ class FN123(FNBase):
     rlscnt: Optional[conint(ge=0)] = None
     mescnt: Optional[conint(ge=0)] = None
     meswt: Optional[confloat(ge=0)] = None
-    comment3: Optional[str]
+    # comment3: Optional[str]
 
     _string_to_float = validator("meswt", allow_reuse=True, pre=True)(string_to_float)
 

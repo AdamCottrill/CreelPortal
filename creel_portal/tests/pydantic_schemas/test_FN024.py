@@ -31,7 +31,7 @@ def data():
     data = {
         "slug": "lha_sc19_002-01-1-1",
         "daytype_id": 1,
-        "prd": "01",
+        "prd": "1",
         "prdtm0": time(8, 0),
         "prdtm1": time(12, 0),
         "prd_dur": 4,
@@ -83,11 +83,11 @@ error_list = [
     (
         "prd",
         "FOO",
-        "ensure this value has at most 2 characters",
+        "ensure this value has at most 1 characters",
     ),
     (
         "prd",
-        "F.",
+        "*",
         "string does not match regex",
     ),
     (

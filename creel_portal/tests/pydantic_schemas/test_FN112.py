@@ -80,6 +80,24 @@ def test_defaults_data(data, fld, value):
     assert item_dict[fld] == value
 
 
+valid_alternatives = [("atydur", 0.2498)]
+
+
+@pytest.mark.parametrize("fld,value", fields_defaults)
+def test_alternative_data(data, fld, value):
+    """If alternative valid data is passed in, it should be converted appropriately.
+
+    Arguments:
+    - `data`:
+    """
+
+    data[fld] = value
+    item = FN112(**data)
+
+    assert item.sama_id == data["sama_id"]
+    assert item.slug == data["slug"]
+
+
 error_list = [
     (
         "atycnt",

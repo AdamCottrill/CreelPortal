@@ -77,7 +77,6 @@ required_fields = [
     "sama",
     "date",
     "samtm0",
-    "dow",
 ]
 
 
@@ -125,8 +124,6 @@ def test_optional_fields(data, fld):
 # invalid weather - cloudy
 # invalide dow
 
-# dow does not aggree with date:
-
 error_list = [
     (
         "sama",
@@ -168,12 +165,6 @@ error_list = [
         "cloudy",
         "value is not a valid integer",
     ),
-    (
-        "dow",
-        "8",
-        "value is not a valid enumeration member; permitted: 1, 2,",
-    ),
-    ("dow", "6", "DOW value (6) is not consistent with date (2022-01-19, dow=4)"),
 ]
 
 

@@ -33,7 +33,7 @@ class FN112(FNBase):
         pre=True,
     )(strip_date)
 
-    @validator("atytm1", allow_reuse=True)
+    @validator("atytm1")
     def atytm0_before_atytm1(cls, v, values):
         atytm0 = values.get("atytm0")
         if v and atytm0:
@@ -45,22 +45,28 @@ class FN112(FNBase):
                 )
         return v
 
-    @validator("atydur", allow_reuse=True)
-    def atydur_matches_atytm0_atytm1(cls, v, values):
-        """verify that the period duration is consistent with difference between the times"""
-        atytm0 = values.get("atytm0")
-        atytm1 = values.get("atytm1")
-        today = date.today()
+    # atydur is calcuated on data upload, not externally so there is no
+    # need to check it right now.
 
-        if atytm0 and atytm1:
-            delta = datetime.combine(today, atytm1) - datetime.combine(today, atytm0)
-            delta_hours = delta.seconds / 3600
-            if delta_hours != v:
-                start = atytm0.strftime("%H:%M")
-                end = atytm1.strftime("%H:%M")
-                err_msg = (
-                    f"Activity duration (atydur={v}) is not consistent with start "
-                    + f"and end times({start}, {end}, delta={delta_hours})."
-                )
-                raise ValueError(err_msg)
-        return v
+
+#    @validator("atydur")
+#    def atydur_matches_atytm0_atytm1(cls, v, values):
+#        """verify that the period duration is consistent with difference between the times"""
+#        atytm0 = values.get("atytm0")
+#        atytm1 = values.get("atytm1")
+#        today = date.today()
+#
+#        if atytm0 and atytm1:
+#            delta = datetime.combine(today, atytm1) - datetime.combine(today, atytm0)
+#            delta_hours = delta.seconds / 3600
+#            if v is None:
+#                return delta_hours
+#            if round(delta_hours, 1) != round(v, 1):
+#                start = atytm0.strftime("%H:%M")
+#                end = atytm1.strftime("%H:%M")
+#                err_msg = (
+#                    f"Activity duration (atydur={v}) is not consistent with start "
+#                    + f"and end times({start}, {end}, delta={delta_hours})."
+#                )
+#                raise ValueError(err_msg)
+#        return v

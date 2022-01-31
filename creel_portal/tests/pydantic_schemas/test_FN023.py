@@ -33,7 +33,7 @@ def data():
         "season_id": 1,
         "dtp": "2",
         "dtp_nm": "Weekend",
-        "dtp_lst": "17",
+        "dow_lst": "17",
     }
     return data
 
@@ -51,7 +51,7 @@ def test_valid_base_data(data):
     assert item.slug == data["slug"]
     assert item.dtp == int(data["dtp"])
     assert item.dtp_nm == data["dtp_nm"]
-    assert item.dtp_lst == data["dtp_lst"]
+    assert item.dow_lst == data["dow_lst"]
 
 
 required_fields = [
@@ -59,7 +59,7 @@ required_fields = [
     "season_id",
     "dtp",
     "dtp_nm",
-    "dtp_lst",
+    "dow_lst",
 ]
 
 
@@ -100,7 +100,7 @@ error_list = [
         "value is not a valid enumeration member",
     ),
     (
-        "dtp_lst",
+        "dow_lst",
         "00",
         "value is not a valid enumeration member",
     ),
@@ -110,9 +110,9 @@ error_list = [
         "Day type code (2) is not consistent with day type name (Weekday)",
     ),
     (
-        "dtp_lst",
+        "dow_lst",
         "23456",
-        "Day type code (2) is not consistent with day list (23456)",
+        "Day type code (2) is not consistent with dow list (23456)",
     ),
 ]
 

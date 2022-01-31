@@ -22,8 +22,16 @@ A. Cottrill
 # and reflecting it to get the tables and columns and running a simple
 # query.
 
-
+from datetime import datetime
 import pyodbc
+
+
+def strip_date(value):
+    """pyodbc treats times as datetimes. we need to strip the date off if
+    it is there."""
+    if isinstance(value, datetime):
+        return value.time()
+    return value
 
 
 def get_mdb_connection(mdb):
@@ -52,17 +60,17 @@ def execute_select(con, stmt):
 
 
 def get_fn011_stmt():
+    """Some day soon nuke fiedls after FOF_LOC.  ADD LAKE!"""
 
-    stmt = """select
-        YEAR,
-        PRJ_CD,
-        PRJ_NM,
-        PRJ_LDR,
-        PRJ_DATE0,
-        PRJ_DATE1,
-        COMMENT0,
-        PROTOCOL,
-        LAKE from FN011"""
+    stmt = """SELECT YEAR,
+                 PRJ_CD,
+                 CONTMETH,
+                 PRJ_DATE0,
+                 PRJ_DATE1,
+                 PRJ_LDR,
+                 PRJ_NM,
+                 COMMENT0
+        FROM FN011;"""
 
     return stmt
 
@@ -80,158 +88,173 @@ def get_fn022_stmt():
     return stmt
 
 
+def get_fn023_stmt():
+
+    stmt = """SELECT
+    PRJ_CD,
+    SSN,
+    DTP,
+    DTP_NM,
+    DOW_LST
+    FROM FN023;
+    """
+    return stmt
+
+
+def get_fn024_stmt():
+
+    stmt = """SELECT PRJ_CD,
+                SSN,
+                DTP,
+                PRD,
+                PRDTM0,
+                PRD_DUR,
+                PRDTM1,
+                TIME_WT
+            FROM FN024"""
+
+    return stmt
+
+
+def get_fn025_stmt():
+
+    stmt = """SELECT PRJ_CD,
+                SSN,
+                [DATE],
+                DTP1,
+                DESCRIPTION
+            FROM FN025"""
+
+    return stmt
+
+
 def get_fn026_stmt():
 
-    stmt = """select
-             PRJ_CD,
-             SPACE,
-             SPACE_DES,
-             SITE_LST,
-             SITP_LST,
-             AREA_LST,
-             SIDEP_LT,
-             SIDEP_GE,
-             GRDEP_LT,
-             GRDEP_GE
-         from FN026"""
+    stmt = """SELECT
+                PRJ_CD,
+                SPACE,
+                SPACE_DES,
+                COMMENT6,
+                AREA_CNT,
+                AREA_LST,
+                AREA_WT,
+                SPACE_SIZ,
+                GRID5,
+                DD_LAT,
+                DD_LON
+    FROM FN026;"""
     return stmt
 
 
 def get_fn028_stmt():
 
-    stmt = """select
-                PRJ_CD,
-                MODE,
-                MODE_DES,
-                GR,
-                GRUSE,
-                ORIENT,
-                EFFDUR_GE,
-                EFFDUR_LT,
-                EFFTM0_GE,
-                EFFTM0_LT
-         from FN028"""
+    stmt = """SELECT
+                 PRJ_CD,
+                 MODE,
+                 MODE_DES,
+                 ATYUNIT,
+                 ITVUNIT,
+                 CHKFLAG,
+                 COMMENT8
+              FROM FN028;"""
     return stmt
 
 
-def get_fn013_stmt():
+def get_fn111_stmt():
 
-    stmt = """select
-                PRJ_CD,
-                GR,
-                GRTP,
-                GR_DES,
-                EFFCNT,
-                EFFDST
-         from FN013"""
+    stmt = """SELECT
+                 PRJ_CD,
+                 SAMA,
+                 STRATUM,
+                 MODE,
+                 [DATE],
+                 SAMTM0,
+                 COMMENT1,
+                 SPACE,
+                 WEATHER,
+                 ATYDATA,
+                 CREW,
+                 AIRTEM0,
+                 SITEM0,
+                 WIND,
+                 CLOUD_PC,
+                 PRECIP
+              FROM FN111;"""
     return stmt
 
 
-def get_fn014_stmt():
+def get_fn112_stmt():
 
-    stmt = """select
+    stmt = """SELECT
                 PRJ_CD,
-                GR,
-                EFF,
-                EFF_DES,
-                MESH,
-                GRLEN,
-                GRHT,
-                GRWID,
-                GRCOL,
-                GRMAT,
-                GRYARN,
-                GRKNOT
-         from FN014"""
+                SAMA,
+                ATYTM0,
+                ATYTM1,
+                Round(24*([ATYTM1]-[ATYTM0]),2) AS ATYDUR,
+                ATYCNT,
+                ITVCNT,
+                CHKCNT,
+                COMMENT2
+              FROM FN112;"""
     return stmt
 
 
 def get_fn121_stmt():
 
-    stmt = """select
+    stmt = """SELECT
                 PRJ_CD,
                 SAM,
-                SSN,
-                SPACE,
-                MODE,
-                EFFDT0,
+                SAMA,
+                ITVSEQ,
+                [DATE],
+                DOW,
+                ITVTM0,
                 EFFTM0,
-                EFFDT1,
                 EFFTM1,
+                EFFCMP,
                 EFFDUR,
-                EFFST,
-                SITP,
-                SITE,
-                GRID5,
-                DD_LAT0 as DD_LAT,
-                DD_LON0 as DD_LON,
-                DD_LAT1,
-                DD_LON1,
-                SITEM,
-                SITEM1,
-                SITEM0,
-                SIDEP,
-                GRDEPMAX,
-                GRDEPMIN,
-                SECCHI,
-                XSLIME,
-                CREW,
+                PERSONS,
+                ANGLERS,
+                RODS,
+                ANGMETH,
+                ANGGUID,
+                ANGORIG,
+                ANGVIS,
+                ANGOP1,
+                ANGOP2,
+                ANGOP3,
                 COMMENT1
-         from FN121"""
-    return stmt
-
-
-def get_fn122_stmt():
-
-    stmt = """select
+              FROM FN121
+              order by
                 PRJ_CD,
                 SAM,
-                EFF,
-                EFFDST,
-                GRDEP,
-                GRTEM0,
-                GRTEM1,
-                WATERHAUL,
-                COMMENT2
-         from FN122"""
+                SAMA,
+                ITVSEQ
+"""
     return stmt
 
 
 def get_fn123_stmt():
 
-    stmt = """select
+    stmt = """SELECT
                 PRJ_CD,
                 SAM,
                 EFF,
                 SPC,
                 GRP,
-                CATCNT,
-                BIOCNT,
-                CATWT,
-                SUBCNT,
-                SUBWT,
-                COMMENT3 as COMMENT
-         from FN123"""
-    return stmt
-
-
-def get_fn124_stmt():
-
-    stmt = """select
-                PRJ_CD,
-                SAM,
-                EFF,
-                SPC,
-                GRP,
-                SIZ,
-                SIZCNT
-         from FN124"""
+                SEK,
+                HVSCNT,
+                RLSCNT,
+                MESCNT,
+                MESWT
+                FROM FN123;
+                """
     return stmt
 
 
 def get_fn125_stmt():
 
-    stmt = """select
+    stmt = """SELECT
                 PRJ_CD,
                 SAM,
                 EFF,
@@ -240,24 +263,21 @@ def get_fn125_stmt():
                 FISH,
                 FLEN,
                 TLEN,
-                GIRTH,
                 RWT,
                 SEX,
                 MAT,
                 GON,
                 CLIPC,
-                CLIPA,
-                NODC,
-                NODA,
-                TISSUE,
+                GIRTH,
                 AGEST,
-                FATE,
+                NODC,
+                COMMENT5,
+                TISSUE,
                 AGE_FLAG,
                 LAM_FLAG,
                 STOM_FLAG,
-                TAG_FLAG,
-                COMMENT5
-         from FN125"""
+                TAG_FLAG
+               FROM FN125;"""
     return stmt
 
 
@@ -331,7 +351,6 @@ def get_fn127_stmt():
                 AGEID,
                 PREFERRED,
                 AGEA,
-                XAGEM,
                 AGEMT,
                 EDGE,
                 CONF,

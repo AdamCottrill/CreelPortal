@@ -32,7 +32,7 @@ class FN127(FNBase):
     ageid: int
     preferred: bool
     agea: Optional[conint(ge=0)] = None
-    xagem: constr(regex="^([A-Z0-9]{2})$", max_length=2)
+
     agemt: constr(regex="^([A-Z0-9]{5})$", max_length=5)
     edge: Optional[EdgeEnum] = None
     conf: Optional[conint(ge=1, le=9)] = None
@@ -43,22 +43,12 @@ class FN127(FNBase):
         string_to_int
     )
 
-    @validator("xagem")
-    @classmethod
-    def check_xagem_structure(cls, value, values):
-        if value is not None:
-            allowed = "01234567ABCDEFGMK"
-            structure = value[1]
-            if structure not in allowed:
-                msg = f"Unknown aging structure ({','.join(structure)}) found in xagem ({value})"
-                raise ValueError(msg)
-        return value
-
     @validator("agemt")
     @classmethod
     def check_agemt_structure(cls, value, values):
+        """G and X are not allowed"""
         if value is not None:
-            allowed = "01234567ABCDEFGMKT"
+            allowed = "01234567ABCDEFMTV"
             structure = value[0]
             if structure not in allowed:
                 msg = f"Unknown aging structure ({','.join(structure)}) found in agemt ({value})"

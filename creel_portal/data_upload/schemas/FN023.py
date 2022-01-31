@@ -17,7 +17,7 @@ class DayTypeNameEnum(str, Enum):
     weekend = "Weekend"
 
 
-class DayTypeListEnum(str, Enum):
+class DowListEnum(str, Enum):
     weekday = "23456"
     weekend = "17"
 
@@ -30,7 +30,7 @@ class FN023(FNBase):
 
     dtp: DayTypeEnum
     dtp_nm: DayTypeNameEnum
-    dtp_lst: DayTypeListEnum
+    dow_lst: DowListEnum
 
     class Config:
         validate_assignment = True
@@ -49,12 +49,12 @@ class FN023(FNBase):
 
         return v
 
-    @validator("dtp_lst")
+    @validator("dow_lst")
     @classmethod
-    def dtp_lst_matches_dtp(cls, v, values):
+    def dow_lst_matches_dtp(cls, v, values):
         """verify that the day type list is consistent with day type code"""
         dtp = values.get("dtp")
-        if DayTypeEnum(dtp).name != DayTypeListEnum(v).name:
-            err_msg = f"Day type code ({dtp}) is not consistent with day list ({v})."
+        if DayTypeEnum(dtp).name != DowListEnum(v).name:
+            err_msg = f"Day type code ({dtp}) is not consistent with dow list ({v})."
             raise ValueError(err_msg)
         return v

@@ -613,7 +613,6 @@ class FN125Filter(filters.FilterSet):
             "sex",
             "gon",
             "mat",
-            "age",
             "agest",
             "clipc",
             "fate",

@@ -130,6 +130,8 @@ mode_list = [
     ("tlen", "", None),
     ("flen", "", None),
     ("rwt", "", None),
+    ("agest", "24AMV", "24AMV"),
+    ("tissue", "18D", "18D"),
 ]
 
 

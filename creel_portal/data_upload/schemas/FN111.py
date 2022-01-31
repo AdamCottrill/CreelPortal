@@ -17,16 +17,16 @@ class WeatherEnum(IntEnum):
     definite_effect = 2
 
 
-class DowEnum(IntEnum):
-    """Day of the week as a number"""
+# class DowEnum(IntEnum):
+#     """Day of the week as a number"""
 
-    Sunday = 1
-    Monday = 2
-    Tuesday = 3
-    Wednesday = 4
-    Thursday = 5
-    Friday = 6
-    Saturday = 7
+#     Sunday = 1
+#     Monday = 2
+#     Tuesday = 3
+#     Wednesday = 4
+#     Thursday = 5
+#     Friday = 6
+#     Saturday = 7
 
 
 class FN111(FNBase):
@@ -46,8 +46,8 @@ class FN111(FNBase):
     weather: Optional[WeatherEnum]
     comment1: Optional[str]
 
-    # daycode:
-    dow: DowEnum
+    # # daycode:
+    # dow: DowEnum
 
     class Config:
         validate_assignment = True
@@ -58,16 +58,16 @@ class FN111(FNBase):
         pre=True,
     )(strip_date)
 
-    @validator("dow")
-    def dow_is_consistent_with_date(cls, v, values):
-        date = values.get("date")
-        if date:
-            dow = int(date.strftime("%w")) + 1
+    # @validator("dow")
+    # def dow_is_consistent_with_date(cls, v, values):
+    #     date = values.get("date")
+    #     if date:
+    #         dow = int(date.strftime("%w")) + 1
 
-            if dow != int(v):
-                fdate = date.strftime("%Y-%m-%d")
-                msg = (
-                    f"DOW value ({v}) is not consistent with date ({fdate}, dow={dow})"
-                )
-                raise ValueError(msg)
-        return v
+    #         if dow != int(v):
+    #             fdate = date.strftime("%Y-%m-%d")
+    #             msg = (
+    #                 f"DOW value ({v}) is not consistent with date ({fdate}, dow={dow})"
+    #             )
+    #             raise ValueError(msg)
+    #     return v

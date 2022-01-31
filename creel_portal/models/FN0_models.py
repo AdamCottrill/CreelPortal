@@ -568,7 +568,7 @@ class FN026(models.Model):
     space_siz = models.IntegerField(blank=True, null=True)
     area_cnt = models.IntegerField(blank=True, null=True)
     area_lst = models.CharField(
-        max_length=2, help_text="Area List", blank=True, null=True
+        max_length=20, help_text="Area List", blank=True, null=True
     )
     area_wt = models.FloatField(blank=True, null=True)
 
