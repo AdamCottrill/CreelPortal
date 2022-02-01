@@ -14,7 +14,7 @@ from django.urls import reverse
 import json
 
 
-from creel_portal.models import FN011, FN026, FR713, FR714
+from creel_portal.models import FN011, FN026, FR713, FR714, FN111, FN112, FN121, FN125
 from creel_portal.forms import FN026Form, DataUploadForm
 
 from .utils import (
@@ -100,6 +100,18 @@ class CreelDetailView(DetailView):
         # the api and load this data via ajax when the page loads.
         catch_totals = get_catch_totals(creel)
         context["catch_totals"] = catch_totals
+
+        interview_log_count = FN111.objects.filter(creel=creel).count()
+        context["interview_log_count"] = interview_log_count
+
+        activity_counts = FN112.objects.filter(sama__creel=creel).count()
+        context["activity_counts"] = activity_counts
+
+        interview_count = FN121.objects.filter(sama__creel=creel).count()
+        context["interview_counts"] = interview_count
+
+        biosam_count = FN125.objects.filter(catch__interview__sama__creel=creel).count()
+        context["biosam_count"] = biosam_count
 
         return context
 

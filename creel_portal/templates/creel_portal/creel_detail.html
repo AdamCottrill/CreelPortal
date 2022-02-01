@@ -33,6 +33,11 @@
          border-color: #8064A2;
      }
 
+     .map-zoom-button-row{
+         margin: auto;
+         display: block;
+     }
+
     </style>
 
 
@@ -85,8 +90,35 @@
 
                             <tr>
                                 <td>Contact Method:</td>
-                                <td>{{ object.final_run.get_contmeth_display }} ({{ object.final_run.contmeth }})</td>
+                                {% if object.final_run %}
+                                    <td>{{ object.final_run.get_contmeth_display }} ({{ object.final_run.contmeth }})</td>
+                                {% else %}
+                                    <td>{{ object.get_contmeth_display }} ({{ object.contmeth }})</td>
+                                {%  endif %}
                             </tr>
+
+
+                            <tr>
+                                <td>Interviews Logs:</td>
+                                <td>{{ interview_log_count|intcomma }}</td>
+                            </tr>
+
+                            <tr>
+                                <td>Activity Counts:</td>
+                                <td>{{ activity_counts|intcomma }}</td>
+                            </tr>
+
+                            <tr>
+                                <td>Interviews:</td>
+                                <td>{{ interview_counts|intcomma }}</td>
+                            </tr>
+
+                            <tr>
+                                <td>Biological Samples:</td>
+                                <td>{{ biosam_count|intcomma }}</td>
+                            </tr>
+
+
                             <tr>
                                 <td>Strata Combine Mask:</td>
                                 <td>{{ object.final_run.strat_comb }}</td>
@@ -107,7 +139,6 @@
                                 <td>Final Run:</td>
                                 <td>{{ object.final_run.run }}</td>
                             </tr>
-
 
                         </tbody>
                     </table>
@@ -140,6 +171,15 @@
         </div
         <div class="col-md-8" >
             <div id="map" style="width: 700px; height: 700px;"></div>
+
+            <div class="row map-zoom-button-row">
+                <div class="col-md-4 col-md-offset-3">
+                <div class="btn-group" style="padding: 10px" role="group" aria-label="toggle map state from lake extent to project extent">
+                    <button type="button" class="btn btn-default btn-sm" onclick="zoomToLake()" id="zoom-to-lake">Zoom to Lake</button>
+                    <button type="button" class="btn btn-default btn-sm" onclick="zoomToProject()" id="zoom-to-project">Zoom to Project</button>
+                </div>
+                </div>
+            </div>
         </div>
 
         <div>
@@ -267,12 +307,12 @@
                                                                 <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Edit
                                                             </a>
 
-                                            </button>
+                        </button>
                                                         {% else %}
 
-                                            <a class="btn btn-xs btn-danger" href="{{ the_url }}" role="button">
-                                                <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Add
-                                            </a>
+                        <a class="btn btn-xs btn-danger" href="{{ the_url }}" role="button">
+                            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Add
+                        </a>
 
 
                                                         {% endif %}
@@ -433,19 +473,13 @@
                             {% endif %}
 
                             <!--
-
-
                                  {% comment %}
                                  {% for fr714 in catch_estimates %}
 
                                  {% endfor %}
                                  {% endcomment %}
 
-
-
                             -->
-
-
 
                         </div>
                     </div>
@@ -464,14 +498,14 @@
     <script type="text/javascript">
 
      // add the creel locations here as a json string.
-     var spaces = {{ spaces|safe }};
+     let  spaces = {{ spaces|safe }};
 
+     const spaces_bbox = [[Math.min(...spaces.map(x=>x.dd_lat)), Math.min(...spaces.map(x=>x.dd_lon))],
+                        [Math.max(...spaces.map(x=>x.dd_lat)), Math.max(...spaces.map(x=>x.dd_lon))]]
 
      let bbox = {{ creel.lake.envelope_ontario.json|safe }};
 
-
-
-     function leafletBounds(bbox){
+         function leafletBounds(bbox){
          let pt1 = bbox.coordinates[0][0]
          let pt2 = bbox.coordinates[0][2]
          return [
@@ -486,8 +520,12 @@
          zoomSnap: 0.1
      })
 
-
-
+     const zoomToLake = () => map.flyToBounds(leafletBounds(bbox),  {padding:[25,25]});
+     const zoomToProject = () => {
+         if (typeof spaces_bbox !== 'undefined' &&  spaces_bbox !== null)   {
+             map.flyToBounds(spaces_bbox, {padding:[50,50]});
+         }
+     }
 
      function drawMap(){
 
@@ -511,7 +549,7 @@
              attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
          }).addTo(map);
 
-         map.fitBounds(leafletBounds(bbox));
+         map.fitBounds(leafletBounds(bbox),  {padding:[25,25]});
 
      }
 
