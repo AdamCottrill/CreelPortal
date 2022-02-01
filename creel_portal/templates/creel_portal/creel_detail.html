@@ -469,18 +469,24 @@
 
      let bbox = {{ creel.lake.envelope_ontario.json|safe }};
 
+
+
      function leafletBounds(bbox){
          let pt1 = bbox.coordinates[0][0]
          let pt2 = bbox.coordinates[0][2]
          return [
-             [pt1[1], pt1[0]],
-             [pt2[1], pt2[0]],
+             [pt1[0], pt1[1]],
+             [pt2[0], pt2[1]],
          ]
      }
 
+
+
      let map = new L.map('map', {
          zoomSnap: 0.1
-     }).fitBounds(leafletBounds(bbox));
+     })
+
+
 
 
      function drawMap(){
@@ -505,8 +511,9 @@
              attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
          }).addTo(map);
 
-     }
+         map.fitBounds(leafletBounds(bbox));
 
+     }
 
      //============================================================
      // catch plots

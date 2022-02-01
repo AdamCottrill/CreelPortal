@@ -13,8 +13,8 @@ class DayTypeEnum(IntEnum):
 
 
 class DayTypeNameEnum(str, Enum):
-    weekday = "Weekday"
-    weekend = "Weekend"
+    weekday = "WEEKDAY"
+    weekend = "WEEKEND"
 
 
 class DowListEnum(str, Enum):
@@ -40,21 +40,20 @@ class FN023(FNBase):
     def dtp_nm_matches_dtp(cls, v, values):
         """verify that the day type name is consistent with day type"""
         dtp = values.get("dtp")
-        if DayTypeEnum(dtp).name != DayTypeNameEnum(v).name:
-
-            err_msg = (
-                f"Day type code ({dtp}) is not consistent with day type name ({v})."
-            )
+        name = DayTypeEnum(dtp).name
+        if name != DayTypeNameEnum(v.upper()).name:
+            err_msg = f"Day type code '{dtp}' ({name.upper()}) is not consistent with day type name ({v})."
             raise ValueError(err_msg)
 
-        return v
+        return v.upper()
 
     @validator("dow_lst")
     @classmethod
     def dow_lst_matches_dtp(cls, v, values):
         """verify that the day type list is consistent with day type code"""
         dtp = values.get("dtp")
-        if DayTypeEnum(dtp).name != DowListEnum(v).name:
-            err_msg = f"Day type code ({dtp}) is not consistent with dow list ({v})."
+        name = DayTypeEnum(dtp).name
+        if name != DowListEnum(v).name:
+            err_msg = f"Day type code '{dtp}' ({name.upper()}) is not consistent with dow list ({v})."
             raise ValueError(err_msg)
         return v

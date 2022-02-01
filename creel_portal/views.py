@@ -118,7 +118,7 @@ def edit_creel_space(request, slug, space):
         form = FN026Form(request.POST, instance=space)
         if form.is_valid():
             form.save()
-            return redirect("creel_detail", slug=space.creel.slug)
+            return redirect("creel_portal:creel_detail", slug=space.creel.slug)
     else:
         form = FN026Form(instance=space)
 

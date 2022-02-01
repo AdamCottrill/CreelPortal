@@ -313,8 +313,9 @@ def process_accdb_upload(SRC_DIR: str, SRC_DB: str):
                 creel_id = tmp["creel_id"]
                 tmp["creel_id"] = fn011_map[fn011_inverse[creel_id]]
                 obj = Fnp.FN026(**tmp)
-                items.append(obj)
-            Fnp.FN026.objects.bulk_create(items)
+                obj.save()
+            #    items.append(obj)
+            # Fnp.FN026.objects.bulk_create(items)
             filters = {"creel__prj_cd__in": PRJ_CDs}
             fn026_map = get_id_cache(Fnp.FN026, filters=filters)
 

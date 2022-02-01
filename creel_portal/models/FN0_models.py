@@ -642,6 +642,8 @@ class FN026(models.Model):
 class FN028(models.Model):
     """Class to represent the fishing modes used in a creel."""
 
+    UNIT_CHOICES = ((1, "person"), (2, "party"))
+
     CHKFLAG_CHOICES = ((0, "No"), (1, "Yes"))
 
     creel = models.ForeignKey("FN011", related_name="modes", on_delete=models.CASCADE)
@@ -651,8 +653,12 @@ class FN028(models.Model):
     mode_des = models.CharField(
         help_text="Fishing Mode Description", max_length=100, blank=False
     )
-    atyunit = models.IntegerField(help_text="Activity Unit")
-    itvunit = models.IntegerField(help_text="Interview Unit")
+    atyunit = models.IntegerField(
+        help_text="Activity Unit", default=1, choices=UNIT_CHOICES
+    )
+    itvunit = models.IntegerField(
+        help_text="Interview Unit", default=1, choices=UNIT_CHOICES
+    )
     chkflag = models.IntegerField(
         help_text="Check Flag", default=0, choices=CHKFLAG_CHOICES
     )

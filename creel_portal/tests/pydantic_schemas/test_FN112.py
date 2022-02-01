@@ -164,14 +164,14 @@ error_list = [
         "10:00",
         "Activity Count end time (atytm1=08:15) occurs before start time(atytm0=10:00)",
     ),
-    (
-        "atydur",
-        "0.75",
-        (
-            "Activity duration (atydur=0.75) is not consistent with start "
-            + "and end times(08:00, 08:15, delta=0.25)."
-        ),
-    ),
+    # (
+    #     "atydur",
+    #     "0.75",
+    #     (
+    #         "Activity duration (atydur=0.75) is not consistent with start "
+    #         + "and end times(08:00, 08:15, delta=0.25)."
+    #     ),
+    # ),
 ]
 
 

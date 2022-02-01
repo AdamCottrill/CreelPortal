@@ -38,6 +38,36 @@ from common.models import Species
 class FN121(models.Model):
     """Class to represent the creel intervews."""
 
+    ANGMETH_CHOICES = [
+        (1, "Still"),
+        (2, "Jig"),
+        (3, "Drift"),
+        (4, "Troll"),
+        (5, "Down rig"),
+        (6, "Spin cast"),
+        (7, "Fly cast"),
+        (8, "Other/combination"),
+    ]
+
+    ANGVIZ_CHOICES = [
+        (1, "Permanent resident"),
+        (2, "Non-permanent resident"),
+        (3, "Day tripper"),
+        (4, "Camp-provincial park"),
+        (5, "Camp-commercial park"),
+        (6, "Camp-crown land"),
+        (7, "Other-paid"),
+        (8, "Other-non-paid"),
+    ]
+
+    ANGORIG_CHOICES = [
+        (1, "Local"),
+        (2, "Ontario"),
+        (3, "Canada"),
+        (4, "US"),
+        (5, "Other"),
+    ]
+
     # creel = models.ForeignKey(FN011, related_name='interviews')
     sama = models.ForeignKey(
         "FN111", related_name="interviews", on_delete=models.CASCADE
@@ -59,9 +89,9 @@ class FN121(models.Model):
     persons = models.IntegerField(blank=True, null=True)
     anglers = models.IntegerField(blank=True, null=True)
     rods = models.IntegerField(blank=True, null=True)
-    angmeth = models.IntegerField(blank=True, null=True)
-    angvis = models.IntegerField(blank=True, null=True)
-    angorig = models.IntegerField(blank=True, null=True)
+    angmeth = models.IntegerField(blank=True, null=True, choices=ANGMETH_CHOICES)
+    angvis = models.IntegerField(blank=True, null=True, choices=ANGVIZ_CHOICES)
+    angorig = models.IntegerField(blank=True, null=True, choices=ANGORIG_CHOICES)
     angop1 = models.CharField(max_length=25, blank=True, null=True)
     angop2 = models.CharField(max_length=25, blank=True, null=True)
     angop3 = models.CharField(max_length=25, blank=True, null=True)

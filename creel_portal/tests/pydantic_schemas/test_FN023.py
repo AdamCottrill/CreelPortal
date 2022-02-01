@@ -32,7 +32,7 @@ def data():
         "slug": "lha_sc19_002-01-1",
         "season_id": 1,
         "dtp": "2",
-        "dtp_nm": "Weekend",
+        "dtp_nm": "WEEKEND",
         "dow_lst": "17",
     }
     return data
@@ -107,12 +107,12 @@ error_list = [
     (
         "dtp_nm",
         "Weekday",
-        "Day type code (2) is not consistent with day type name (Weekday)",
+        "value is not a valid enumeration member",
     ),
     (
         "dow_lst",
         "23456",
-        "Day type code (2) is not consistent with dow list (23456)",
+        "Day type code '2' (WEEKEND) is not consistent with dow list (23456)",
     ),
 ]
 
@@ -126,6 +126,24 @@ def test_invalid_data(data, fld, value, msg):
     """
 
     data[fld] = value
+
+    with pytest.raises(ValidationError) as excinfo:
+        FN023(**data)
+
+    assert msg in str(excinfo.value)
+
+
+def test_wrong_dtp(data):
+    """
+
+    Arguments:
+    - `data`:
+    """
+
+    msg = "Day type code '1' (WEEKDAY) is not consistent with day type name (WEEKEND)"
+
+    data["dtp"] = "1"
+    data["dow_lst"] = "23456"
 
     with pytest.raises(ValidationError) as excinfo:
         FN023(**data)

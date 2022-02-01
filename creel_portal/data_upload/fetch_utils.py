@@ -94,7 +94,7 @@ def get_fn023_stmt():
     PRJ_CD,
     SSN,
     DTP,
-    DTP_NM,
+    UCASE([FN023].[DTP_NM]) as DTP_NM,
     DOW_LST
     FROM FN023;
     """
@@ -295,7 +295,6 @@ def get_fn125tags_stmt():
                 TAGDOC,
                 TAGSTAT,
                 XCWTSEQ,
-                XTAGINCKD,
                 COMMENT_TAG
          from FN125_tags"""
     return stmt
