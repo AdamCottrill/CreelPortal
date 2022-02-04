@@ -503,15 +503,17 @@
 
      let bbox = {{ creel.lake.envelope_ontario.json|safe }};
 
-         function leafletBounds(bbox){
-         let pt1 = bbox.coordinates[0][0]
-         let pt2 = bbox.coordinates[0][2]
-         return [
-             [pt1[0], pt1[1]],
-             [pt2[0], pt2[1]],
-         ]
-     }
+     function leafletBounds(bbox){
+         const pt1 = bbox.coordinates[0][0]
+         const pt2 = bbox.coordinates[0][2]
 
+         // sort ensure that lat (+ve) is always first as required by leaflet
+         // there is a bug in the gdal library that can cause inconsistencies between versions.
+         // this should help that.
+         pt1.reverse()
+         pt2.reverse()
+         return [pt1, pt2]
+     }
 
 
      let map = new L.map('map', {
