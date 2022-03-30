@@ -510,8 +510,8 @@
          // sort ensure that lat (+ve) is always first as required by leaflet
          // there is a bug in the gdal library that can cause inconsistencies between versions.
          // this should help that.
-         pt1.reverse()
-         pt2.reverse()
+         pt1.sort((a,b)=> b - a)
+         pt2.sort((a,b)=> b - a)
          return [pt1, pt2]
      }
 
