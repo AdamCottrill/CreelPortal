@@ -137,6 +137,11 @@ error_list = [
         -4,
         "ensure this value is greater than 0",
     ),
+    (
+        "tagid",
+        "lha_ia19_002-1-001-091-00-1-2",
+        "ensure this value has at most 20 characters",
+    ),
     ("tagstat", "X", "value is not a valid enumeration member;"),
     ("tagdoc", "X", "ensure this value has at least 5 characters"),
     ("tagdoc", "1234567", "ensure this value has at most 5 characters"),

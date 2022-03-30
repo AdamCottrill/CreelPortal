@@ -40,11 +40,10 @@ class FN125Tags(FNBase):
     slug: str
     fish_id: int
     fish_tag_id: int
-    tagid: str
+    tagid: constr(max_length=20)
     tagdoc: constr(regex="^([A-Z0-9]{5})$", min_length=5, max_length=5)
     tagstat: TagStatEnum = "A"
     xcwtseq: Optional[PositiveInt] = None
-    xtaginckd: Optional[bool]
     comment_tag: Optional[str]
 
     _string_to_int = validator("xcwtseq", allow_reuse=True, pre=True)(string_to_int)

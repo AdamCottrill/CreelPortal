@@ -29,12 +29,10 @@ class FN125_Tag(models.Model):
     fish_tag_id = models.IntegerField()
     # tag fields
     tagstat = models.CharField(max_length=5, db_index=True, blank=True, null=True)
-    tagid = models.CharField(max_length=9, blank=True, null=True)
+    tagid = models.CharField(max_length=20, blank=True, null=True)
     tagdoc = models.CharField(max_length=6, db_index=True, blank=True, null=True)
     xcwtseq = models.CharField(max_length=5, blank=True, null=True)
-    xtaginckd = models.CharField(max_length=6, blank=True, null=True)
     xtag_chk = models.CharField(max_length=50, blank=True, null=True)
-
     comment_tag = models.TextField(blank=True, null=True)
 
     class Meta:
