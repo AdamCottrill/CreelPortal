@@ -16,9 +16,11 @@ from .models import (
     FN123,
     FN125,
     FN127,
+    Strata,
+    FR711,
+    FR713,
+    FR714,
 )
-
-from .models.FR7_models import Strata, FR711, FR713, FR714
 
 
 from .api.serializers import UserSerializer

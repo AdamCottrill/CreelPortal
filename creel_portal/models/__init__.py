@@ -14,6 +14,9 @@ from .FN125_Lamprey import FN125_Lamprey
 from .FN125_Tag import FN125_Tag
 from .FN126 import FN126
 from .FN127 import FN127
-
-
-from .FR7_models import Strata, FR711, FR712, FR713, FR714, FR715
+from .Strata import Strata
+from .FR711 import FR711
+from .FR712 import FR712
+from .FR713 import FR713
+from .FR714 import FR714
+from .FR715 import FR715

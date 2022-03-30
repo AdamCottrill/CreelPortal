@@ -17,9 +17,11 @@ from creel_portal.models import (
     FN123,
     FN125,
     FN127,
+    Strata,
+    FR711,
+    FR713,
+    FR714,
 )
-
-from creel_portal.models.FR7_models import Strata, FR711, FR713, FR714
 
 
 # serializers for common elements
