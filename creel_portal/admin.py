@@ -1,6 +1,5 @@
 from django.contrib import admin
 
-from .models.FN1_models import FN121, FN123, FN125
 from .models import (
     FN011,
     FN022,
@@ -11,6 +10,9 @@ from .models import (
     FN028,
     FN111,
     FN112,
+    FN121,
+    FN123,
+    FN125,
 )
 
 # Register your models here.

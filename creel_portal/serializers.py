@@ -12,8 +12,12 @@ from .models import (
     FN028,
     FN111,
     FN112,
+    FN121,
+    FN123,
+    FN125,
+    FN127,
 )
-from .models.FN1_models import FN121, FN123, FN125, FN127
+
 from .models.FR7_models import Strata, FR711, FR713, FR714
 
 

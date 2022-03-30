@@ -13,8 +13,12 @@ from creel_portal.models import (
     FN028,
     FN111,
     FN112,
+    FN121,
+    FN123,
+    FN125,
+    FN127,
 )
-from creel_portal.models.FN1_models import FN121, FN123, FN125, FN127
+
 from creel_portal.models.FR7_models import Strata, FR711, FR713, FR714
 
 
