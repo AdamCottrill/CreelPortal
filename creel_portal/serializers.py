@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from common.models import Lake, Species
 
-from .models.FN0_models import (
+from .models import (
     FN011,
     FN022,
     FN023,

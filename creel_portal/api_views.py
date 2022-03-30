@@ -3,7 +3,7 @@ from rest_framework import viewsets, generics
 
 from common.models import Lake, Species
 
-from creel_portal.models.FN0_models import (
+from creel_portal.models import (
     FN011,
     FN022,
     FN023,

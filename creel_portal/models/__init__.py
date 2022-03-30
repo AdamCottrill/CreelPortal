@@ -1,3 +1,14 @@
+from .FN011 import FN011
+from .FN022 import FN022
+from .FN023 import FN023
+from .FN024 import FN024
+from .FN025 import FN025
+from .FN026 import FN026
+from .FN028 import FN028
+from .FN111 import FN111
+from .FN112 import FN112
+
+
 from .FN1_models import (
     FN121,
     FN123,
@@ -8,5 +19,5 @@ from .FN1_models import (
     FN127,
 )
 
-from .FN0_models import FN011, FN022, FN023, FN024, FN025, FN026, FN028, FN111, FN112
+
 from .FR7_models import Strata, FR711, FR712, FR713, FR714, FR715

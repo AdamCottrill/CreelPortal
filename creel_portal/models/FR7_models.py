@@ -22,7 +22,13 @@ from django.db import models
 
 from common.models import Species
 
-from .FN0_models import FN011, FN022, FN023, FN024, FN026, FN028
+from .FN011 import FN011
+from .FN022 import FN022
+from .FN023 import FN023
+from .FN024 import FN024
+from .FN026 import FN026
+from .FN028 import FN028
+
 
 from .choices import CONTMETH_CHOICES, REC_TP_CHOICES, ANG_FN_CHOICES
 

@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .models.FN1_models import FN121, FN123, FN125
-from .models.FN0_models import (
+from .models import (
     FN011,
     FN022,
     FN023,
