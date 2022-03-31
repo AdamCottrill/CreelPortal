@@ -15,6 +15,7 @@ from .FN111_serializers import FN111Serializer, FN111ListSerializer
 from .FN112_serializers import FN112Serializer, FN112ListSerializer
 from .FN121_serializers import FN121Serializer, FN121ListSerializer
 from .FN123_serializers import FN123Serializer, FN123ListSerializer
+from .FN124_serializers import FN124ListSerializer
 from .FN125_serializers import FN125Serializer, FN125ListSerializer
 from .FN125Lamprey_serializers import FN125LampreyListSerializer
 from .FN125Tag_serializers import FN125TagListSerializer

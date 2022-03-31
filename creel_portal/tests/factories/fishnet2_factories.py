@@ -27,6 +27,7 @@ from datetime import datetime
 from creel_portal.models import (
     FN121,
     FN123,
+    FN124,
     FN125,
     FN125_Tag,
     FN125_Lamprey,
@@ -71,6 +72,21 @@ class FN123Factory(factory.DjangoModelFactory):
     sek = True
     hvscnt = 3
     rlscnt = 1
+
+
+class FN124Factory(factory.django.DjangoModelFactory):
+    """A factory for FN124 objects.  Only fields that are required or have
+    been tested are currently inlcuded in this factory.
+
+    """
+
+    class Meta:
+        model = FN124
+        django_get_or_create = ("catch", "siz")
+
+    catch = factory.SubFactory(FN123Factory)
+    siz = 350
+    sizcnt = 12
 
 
 class FN125Factory(factory.DjangoModelFactory):

@@ -9,6 +9,7 @@ from .FN111 import FN111
 from .FN112 import FN112
 from .FN121 import FN121
 from .FN123 import FN123
+from .FN124 import FN124
 from .FN125 import FN125
 from .FN125Tags import FN125Tags
 from .FN125Lamprey import FN125Lamprey

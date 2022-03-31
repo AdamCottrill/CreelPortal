@@ -252,6 +252,20 @@ def get_fn123_stmt():
     return stmt
 
 
+def get_fn124_stmt():
+
+    stmt = """select
+                PRJ_CD,
+                SAM,
+                EFF,
+                SPC,
+                GRP,
+                SIZ,
+                SIZCNT
+         from FN124"""
+    return stmt
+
+
 def get_fn125_stmt():
 
     stmt = """SELECT
